@@ -178,6 +178,11 @@ function Dashboard() {
     setMobileOpen(!mobileOpen);
   };
 
+  const [tabsValue, setTabsValue] = useState(0);
+  const handleTabsChange = (event, newValue) => {
+    setTabsValue(newValue);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'white' }}>

@@ -36,7 +36,8 @@ export default function Content() {
         backgroundColor: 'background.paper',
         borderRadius: 1,          
         boxShadow: 1,
-        height: '100%'
+        height: '70vh',
+        overflow: 'hidden'
       }}>
         <Box sx={{
           display: 'flex',
@@ -54,7 +55,7 @@ export default function Content() {
           <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '40%', flexGrow: 0, flexShrink: 0 }}>
             <DrawingTree />
           </Paper>
-          <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', overflow: 'hidden', flexBasis: '60%', flexGrow: 0, flexShrink: 0 }}>
+          <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '60%', flexGrow: 0, flexShrink: 0 }}>
             <DrawingsAllTree />
           </Paper>
         </Box>
@@ -63,35 +64,37 @@ export default function Content() {
           flexDirection: 'column',
           alignItems: 'flex-start',     
           gap: 2,                   
-          padding: 0,               
+          padding: 0,
+          paddingBottom: 0,
+          paddingRight: 0,
           backgroundColor: 'background.paper',
           borderRadius: 1,          
           boxShadow: 0,
           width: '100%',
-          height: '100%'
+          height: '100%',
+          /*backgroundColor: 'red',*/
+          /*overflow: 'hidden'*/
         }}>
-          <Paper elevation={3} sx={{ width: '100%', height: '100%', margin: 0, position: 'relative' }}>
-          <Box sx={{
-              borderTopLeftRadius: '8px',
-              borderTopRightRadius: '8px',
-              overflow: 'hidden',
-    
-            }}>
-            <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0 }}>
-              <Tabs value={tabsValue} onChange={handleTabsChange} textColor="inherit">
-                <Tab label="Параметры" />
-                <Tab label="Описание операции" />
-                <Tab label="Мерительный инструмент" />
-                <Tab label="Оснастка" />
-                <Tab label="Материалы" />
-              </Tabs>
-            </AppBar>
-          </Box>
+          <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
+            <Box sx={{
+                /*borderTopLeftRadius: '8px',
+                borderTopRightRadius: '8px',*/
+                overflow: 'hidden'
+              }}>
+              <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0 }}>
+                <Tabs value={tabsValue} onChange={handleTabsChange} textColor="inherit">
+                  <Tab label="Параметры" />
+                  <Tab label="Описание операции" />
+                  <Tab label="Мерительный инструмент" />
+                  <Tab label="Оснастка" />
+                  <Tab label="Материалы" />
+                </Tabs>
+              </AppBar>
+            </Box>
             <Box sx={{           
-              maxHeight: '350px',
+              height: '91%',
               overflowY: 'auto',
-              paddingTop: 2,
-              paddingLeft: 2
+              padding: 2,          
             }}>
               {tabsValue === 0 && 
                 <Grid container spacing={2}>
@@ -316,26 +319,21 @@ export default function Content() {
                         >
                         </TextField>
                       </Grid>
-                    </Grid>                    
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={2.4}>
-                        <Button variant='contained' color='primary' size='medium'>
-                          Сохранить изменения
-                        </Button>
-                      </Grid>
-                    </Grid>                    
-                  </Grid>
+                    </Grid>
+                  </Grid>                  
                 </Grid>
-              }      
-            </Box>        
-          </Paper>                 
-          <ButtonGroup variant="contained" aria-label="Loading button group">
-            <LoadingButton>Сохранить</LoadingButton>
-            <Button>Печать</Button>
-            <LoadingButton>Экспорт в XLSX</LoadingButton>
-          </ButtonGroup>                 
+              }
+            </Box>
+          </Paper>    
+          <Box>
+            <ButtonGroup variant="contained" aria-label="Loading button group">
+              <LoadingButton>Сохранить</LoadingButton>
+              <Button>Предварительный просмотр</Button>
+              <Button>Печать</Button>
+              <LoadingButton>Экспорт в CSV</LoadingButton>
+              <LoadingButton>Экспорт в XLSX</LoadingButton>
+            </ButtonGroup>
+          </Box>             
         </Box>
       </Box>
     </>

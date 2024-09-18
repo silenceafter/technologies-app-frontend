@@ -59,18 +59,7 @@ export default function DrawingsAllTree() {
                 </Typography>
             </Toolbar>
         </AppBar>
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',     
-          gap: 2,                   
-          padding: 0,               
-          backgroundColor: 'background.paper',
-          borderRadius: 1,          
-          boxShadow: 0,
-          
-          overflow: 'hidden'
-        }}>
+        <Box>
             <RichTreeView items={MUI_X_PRODUCTS} />
         </Box>             
     </>
