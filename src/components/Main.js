@@ -165,7 +165,7 @@ let theme = createTheme({
   };
 const drawerWidth = 256;
 
-function Dashboard() {
+function Main() {
   const [treeData, setTreeData] = useState([
     { title: 'БЦКИ1234', children: [{ title: 'Технология1' }, { title: 'Технология2' }] },
     { title: 'БЦКИ1235', children: [{ title: 'Операция1' }, { title: 'Операция2' }] },
@@ -201,4 +201,4 @@ function Dashboard() {
   );
 }
 
-export { Dashboard };
+export { Main };

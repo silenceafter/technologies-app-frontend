@@ -14,35 +14,7 @@ import Box from '@mui/material/Box';
 import { Tabs, Tab } from '@mui/material';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 
-const MUI_X_PRODUCTS = [
-    {
-      id: 'grid',
-      label: 'Data Grid',
-      children: [
-        { id: 'grid-community', label: '@mui/x-data-grid' },
-        { id: 'grid-pro', label: '@mui/x-data-grid-pro' },
-        { id: 'grid-premium', label: '@mui/x-data-grid-premium' },
-      ],
-    },
-    {
-      id: 'pickers',
-      label: 'Date and Time Pickers',
-      children: [
-        { id: 'pickers-community', label: '@mui/x-date-pickers' },
-        { id: 'pickers-pro', label: '@mui/x-date-pickers-pro' },
-      ],
-    },
-    {
-      id: 'charts',
-      label: 'Charts',
-      children: [{ id: 'charts-community', label: '@mui/x-charts' }],
-    },
-    {
-      id: 'tree-view',
-      label: 'Tree View',
-      children: [{ id: 'tree-view-community', label: '@mui/x-tree-view' }],
-    },
-  ];
+const MUI_X_PRODUCTS = [];
 
 export default function DrawingTree() {
   return (
@@ -55,12 +27,19 @@ export default function DrawingTree() {
         >
             <Toolbar>
                 <Typography color="inherit">
-                    Чертеж ЖШТИ063831.002-00
+                    Чертеж
                 </Typography>
             </Toolbar>
         </AppBar>
         <Box>
+          {MUI_X_PRODUCTS.length > 0 ? (
             <RichTreeView items={MUI_X_PRODUCTS} />
+          ) : (
+            <Typography sx={{ padding: 2 }}>
+              Выберите чертеж из списка
+            </Typography>
+          )}
+            
         </Box>             
     </>
   );
