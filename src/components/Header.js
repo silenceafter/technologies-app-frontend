@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
@@ -14,38 +14,50 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
 import { useTheme } from '@mui/material/styles';
-import { Autocomplete, Toolbar } from '@mui/material';
+import { Autocomplete, Box, CircularProgress, Input, ListItem, ListItemText, Toolbar } from '@mui/material';
 import { fetchDataGet } from '../store/thunk/thunks';
 import { useSelector, useDispatch } from 'react-redux';
+import { fetchData, setSearch, setLimit, setMax, selectSearch, selectLimit, selectMax } from '../store/slices/headerSlice';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
 function Header(props) {
   const { onDrawerToggle } = props;
   const theme = useTheme();
-
-  const [value, setValue] = useState(null);
-  const [inputValue, setInputValue] = useState('');
   const dispatch = useDispatch();
 
-  // Запросы
+  const [value, setValue] = useState(null);
+  const { key, ...restProps } = props;
+  
+
+  //запросы
   const userDataRequest = useSelector((state) => state.getRequest.userDataRequest);
+  const search = useSelector(selectSearch);
+  const limit = useSelector(selectLimit);
+  const max = useSelector(selectMax);
+
+  //запросы для прокрутки списка
+  const { items, loading, error } = useSelector((state) => state.header);
+  const listboxRef = useRef(null);
+
+  const shouldFetchData = search !== undefined && limit !== undefined && max !== undefined;
 
   useEffect(() => {
-    const params = {
-      search: '',
-      params: {
-        limits: 100,
-        max: 0,
-      },
-      name: 'GetDrawings',
-    };
-    dispatch(fetchDataGet(params, 'http://localhost/ivc/ogt/executescripts/getdrawings.v0.php', 'userDataRequest'));
-  }, [dispatch]);
+    if (shouldFetchData) {
+      dispatch(fetchData({ search, limit, max }));
+    }      
+  }, [dispatch, search, limit, max, shouldFetchData]);
+
+  const handleScroll = (event) => {
+    const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
+    if (scrollHeight - scrollTop === clientHeight) {
+      //dispatch(setPage(page + 1));
+      console.log('handleScroll');
+    }
+  };
 
   return (
     <React.Fragment>
-      {userDataRequest?.data ? console.log(userDataRequest.data) : console.log('no')}
       <AppBar color="primary" position="sticky" elevation={0}>
         <Toolbar>
           <Grid container spacing={1} sx={{ alignItems: 'center' }}>
@@ -75,7 +87,6 @@ function Header(props) {
           </Grid>
         </Toolbar>
       </AppBar>
-
       <AppBar component="div" color="primary" position="static" elevation={0} sx={{ zIndex: 0 }}>
         <Toolbar>
           <Grid container spacing={1} sx={{ alignItems: 'center' }}>
@@ -99,7 +110,6 @@ function Header(props) {
           </Grid>
         </Toolbar>
       </AppBar>
-
       <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0, paddingBottom: '0.5rem' }}>
         <Toolbar>
           <Grid container spacing={2} sx={{ alignItems: 'center' }}>
@@ -108,13 +118,37 @@ function Header(props) {
             </Grid>
             <Grid item xs>
               <Autocomplete
-                options={userDataRequest?.data || []} // Используем .data, чтобы получить массив
-                getOptionLabel={(option) => option.ex_code || option.label} // Убедитесь, что поле существует
-                value={value}
+                options={items?.html || []}
+                getOptionLabel={(option) => option.ex_code || option.label}
+                filterOptions={(options, state) => {
+                  const { inputValue } = state;
+                  return options.filter(option =>
+                    option.ex_code.toLowerCase().includes(inputValue.toLowerCase()) ||
+                    option.name.toLowerCase().includes(inputValue.toLowerCase())
+                  );
+                }}
                 onChange={(event, newValue) => {
                   setValue(newValue);
                   console.log('Выбранное значение:', newValue); // Здесь вы можете выполнять действия с выбранным значением
                 }}
+                noOptionsText="нет результатов"
+                ListboxProps={{
+                  onScroll: handleScroll,
+                  sx: {
+                    maxHeight: '80vh',
+                    overflowY: 'auto'
+                  }
+                }}
+                renderOption={(props, option) => (
+                  <ListItem {...props} style={{ padding: '8px 16px' }}>
+                    <ListItemText
+                      primary={option.ex_code}
+                      secondary={option.name}
+                      primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
+                      secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
+                    />
+                  </ListItem>
+                )}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -122,17 +156,19 @@ function Header(props) {
                     variant="outlined"
                     sx={{ backgroundColor: '#fff', borderRadius: 1, width: '30%' }}
                     size='small'
+                    
                   />
                 )}
                 sx={{
                   '& .MuiAutocomplete-listbox': {
                     backgroundColor: '#fff',
-                    boxShadow: 2,
+                    boxShadow: 2
                   },
                   '& .MuiAutocomplete-option': {
-                    padding: '8px 16px',
+                    padding: '8px 16px'
                   },
                 }}
+                value={value}
               />
             </Grid>        
           </Grid>

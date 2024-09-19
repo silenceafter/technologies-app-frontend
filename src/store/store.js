@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import getRequestReducer from './reducers/getRequestReducer';
+import headerReducer from './slices/headerSlice';
 /*import postRequestReducer from './reducers/postRequestReducer';
 import routerReducer from './reducers/routerReducer';
 import sidebarReducer from './slices/sidebarSlice';*/
@@ -10,6 +11,7 @@ import { thunk } from 'redux-thunk'; // Middleware для асинхронных
 //корневой редьюсер
 const rootReducer = combineReducers({
   getRequest: getRequestReducer,
+  header: headerReducer,
   /*postRequest: postRequestReducer,
   social: sidebarReducer,
   router: routerReducer,*/
