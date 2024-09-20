@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
@@ -17,7 +17,8 @@ import { useTheme } from '@mui/material/styles';
 import { Autocomplete, Box, CircularProgress, Input, ListItem, ListItemText, Toolbar } from '@mui/material';
 import { fetchDataGet } from '../store/thunk/thunks';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setLimit, setMax, selectSearch, selectLimit, selectMax } from '../store/slices/headerSlice';
+import { fetchData, setSearch, setLimit, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/headerSlice';
+import { debounce } from 'lodash';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -28,31 +29,69 @@ function Header(props) {
 
   const [value, setValue] = useState(null);
   const { key, ...restProps } = props;
-  
 
+  //TextField
+  const [inputValue, setInputValue] = useState('');
+  
   //запросы
   const userDataRequest = useSelector((state) => state.getRequest.userDataRequest);
   const search = useSelector(selectSearch);
   const limit = useSelector(selectLimit);
-  const max = useSelector(selectMax);
+  const page = useSelector(selectPage);
 
   //запросы для прокрутки списка
-  const { items, loading, error } = useSelector((state) => state.header);
-  const listboxRef = useRef(null);
+  const { items, loading, error, hasMore } = useSelector((state) => state.header);
+  const listRef = useRef(null);
 
-  const shouldFetchData = search !== undefined && limit !== undefined && max !== undefined;
+  const shouldFetchData = search !== undefined && limit !== undefined && page !== undefined;
+
+  /*const debouncedFetchData = useMemo(() => debounce((searchTerm) => {
+    dispatch(fetchData({ searchTerm, limit, page }));
+  }, 3000), [dispatch]);*/
+
+  /*useEffect(() => {
+    if (search) {
+      debouncedFetchData(search);
+    }
+  }, [search, debouncedFetchData]);*/
+
+  /*useEffect(() => {
+    return () => {
+      debouncedFetchData.cancel();
+    };
+  }, [debouncedFetchData]);*/
+
+  // Эффект для начальной загрузки данных и изменения страницы
+  /*useEffect(() => {
+    if (typeof search != 'undefined' && hasMore && !loading) {
+      dispatch(fetchData({ search, limit, page }));
+    }      
+  }, [dispatch, search, limit, page, hasMore, loading]);*/
+  
+  useEffect(() => {
+    if (search && !loading) {
+      dispatch(fetchData({ search, limit, page: 1 }));
+    }
+  }, [dispatch, search, limit, loading]);
+  
+  /*useEffect(() => {
+    if (shouldFetchData && hasMore && !loading) {
+      dispatch(fetchData({ search, limit, page }));
+    }      
+  }, [dispatch, search, limit, page, shouldFetchData, hasMore]);*/
 
   useEffect(() => {
-    if (shouldFetchData) {
-      dispatch(fetchData({ search, limit, max }));
-    }      
-  }, [dispatch, search, limit, max, shouldFetchData]);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);//чистим обработчик при размонтировании
+  }, [loading, hasMore]);
 
   const handleScroll = (event) => {
-    const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-    if (scrollHeight - scrollTop === clientHeight) {
-      //dispatch(setPage(page + 1));
-      console.log('handleScroll');
+    if (listRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = event.target;
+      if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
+        dispatch(setPage(page + 1));
+        dispatch(fetchData({ search, limit, page }));
+      }
     }
   };
 
@@ -118,7 +157,7 @@ function Header(props) {
             </Grid>
             <Grid item xs>
               <Autocomplete
-                options={items?.html || []}
+                options={items || []}
                 getOptionLabel={(option) => option.ex_code || option.label}
                 filterOptions={(options, state) => {
                   const { inputValue } = state;
@@ -127,20 +166,41 @@ function Header(props) {
                     option.name.toLowerCase().includes(inputValue.toLowerCase())
                   );
                 }}
+                onInputChange={(event, newInputValue) => {
+                  setInputValue(newInputValue);
+                  dispatch(setSearch(newInputValue));
+                }}
                 onChange={(event, newValue) => {
                   setValue(newValue);
-                  console.log('Выбранное значение:', newValue); // Здесь вы можете выполнять действия с выбранным значением
                 }}
+                inputValue={inputValue}
+                loadingText="поиск данных"
                 noOptionsText="нет результатов"
-                ListboxProps={{
+                loading={loading}
+                ListboxProps={{                  
                   onScroll: handleScroll,
+                  ref: listRef,
                   sx: {
                     maxHeight: '80vh',
                     overflowY: 'auto'
                   }
                 }}
+                renderGroup={(params) => (
+                  <div key={params.key}>
+                    {params.children}
+                    {loading && (
+                      <Box sx={{ 
+                        display: 'flex',
+                        justifyContent: 'center',
+                        padding: '10px'}}
+                      >
+                        <CircularProgress size={24} />
+                      </Box>
+                    )}
+                  </div>
+                )}
                 renderOption={(props, option) => (
-                  <ListItem {...props} style={{ padding: '8px 16px' }}>
+                  <ListItem {...props} key={`${option.ex_code}-${option.in_code}-${option.name}`} style={{ padding: '8px 16px' }}>
                     <ListItemText
                       primary={option.ex_code}
                       secondary={option.name}

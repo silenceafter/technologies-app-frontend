@@ -4,16 +4,17 @@ const initialState = {
   items: [],
   loading: false,
   error: null,
+  hasMore: true,
   search: '',
   limit: 100,
-  max: 0,
+  page: 1,
 };
 
 export const fetchData = createAsyncThunk(
   'header/fetchData',
-  async ({ search, limit, max }, { rejectWithValue }) => {
+  async ({ search, limit, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getdrawings.v0.php?search=${search}&&limit=${limit}&max=${max}`);
+      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getdrawings.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -31,12 +32,14 @@ const headerSlice = createSlice({
   reducers: {
     setSearch: (state, action) => {
       state.search = action.payload;
+      state.page = 1;
+      state.items = [];
     },
     setLimit: (state, action) => {
       state.limit = action.payload;      
     },
-    setMax: (state, action) => {
-       state.max = action.payload;
+    setPage: (state, action) => {
+       state.page = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -47,10 +50,21 @@ const headerSlice = createSlice({
       })
       .addCase(fetchData.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        const newItems = action.payload.data.filter(newItem => 
+          !state.items.some(existingItem => {
+            return `${existingItem.ex_code}-${existingItem.in_code}-${existingItem.name}` === 
+                `${newItem.ex_code}-${newItem.in_code}-${newItem.name}`;
+            })
+        );
+        //
+        state.items = [...state.items, ...newItems];//добавляем только новые данные к существующему списку        
+        if (newItems.length < state.limit) {
+          state.hasMore = false;//если меньше лимита, прекращаем подгрузку
+        }
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
+        state.hasMore = false;
         state.error = action.payload;
       });
   },
@@ -59,7 +73,7 @@ const headerSlice = createSlice({
 //селекторы
 export const selectSearch = (state) => state.header.search;
 export const selectLimit = (state) => state.header.limit;
-export const selectMax = (state) => state.header.max;
+export const selectPage = (state) => state.header.page;
 
-export const { setSearch, setLimit, setMax } = headerSlice.actions;
+export const { setSearch, setLimit, setPage } = headerSlice.actions;
 export default headerSlice.reducer;
