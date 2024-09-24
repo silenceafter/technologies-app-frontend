@@ -11,10 +11,10 @@ const initialState = {
 };
 
 export const fetchData = createAsyncThunk(
-  'header/fetchData',
+  'operations/fetchData',
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getdrawings.v0.php?search=${search}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getoperations.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -26,8 +26,8 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-const headerSlice = createSlice({
-  name: 'header',
+const operationsSlice = createSlice({
+  name: 'operations',
   initialState,
   reducers: {
     setSearch: (state, action) => {
@@ -53,12 +53,12 @@ const headerSlice = createSlice({
         state.loading = false;
         const newItems = action.payload.data.filter(newItem => 
           !state.items.some(existingItem => {
-            return `${existingItem.ex_code}-${existingItem.in_code}-${existingItem.name}` === 
-                `${newItem.ex_code}-${newItem.in_code}-${newItem.name}`;
+            return `${existingItem.code}-${existingItem.name}` === 
+                `${newItem.code}-${newItem.name}`;
             })
         );
         //
-        state.items = [...state.items, ...newItems];//добавляем только новые данные к существующему списку        
+        state.items = [...state.items, ...newItems];//добавляем только новые данные к существующему списку
         if (newItems.length < state.limit) {
           state.hasMore = false;//если меньше лимита, прекращаем подгрузку
         }
@@ -72,9 +72,9 @@ const headerSlice = createSlice({
 });
 
 //селекторы
-export const selectSearch = (state) => state.header.search;
-export const selectLimit = (state) => state.header.limit;
-export const selectPage = (state) => state.header.page;
+export const selectSearch = (state) => state.operations.search;
+export const selectLimit = (state) => state.operations.limit;
+export const selectPage = (state) => state.operations.page;
 
-export const { setSearch, setLimit, setPage } = headerSlice.actions;
-export default headerSlice.reducer;
+export const { setSearch, setLimit, setPage } = operationsSlice.actions;
+export default operationsSlice.reducer;

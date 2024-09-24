@@ -17,6 +17,8 @@ import DrawingTree from './DrawingTree';
 import DrawingsAllTree from './DrawingsAllTree';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import { OperationsSearch } from './OperationsSearch';
+import { ProfessionsSearch } from './ProfessionsSearch';
 
 export default function Content() {
   const [tabsValue, setTabsValue] = useState(0);
@@ -116,16 +118,8 @@ export default function Content() {
                   {/* Вторая строка */}
                   <Grid item xs={12}>
                     <Grid container spacing={2}>
-                      <Grid item xs={4.8}>                      
-                        <TextField
-                            required
-                            fullWidth
-                            id="operation-number-2"
-                            label="Код операции"
-                            type="search"    
-                            size="small"                        
-                          >
-                          </TextField>   
+                      <Grid item xs={4.8}>
+                        <OperationsSearch />                    
                       </Grid>
                     </Grid>                  
                   </Grid>
@@ -172,14 +166,15 @@ export default function Content() {
                   <Grid item xs={12}>
                     <Grid container spacing={2}>
                       <Grid item xs={4.8}>
-                        <TextField
+                        {/*<TextField
                           required
                           fullWidth
                           id="operation-number-6"
                           label="Код профессии"
                           size="small"
                         >
-                        </TextField>
+                        </TextField>*/}
+                        <ProfessionsSearch />
                       </Grid>
                     </Grid>
                   </Grid>
