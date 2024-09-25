@@ -19,6 +19,10 @@ import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { OperationsSearch } from './OperationsSearch';
 import { ProfessionsSearch } from './ProfessionsSearch';
+import { MeasuringToolsSearch } from './MeasuringToolsSearch';
+import { RigSearch } from './RigSearch';
+import { ComponentsSearch } from './ComponentsSearch';
+import { MaterialsSearch } from './MaterialsSearch';
 
 export default function Content() {
   const [tabsValue, setTabsValue] = useState(0);
@@ -89,6 +93,7 @@ export default function Content() {
                   <Tab label="Описание операции" />
                   <Tab label="Мерительный инструмент" />
                   <Tab label="Оснастка" />
+                  <Tab label="Комплектующие" />
                   <Tab label="Материалы" />
                 </Tabs>
               </AppBar>
@@ -166,14 +171,6 @@ export default function Content() {
                   <Grid item xs={12}>
                     <Grid container spacing={2}>
                       <Grid item xs={4.8}>
-                        {/*<TextField
-                          required
-                          fullWidth
-                          id="operation-number-6"
-                          label="Код профессии"
-                          size="small"
-                        >
-                        </TextField>*/}
                         <ProfessionsSearch />
                       </Grid>
                     </Grid>
@@ -247,7 +244,7 @@ export default function Content() {
                   <Grid item xs={12}>
                     <Grid container spacing={2}>
                       <Grid item xs={4.8}>
-                        <TextField
+                        <TextField                          
                           multiline
                           fullWidth
                           rows={8}
@@ -267,14 +264,7 @@ export default function Content() {
                   <Grid item xs={12}>
                     <Grid container spacing={2}>
                       <Grid item xs={4.8}>
-                        <TextField
-                          required
-                          fullWidth
-                          id="operation-number-12"
-                          label="Мерительный инструмент"
-                          size="small"
-                        >
-                        </TextField>
+                        <MeasuringToolsSearch />
                       </Grid>
                     </Grid>                    
                   </Grid>             
@@ -286,14 +276,7 @@ export default function Content() {
                   <Grid item xs={12}>
                     <Grid container spacing={2}>
                       <Grid item xs={4.8}>
-                        <TextField
-                          required
-                          fullWidth
-                          id="operation-number-13"
-                          label="Оснастка"
-                          size="small"
-                        >
-                        </TextField>
+                        <RigSearch />
                       </Grid>
                     </Grid>                    
                   </Grid>             
@@ -305,14 +288,19 @@ export default function Content() {
                   <Grid item xs={12}>
                     <Grid container spacing={2}>
                       <Grid item xs={4.8}>
-                        <TextField
-                          required
-                          fullWidth
-                          id="operation-number-14"
-                          label="Материалы"
-                          size="small"
-                        >
-                        </TextField>
+                        <ComponentsSearch />
+                      </Grid>
+                    </Grid>
+                  </Grid>                  
+                </Grid>
+              }
+              {tabsValue === 5 &&
+                <Grid container spacing={2}>
+                {/* Первая строка */}
+                  <Grid item xs={12}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={4.8}>
+                        <MaterialsSearch />
                       </Grid>
                     </Grid>
                   </Grid>                  

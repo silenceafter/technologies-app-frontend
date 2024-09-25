@@ -1,22 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
 import { 
-    AppBar,
     Autocomplete, 
     Box, 
     CircularProgress, 
-    Grid,
-    Link,
     ListItem, 
     ListItemText,
-    TextField,
-    Toolbar
+    TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/professionsSlice';
+import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/rigSlice';
 import { debounce } from 'lodash';
 
-function ProfessionsSearch() {
+function RigSearch() {
   const dispatch = useDispatch();
 
   const [value, setValue] = useState(null);
@@ -30,7 +25,7 @@ function ProfessionsSearch() {
   const page = useSelector(selectPage);
 
   //запросы для прокрутки списка
-  const { items, loading, error, hasMore } = useSelector((state) => state.professions);
+  const { items, loading, error, hasMore } = useSelector((state) => state.rig);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
@@ -92,7 +87,7 @@ function ProfessionsSearch() {
               onScroll: handleScroll,
               ref: listRef,
               sx: {
-              maxHeight: '25vh',
+              maxHeight: '48vh',
               overflowY: 'auto'
               }
           }}
@@ -125,8 +120,8 @@ function ProfessionsSearch() {
               {...params}
               required
               fullWidth
-              id="operation-number-2"
-              placeholder="Код профессии"
+              id="operation-number-13"
+              placeholder="Оснастка"
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}
               size='small'           
@@ -147,4 +142,4 @@ function ProfessionsSearch() {
   );
 }
 
-export { ProfessionsSearch };
+export { RigSearch };

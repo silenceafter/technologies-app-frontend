@@ -92,7 +92,7 @@ function OperationsSearch() {
               onScroll: handleScroll,
               ref: listRef,
               sx: {
-              maxHeight: '40vh',
+              maxHeight: '42.5vh',
               overflowY: 'auto'
               }
           }}
