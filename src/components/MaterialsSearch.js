@@ -120,7 +120,7 @@ function MaterialsSearch() {
               {...params}
               required
               fullWidth
-              id="operation-number-15"
+              id="materials-16"
               placeholder="Материалы"
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}

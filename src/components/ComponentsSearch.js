@@ -120,7 +120,7 @@ function ComponentsSearch() {
               {...params}
               required
               fullWidth
-              id="operation-number-14"
+              id="components-15"
               placeholder="Комплектующие"
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}

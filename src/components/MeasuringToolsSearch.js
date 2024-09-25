@@ -120,7 +120,7 @@ function MeasuringToolsSearch() {
               {...params}
               required
               fullWidth
-              id="operation-number-12"
+              id="measuring-tools-13"
               placeholder="Мерительный инструмент"
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}

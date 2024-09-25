@@ -125,7 +125,7 @@ function ProfessionsSearch() {
               {...params}
               required
               fullWidth
-              id="operation-number-2"
+              id="profession-code-6"
               placeholder="Код профессии"
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}

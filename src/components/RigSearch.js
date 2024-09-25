@@ -120,7 +120,7 @@ function RigSearch() {
               {...params}
               required
               fullWidth
-              id="operation-number-13"
+              id="rig-14"
               placeholder="Оснастка"
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}

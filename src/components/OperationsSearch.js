@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/operationsSlice';
 import { debounce } from 'lodash';
 
-function OperationsSearch() {
+function OperationsSearch({props}) {
   const dispatch = useDispatch();
 
   const [value, setValue] = useState(null);
@@ -125,8 +125,10 @@ function OperationsSearch() {
               {...params}
               required
               fullWidth
-              id="operation-number-2"
-              placeholder="Код операции"
+              id={props.id}
+              error={props.error}
+              helperText={props.helpText}
+              placeholder={props.placeholder}
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}
               size='small'           
