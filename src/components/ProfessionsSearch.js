@@ -70,13 +70,13 @@ function ProfessionsSearch() {
     <>
         <Autocomplete
           options={items || []}
-          getOptionLabel={(option) => option.code || option.label}
+          getOptionLabel={(option) => `${option.code} ${option.name}`}
           filterOptions={(options, state) => {
-              const { inputValue } = state;
-              return options.filter(option =>
-              option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
-              option.name.toLowerCase().includes(inputValue.toLowerCase())
-              );
+            const { inputValue } = state;
+            return options.filter(option =>
+            option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+            option.name.toLowerCase().includes(inputValue.toLowerCase())
+            );
           }}
           onInputChange={(event, newInputValue) => {
               setInputValue(newInputValue);
@@ -142,7 +142,7 @@ function ProfessionsSearch() {
               },
           }}
           value={value}
-            />
+        />
     </>
   );
 }

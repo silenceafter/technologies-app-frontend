@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { 
     Autocomplete, 
-    Box, 
+    Box,
+    Chip,
     CircularProgress, 
     ListItem, 
     ListItemText,
@@ -14,7 +15,7 @@ import { debounce } from 'lodash';
 function MeasuringToolsSearch() {
   const dispatch = useDispatch();
 
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState([]);
 
   //TextField
   const [inputValue, setInputValue] = useState('');
@@ -63,81 +64,88 @@ function MeasuringToolsSearch() {
   };
   return (
     <>
-        <Autocomplete
-          options={items || []}
-          getOptionLabel={(option) => option.code || option.label}
-          filterOptions={(options, state) => {
-              const { inputValue } = state;
-              return options.filter(option =>
-              option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
-              option.name.toLowerCase().includes(inputValue.toLowerCase())
-              );
-          }}
-          onInputChange={(event, newInputValue) => {
-              setInputValue(newInputValue);
-          }}
-          onChange={(event, newValue) => {
-              setValue(newValue);
-          }}
-          inputValue={inputValue}
-          loadingText="поиск данных"
-          noOptionsText="нет результатов"
-          loading={loading}
-          ListboxProps={{                  
-              onScroll: handleScroll,
-              ref: listRef,
-              sx: {
-              maxHeight: '48vh',
-              overflowY: 'auto'
-              }
-          }}
-          renderGroup={(params) => (
-              <div key={params.key}>
-              {params.children}
-              {loading && (
-                  <Box sx={{ 
-                  display: 'flex',
-                  justifyContent: 'center',
-                  padding: '10px'}}
-                  >
-                  <CircularProgress size={24} />
-                  </Box>
-              )}
-              </div>
+         
+    <Autocomplete
+      multiple
+      options={items || []}
+      getOptionLabel={(option) => option.code || option.label}
+      filterOptions={(options, state) => {
+        const { inputValue } = state;
+        return options.filter(option =>
+          option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+          option.name.toLowerCase().includes(inputValue.toLowerCase())
+        );
+      }}
+      onInputChange={(event, newInputValue) => {
+        setInputValue(newInputValue);
+      }}
+      onChange={(event, newValue) => {
+        setValue(newValue);
+      }}
+      inputValue={inputValue}
+      loadingText="поиск данных"
+      noOptionsText="нет результатов"
+      loading={loading}
+      ListboxProps={{
+        onScroll: handleScroll,
+        ref: listRef,
+        sx: {
+          maxHeight: '48vh',
+          overflowY: 'auto',
+        },
+      }}
+      renderGroup={(params) => (
+        <div key={params.key}>
+          {params.children}
+          {loading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
+              <CircularProgress size={24} />
+            </Box>
           )}
-          renderOption={(props, option) => (
-              <ListItem {...props} key={`${option.code}-${option.name}`} style={{ padding: '8px 16px' }}>
-              <ListItemText
-                  primary={option.code}
-                  secondary={option.name}
-                  primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
-                  secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
-              />
-              </ListItem>
-          )}
-          renderInput={(params) => (
-              <TextField
-              {...params}
-              required
-              fullWidth
-              id="measuring-tools-13"
-              placeholder="Мерительный инструмент"
-              variant="outlined"
-              sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-              size='small'           
-              />
-          )}
-          sx={{
-              '& .MuiAutocomplete-listbox': {
-              backgroundColor: '#fff',
-              boxShadow: 2
-              },
-              '& .MuiAutocomplete-option': {
-              padding: '8px 16px'
-              },
-          }}
-          value={value}
-            />
+        </div>
+      )}
+      renderOption={(props, option) => (
+        <ListItem {...props} key={`${option.code}-${option.name}`} style={{ padding: '8px 16px' }}>
+          <ListItemText
+            primary={option.code}
+            secondary={option.name}
+            primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
+            secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
+          />
+        </ListItem>
+      )}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          required
+          fullWidth
+          id="measuring-tools-13"
+          placeholder="Мерительный инструмент"
+          variant="outlined"
+          sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+          size='small'
+        />
+      )}
+      renderTags={(tagValue, getTagProps) =>
+        tagValue.map((option, index) => (
+          <Chip
+            key={index} // Используем индекс в качестве ключа
+            label={option.name || option.label} // Убедитесь, что 'code' или 'label' доступны
+            {...getTagProps({ index })} // передаем tagProps без явной деструктуризации key            
+          />
+        ))
+      }
+      sx={{
+        '& .MuiAutocomplete-listbox': {
+          backgroundColor: '#fff',
+          boxShadow: 2,
+        },
+        '& .MuiAutocomplete-option': {
+          padding: '8px 16px',
+        },
+      }}
+      value={value}
+    />
     </>
   );
 }
