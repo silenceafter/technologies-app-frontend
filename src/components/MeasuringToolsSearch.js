@@ -129,9 +129,9 @@ function MeasuringToolsSearch() {
       renderTags={(tagValue, getTagProps) =>
         tagValue.map((option, index) => (
           <Chip
-            key={index} // Используем индекс в качестве ключа
-            label={option.name || option.label} // Убедитесь, что 'code' или 'label' доступны
-            {...getTagProps({ index })} // передаем tagProps без явной деструктуризации key            
+            key={index}
+            label={option.name || option.label}
+            {...getTagProps({ index })}         
           />
         ))
       }

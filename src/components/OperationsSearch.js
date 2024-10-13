@@ -70,7 +70,7 @@ function OperationsSearch({props}) {
     <>
         <Autocomplete
           options={items || []}
-          getOptionLabel={(option) => option.code || option.label}
+          getOptionLabel={(option) => `${option.code} ${option.name}`}
           filterOptions={(options, state) => {
               const { inputValue } = state;
               return options.filter(option =>

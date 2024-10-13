@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { 
     Autocomplete, 
     Box, 
+    Chip,
     CircularProgress, 
     ListItem, 
     ListItemText,
@@ -14,7 +15,7 @@ import { debounce } from 'lodash';
 function ComponentsSearch() {
   const dispatch = useDispatch();
 
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState([]);
 
   //TextField
   const [inputValue, setInputValue] = useState('');
@@ -64,8 +65,9 @@ function ComponentsSearch() {
   return (
     <>
         <Autocomplete
+          multiple
           options={items || []}
-          getOptionLabel={(option) => option.code || option.label}
+          getOptionLabel={(option) => `${option.code} ${option.name}`}
           filterOptions={(options, state) => {
               const { inputValue } = state;
               return options.filter(option =>
@@ -127,6 +129,15 @@ function ComponentsSearch() {
               size='small'           
               />
           )}
+          renderTags={(tagValue, getTagProps) =>
+            tagValue.map((option, index) => (
+              <Chip
+                key={index}
+                label={option.name || option.label}
+                {...getTagProps({ index })}         
+              />
+            ))
+          }
           sx={{
               '& .MuiAutocomplete-listbox': {
               backgroundColor: '#fff',
