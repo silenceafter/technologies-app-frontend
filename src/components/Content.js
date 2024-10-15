@@ -25,6 +25,7 @@ import { ComponentsSearch } from './ComponentsSearch';
 import { MaterialsSearch } from './MaterialsSearch';
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
+import { TabPanel } from './TabPanel';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -51,6 +52,52 @@ export default function Content() {
     components15: '',
     materials16: ''
   });
+
+  //список числовых полей (для последующей валидации вместо type="number")
+  const numericFields = [
+    'operationNumber1', 
+    'workshopNumber3', 
+    'workshopAreaNumber4',
+    'workerCategory7',
+    'workerConditions8',
+    'numberEmployees9',
+    'numberProcessedParts10',
+    'toilsomeness11'
+  ];
+
+  //значения полей формы
+  const [formValues, setFormValues] = useState({
+    operationNumber1: '',
+    operationCode2: '',
+    workshopNumber3: '',
+    workshopAreaNumber4: '',
+    documentName5: '',
+    professionCode6: '',
+    workerCategory7: '',
+    workerConditions8: '',
+    numberEmployees9: '',
+    numberProcessedParts10: '',
+    toilsomeness11: '',
+    operationDescription12: '',
+    measuringTools13: '',
+    rig14: '',
+    components15: '',
+    materials16: ''
+  });
+
+  const handleInputChange = (e) => {
+    //значения формы
+    const { name, value } = e.target;    
+    setFormValues((prevValues) => {
+      if (numericFields.includes(name)) {
+        if (value && !/^\d*$/.test(value)) {
+          return prevValues;
+        }
+      }
+      return { ...prevValues, [name]: value };
+    });
+  };
+
   const [loading, setLoading] = useState({ save: false });
 
   const handleTabsChange = (event, newValue) => {
@@ -61,23 +108,22 @@ export default function Content() {
     setLoading((prev) => ({ ...prev, save: true }));
     setOpen(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    //setShowAlert(true);//включить уведомление    
-    
     setLoading((prev) => ({ ...prev, save: false }));
-    //handleAlertClose();
   }
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
+    const form = event.target;
+    if (form.checkValidity() === false) {
+      // Если форма невалидна, выведем сообщение
+      alert('Некоторые обязательные поля не заполнены!');
+    } else {
+      // Форма валидна, выполняем дальнейшие действия
+      alert('Все обязательные поля заполнены!');
+    }
   };
 
   //alert
-  const [showAlert, setShowAlert] = useState(false);
-  const handleAlertClose = () => {
-    setShowAlert(false);
-  };
-
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
@@ -89,6 +135,16 @@ export default function Content() {
       return;
     }
     setOpen(false);
+  };
+
+  //autocomplete
+  const [selectedOptions, setSelectedOptions] = useState({});
+  const handleOptionSelect = (id, option) => {
+    setSelectedOptions((prevOptions) => ({
+      ...prevOptions,
+      [id]: option,
+    }));
+    console.log(selectedOptions);
   };
 
   return (
@@ -157,168 +213,187 @@ export default function Content() {
               overflowY: 'auto',
               padding: 2,          
             }}>
-              <form>
+              <form onSubmit={handleSubmit}>
                 {tabsValue === 0 && 
-                  <Grid container spacing={2}>
-                    {/* Первая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            required
-                            id="operation-number-1"
-                            label="Номер операции"
-                            type="number"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>
-                      </Grid>                    
-                    </Grid>
-                    {/* Вторая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={4.8}>
-                          <OperationsSearch props={
-                            {
-                              id: "operation-code-2",
-                              error: !!formErrors.operationCode2,
-                              helpText: formErrors.operationCode2,
-                              placeholder: "Код операции"
+                  <TabPanel value={tabsValue} index={0}>
+                    <Grid container spacing={2}>
+                      {/* Первая строка */}
+                      <Grid item xs={12}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={2.4}>
+                            <TextField
+                              required
+                              name='operationNumber1'
+                              id="operation-number-1"
+                              label="Номер операции"
+                              type="text"
+                              size="small"
+                              onChange={handleInputChange}
+                              value={formValues.operationNumber1}
+                            >
+                            </TextField>
+                          </Grid>
+                        </Grid>                    
+                      </Grid>
+                      {/* Вторая строка */}
+                      <Grid item xs={12}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={4.8}>
+                            <OperationsSearch props={
+                              {
+                                id: "operation-code-2",
+                                error: !!formErrors.operationCode2,
+                                helpText: formErrors.operationCode2,
+                                placeholder: "Код операции"
+                              }
                             }
-                          } />
+                            id="operationCode2" onOptionSelect={handleOptionSelect}
+                              selectedValue={selectedOptions['operationCode2']} />
+                          </Grid>
+                        </Grid>                  
+                      </Grid>
+                      {/* Третья строка */}
+                      <Grid item xs={12}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={2.4}>
+                            <TextField
+                              required
+                              name='workshopNumber3'
+                              id="workshop-number-3"
+                              label="Номер цеха"
+                              type="text"
+                              size="small"
+                            >
+                            </TextField>
+                          </Grid>
+                          <Grid item xs={2.4}>
+                            <TextField
+                              name='workshopAreaNumber4'
+                              id="workshop-area-number-4"
+                              label="Номер участка"
+                              type="text"
+                              size="small"
+                            >
+                            </TextField>
+                          </Grid>                      
+                        </Grid>                    
+                      </Grid>
+                      {/* Четвертая строка */}
+                      <Grid item xs={12}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={4.8}>
+                            <TextField
+                              required
+                              fullWidth
+                              name='documentName5'
+                              id="document-name-5"
+                              label="Обозначение документа"
+                              size="small"
+                            >
+                            </TextField>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      {/* Пятая строка */}
+                      <Grid item xs={12}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={4.8}>
+                            <ProfessionsSearch id="professionCode6" onOptionSelect={handleOptionSelect} 
+                              selectedValue={selectedOptions['professionCode6']} />
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      {/* Шестая строка */}
+                      <Grid item xs={12}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={2.4}>
+                            <TextField
+                              required
+                              name='workerCategory7'
+                              id="worker-category-7"
+                              label="Разряд"
+                              type="text"
+                              size="small"
+                            >
+                            </TextField>
+                          </Grid>
+                          <Grid item xs={2.4}>
+                            <TextField
+                              required
+                              name='workerConditions8'
+                              id="worker-conditions-8"
+                              label="Условия труда"
+                              type="text"
+                              size="small"
+                            >
+                            </TextField>
+                          </Grid>
+                          <Grid item xs={2.4}>
+                            <TextField
+                              required
+                              name='numberEmployees9'
+                              id="number-employees-9"
+                              label="Кол-во работающих"
+                              type="text"
+                              size="small"
+                            >
+                            </TextField>
+                          </Grid>
+                          <Grid item xs={4.8}>
+                            <TextField
+                              required
+                              fullWidth
+                              name='numberProcessedParts10'
+                              id="number-processed-parts-10"
+                              label="Кол-во одновременно обрабатываемых деталей"
+                              type="text"
+                              size="small"
+                            >
+                            </TextField>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      {/* Седьмая строка */}
+                      <Grid item xs={12}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={2.4}>
+                            <TextField
+                              required
+                              name='toilsomeness11'
+                              id="toilsomeness-11"
+                              label="Трудоемкость"
+                              type="text"
+                              size="small"
+                            >
+                            </TextField>
+                          </Grid>
                         </Grid>
                       </Grid>                  
-                    </Grid>
-                    {/* Третья строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            required
-                            id="workshop-number-3"
-                            label="Номер цеха"
-                            type="number"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            id="workshop-area-number-4"
-                            label="Номер участка"
-                            type="number"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>                      
-                      </Grid>                    
-                    </Grid>
-                    {/* Четвертая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={4.8}>
-                          <TextField
-                            required
-                            fullWidth
-                            id="document-name-5"
-                            label="Обозначение документа"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                    {/* Пятая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={4.8}>
-                          <ProfessionsSearch />
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                    {/* Шестая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            required
-                            id="worker-category-7"
-                            label="Разряд"
-                            type="number"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            required
-                            id="worker-conditions-8"
-                            label="Условия труда"
-                            type="number"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            required
-                            id="number-employees-9"
-                            label="Кол-во работающих"
-                            type="number"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>
-                        <Grid item xs={4.8}>
-                          <TextField
-                            required
-                            fullWidth
-                            id="number-processed-parts-10"
-                            label="Кол-во одновременно обрабатываемых деталей"
-                            type="number"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                    {/* Седьмая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            required
-                            id="toilsomeness-11"
-                            label="Трудоемкость"
-                            type="number"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>
-                      </Grid>
-                    </Grid>                  
-                  </Grid>        
+                    </Grid>   
+                  </TabPanel>     
                 }
                 {tabsValue === 1 && 
-                  <Grid container spacing={2}>
-                  {/* Первая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={4.8}>
-                          <TextField                          
-                            multiline
-                            fullWidth
-                            rows={8}
-                            id="operation-description-12"
-                            label="Описание операции"
-                            size="small"
-                          >
-                          </TextField>
-                        </Grid>
-                      </Grid>                    
-                    </Grid>             
-                  </Grid>  
+                  <TabPanel value={tabsValue} index={1}>
+                    <Grid container spacing={2}>
+                    {/* Первая строка */}
+                      <Grid item xs={12}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={4.8}>
+                            <TextField                          
+                              multiline
+                              fullWidth
+                              rows={8}
+                              name='operationDescription12'
+                              id="operation-description-12"
+                              label="Описание операции"
+                              size="small"
+                            >
+                            </TextField>
+                          </Grid>
+                        </Grid>                    
+                      </Grid>             
+                    </Grid>
+                  </TabPanel>
                 }
                 {tabsValue === 2 && 
                   <Grid container spacing={2}>
@@ -326,7 +401,8 @@ export default function Content() {
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
-                          <MeasuringToolsSearch />
+                          <MeasuringToolsSearch id="measuringTools13" 
+                            onOptionSelect={handleOptionSelect} selectedValue={selectedOptions['measuringTools13']} />
                         </Grid>
                       </Grid>                    
                     </Grid>             
@@ -338,7 +414,8 @@ export default function Content() {
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
-                          <RigSearch />
+                          <RigSearch id="rig14" onOptionSelect={handleOptionSelect}
+                            selectedValue={selectedOptions['rig14']} />
                         </Grid>
                       </Grid>                    
                     </Grid>             
@@ -350,7 +427,8 @@ export default function Content() {
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
-                          <ComponentsSearch />
+                          <ComponentsSearch id="components15" onOptionSelect={handleOptionSelect}
+                            selectedValue={selectedOptions['components15']} />
                         </Grid>
                       </Grid>
                     </Grid>                  
@@ -362,7 +440,8 @@ export default function Content() {
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
-                          <MaterialsSearch />
+                          <MaterialsSearch id="materials16" onOptionSelect={handleOptionSelect}
+                            selectedValue={selectedOptions['materials16']} />
                         </Grid>
                       </Grid>
                     </Grid>                  

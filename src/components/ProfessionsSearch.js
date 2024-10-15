@@ -16,10 +16,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/professionsSlice';
 import { debounce } from 'lodash';
 
-function ProfessionsSearch() {
+function ProfessionsSearch({ id, selectedValue, onOptionSelect }) {
   const dispatch = useDispatch();
-
-  const [value, setValue] = useState(null);
 
   //TextField
   const [inputValue, setInputValue] = useState('');
@@ -74,15 +72,15 @@ function ProfessionsSearch() {
           filterOptions={(options, state) => {
             const { inputValue } = state;
             return options.filter(option =>
-            option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
-            option.name.toLowerCase().includes(inputValue.toLowerCase())
+              option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+              option.name.toLowerCase().includes(inputValue.toLowerCase())
             );
           }}
           onInputChange={(event, newInputValue) => {
               setInputValue(newInputValue);
           }}
-          onChange={(event, newValue) => {
-              setValue(newValue);
+          onChange={(event, newValue) => {                           
+              onOptionSelect(id, newValue);//setValue(newValue);
           }}
           inputValue={inputValue}
           loadingText="поиск данных"
@@ -105,7 +103,7 @@ function ProfessionsSearch() {
                   justifyContent: 'center',
                   padding: '10px'}}
                   >
-                  <CircularProgress size={24} />
+                    <CircularProgress size={24} />
                   </Box>
               )}
               </div>
@@ -141,7 +139,7 @@ function ProfessionsSearch() {
               padding: '8px 16px'
               },
           }}
-          value={value}
+          value={selectedValue}
         />
     </>
   );

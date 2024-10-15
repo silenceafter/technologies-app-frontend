@@ -12,10 +12,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/componentsSlice';
 import { debounce } from 'lodash';
 
-function ComponentsSearch() {
+function ComponentsSearch({ id, selectedValue, onOptionSelect }) {
   const dispatch = useDispatch();
-
-  const [value, setValue] = useState([]);
 
   //TextField
   const [inputValue, setInputValue] = useState('');
@@ -79,7 +77,7 @@ function ComponentsSearch() {
               setInputValue(newInputValue);
           }}
           onChange={(event, newValue) => {
-              setValue(newValue);
+              onOptionSelect(id, newValue);
           }}
           inputValue={inputValue}
           loadingText="поиск данных"
@@ -147,7 +145,7 @@ function ComponentsSearch() {
               padding: '8px 16px'
               },
           }}
-          value={value}
+          value={selectedValue}
             />
     </>
   );

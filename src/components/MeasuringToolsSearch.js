@@ -12,10 +12,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/measuringToolsSlice';
 import { debounce } from 'lodash';
 
-function MeasuringToolsSearch() {
+function MeasuringToolsSearch({ id, selectedValue, onOptionSelect }) {
   const dispatch = useDispatch();
-
-  const [value, setValue] = useState([]);
 
   //TextField
   const [inputValue, setInputValue] = useState('');
@@ -80,7 +78,7 @@ function MeasuringToolsSearch() {
         setInputValue(newInputValue);
       }}
       onChange={(event, newValue) => {
-        setValue(newValue);
+        onOptionSelect(id, newValue);
       }}
       inputValue={inputValue}
       loadingText="поиск данных"
@@ -144,7 +142,7 @@ function MeasuringToolsSearch() {
           padding: '8px 16px',
         },
       }}
-      value={value}
+      value={selectedValue}
     />
     </>
   );

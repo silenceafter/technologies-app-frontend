@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { 
     Autocomplete, 
-    Box, 
+    Box,
+    Chip,
     CircularProgress, 
     ListItem, 
     ListItemText,
@@ -11,10 +12,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/materialsSlice';
 import { debounce } from 'lodash';
 
-function MaterialsSearch() {
+function MaterialsSearch({ id, selectedValue, onOptionSelect }) {
   const dispatch = useDispatch();
-
-  const [value, setValue] = useState(null);
 
   //TextField
   const [inputValue, setInputValue] = useState('');
@@ -64,8 +63,9 @@ function MaterialsSearch() {
   return (
     <>
         <Autocomplete
+          multiple
           options={items || []}
-          getOptionLabel={(option) => option.code || option.label}
+          getOptionLabel={(option) => `${option.code} ${option.name}`}
           filterOptions={(options, state) => {
               const { inputValue } = state;
               return options.filter(option =>
@@ -77,7 +77,7 @@ function MaterialsSearch() {
               setInputValue(newInputValue);
           }}
           onChange={(event, newValue) => {
-              setValue(newValue);
+              onOptionSelect(id, newValue);
           }}
           inputValue={inputValue}
           loadingText="поиск данных"
@@ -127,6 +127,15 @@ function MaterialsSearch() {
               size='small'           
               />
           )}
+          renderTags={(tagValue, getTagProps) =>
+            tagValue.map((option, index) => (
+              <Chip
+                key={index}
+                label={option.name || option.label}
+                {...getTagProps({ index })}         
+              />
+            ))
+          }
           sx={{
               '& .MuiAutocomplete-listbox': {
               backgroundColor: '#fff',
@@ -136,7 +145,7 @@ function MaterialsSearch() {
               padding: '8px 16px'
               },
           }}
-          value={value}
+          value={selectedValue}
             />
     </>
   );
