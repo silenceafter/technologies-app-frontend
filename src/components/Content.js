@@ -32,27 +32,6 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 export default function Content() {
-  const [tabsValue, setTabsValue] = useState(0);
-  const [bottomNavigationValue, setBottomNavigationValue] = useState(0);
-  const [formErrors, setFormErrors] = useState({
-    operationNumber1: '',
-    operationCode2: '',
-    workshopNumber3: '',
-    workshopAreaNumber4: '',
-    documentName5: '',
-    professionCode6: '',
-    workerCategory7: '',
-    workerConditions8: '',
-    numberEmployees9: '',
-    numberProcessedParts10: '',
-    toilsomeness11: '',
-    operationDescription12: '',
-    measuringTools13: '',
-    rig14: '',
-    components15: '',
-    materials16: ''
-  });
-
   //список числовых полей (для последующей валидации вместо type="number")
   const numericFields = [
     'operationNumber1', 
@@ -85,52 +64,128 @@ export default function Content() {
     materials16: ''
   });
 
-  const handleInputChange = (e) => {
-    //значения формы
-    const { name, value } = e.target;    
-    setFormValues((prevValues) => {
-      if (numericFields.includes(name)) {
-        if (value && !/^\d*$/.test(value)) {
-          return prevValues;
-        }
-      }
-      return { ...prevValues, [name]: value };
-    });
-  };
+  //значения ошибок (валидация)
+  const [formErrors, setFormErrors] = useState({
+    operationNumber1: '',
+    operationCode2: '',
+    workshopNumber3: '',
+    workshopAreaNumber4: '',
+    documentName5: '',
+    professionCode6: '',
+    workerCategory7: '',
+    workerConditions8: '',
+    numberEmployees9: '',
+    numberProcessedParts10: '',
+    toilsomeness11: '',
+    operationDescription12: '',
+    measuringTools13: '',
+    rig14: '',
+    components15: '',
+    materials16: ''
+  });
 
-  const [loading, setLoading] = useState({ save: false });
-
+  //вкладки
+  const [tabsValue, setTabsValue] = useState(0);
   const handleTabsChange = (event, newValue) => {
     setTabsValue(newValue);
   };
 
-  const handleSave = async () => {
-    setLoading((prev) => ({ ...prev, save: true }));
-    setOpen(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setLoading((prev) => ({ ...prev, save: false }));
-  }
+  //проверка формы
+  const validateForm = () => {
+    const errors = {};
+    const textFieldMessage = 'Поле обязательно для заполнения';
+    const autocompleteTextFieldMessage = 'Выберите значение из списка';
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const form = event.target;
-    if (form.checkValidity() === false) {
-      // Если форма невалидна, выведем сообщение
-      alert('Некоторые обязательные поля не заполнены!');
-    } else {
-      // Форма валидна, выполняем дальнейшие действия
-      alert('Все обязательные поля заполнены!');
+    //operationNumber1
+    if (!formValues.operationNumber1) {
+      errors.operationNumber1 = textFieldMessage;
     }
+
+    //operationCode2
+    if (!formValues.operationCode2) {
+      errors.operationCode2 = autocompleteTextFieldMessage;
+    }
+    
+    //workshopNumber3
+    if (!formValues.workshopNumber3) {
+      errors.workshopNumber3 = textFieldMessage;
+    }
+
+    //documentName5
+    if (!formValues.documentName5) {
+      errors.documentName5 = textFieldMessage;
+    }
+
+    //professionCode6
+    if (!formValues.professionCode6) {
+      errors.professionCode6 = autocompleteTextFieldMessage;
+    }
+
+    //workerCategory7
+    if (!formValues.workerCategory7) {
+      errors.workerCategory7 = textFieldMessage;
+    }
+
+    //workerConditions8
+    if (!formValues.workerConditions8) {
+      errors.workerConditions8 = textFieldMessage;
+    }
+
+    //numberEmployees9
+    if (!formValues.numberEmployees9) {
+      errors.numberEmployees9 = textFieldMessage;
+    }
+
+    //numberProcessedParts10
+    if (!formValues.numberProcessedParts10) {
+      errors.numberProcessedParts10 = textFieldMessage;
+    }
+
+    //toilsomeness11
+    if (!formValues.toilsomeness11) {
+      errors.toilsomeness11 = textFieldMessage;
+    }
+
+    //measuringTools13
+    if (formValues.measuringTools13.length == 0) {
+      errors.measuringTools13 = autocompleteTextFieldMessage;
+    }
+
+    //rig14
+    if (formValues.rig14.length == 0) {
+      errors.rig14 = autocompleteTextFieldMessage;
+    }
+
+    //components15
+    if (formValues.components15.length == 0) {
+      errors.components15 = autocompleteTextFieldMessage;
+    }
+
+    //materials16
+    if (formValues.materials16.length == 0) {
+      errors.materials16 = autocompleteTextFieldMessage;
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  //отправка
+  const handleSuccess = () => {
+    setRequestStatus('success');
+    setOpen(true);
+  };
+
+  // Функция, имитирующая ошибку отправки
+  const handleError = () => {
+    setRequestStatus('error');
+    setOpen(true);
   };
 
   //alert
   const [open, setOpen] = useState(false);
-
-  const handleClick = () => {
-    setOpen(true);
-  };
-
-  const handleClose = (event, reason) => {
+  const [requestStatus, setRequestStatus] = useState(false);
+  const handleClose = (reason) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -138,15 +193,44 @@ export default function Content() {
   };
 
   //autocomplete
-  const [selectedOptions, setSelectedOptions] = useState({});
   const handleOptionSelect = (id, option) => {
-    setSelectedOptions((prevOptions) => ({
-      ...prevOptions,
-      [id]: option,
+    //задать значение в formValues
+    const value = option ? option : null;
+    setFormValues((prevFormValues) => ({
+      ...prevFormValues,
+      [id]: value,
     }));
-    console.log(selectedOptions);
+
+    //убрать ошибку в formErrors    
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [id]: '',
+    }));
   };
 
+  //buttonGroup
+  const [loading, setLoading] = useState({ save: false });
+  const handleSave = async () => {
+    setLoading((prev) => ({ ...prev, save: true }));  
+    await new Promise((resolve) => setTimeout(() => {
+      setOpen(true);
+      validateForm();
+      setLoading((prev) => ({ ...prev, save: false }));
+    }, 2000));
+  }
+
+  //textField
+  const handleInputChange = (e) => {
+    //значения формы
+    const { name, value } = e.target;    
+    const errorMessage = numericFields.includes(name) && (value && !/^\d*$/.test(value))
+      ? 'Это поле должно содержать только цифры'
+      : undefined;
+    //
+    setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
+    setFormErrors((prevErrors) => ({ ...prevErrors, [name]: errorMessage }));
+  };
+  //
   return (
     <>
       <Box sx={{
@@ -213,7 +297,7 @@ export default function Content() {
               overflowY: 'auto',
               padding: 2,          
             }}>
-              <form onSubmit={handleSubmit}>
+              <form>
                 {tabsValue === 0 && 
                   <TabPanel value={tabsValue} index={0}>
                     <Grid container spacing={2}>
@@ -229,7 +313,14 @@ export default function Content() {
                               type="text"
                               size="small"
                               onChange={handleInputChange}
+                              error={formErrors.operationNumber1}
+                              helperText={formErrors.operationNumber1 ? formErrors.operationNumber1 : ''}
                               value={formValues.operationNumber1}
+                              slotProps={{
+                                formHelperText: {
+                                  sx: { whiteSpace: 'nowrap' },
+                                },
+                              }}
                             >
                             </TextField>
                           </Grid>
@@ -242,13 +333,11 @@ export default function Content() {
                             <OperationsSearch props={
                               {
                                 id: "operation-code-2",
-                                error: !!formErrors.operationCode2,
-                                helpText: formErrors.operationCode2,
                                 placeholder: "Код операции"
                               }
                             }
                             id="operationCode2" onOptionSelect={handleOptionSelect}
-                              selectedValue={selectedOptions['operationCode2']} />
+                              selectedValue={ formValues['operationCode2'] ? formValues['operationCode2'] : null} errorValue={formErrors['operationCode2']} />
                           </Grid>
                         </Grid>                  
                       </Grid>
@@ -263,6 +352,15 @@ export default function Content() {
                               label="Номер цеха"
                               type="text"
                               size="small"
+                              onChange={handleInputChange}
+                              error={formErrors.workshopNumber3}
+                              helperText={formErrors.workshopNumber3 ? formErrors.workshopNumber3 : ''}
+                              value={formValues.workshopNumber3}
+                              slotProps={{
+                                formHelperText: {
+                                  sx: { whiteSpace: 'nowrap' },
+                                },
+                              }}
                             >
                             </TextField>
                           </Grid>
@@ -273,6 +371,8 @@ export default function Content() {
                               label="Номер участка"
                               type="text"
                               size="small"
+                              onChange={handleInputChange}
+                              value={formValues.workshopAreaNumber4}
                             >
                             </TextField>
                           </Grid>                      
@@ -289,6 +389,15 @@ export default function Content() {
                               id="document-name-5"
                               label="Обозначение документа"
                               size="small"
+                              onChange={handleInputChange}
+                              error={formErrors.documentName5}
+                              helperText={formErrors.documentName5 ? formErrors.documentName5 : ''}
+                              value={formValues.documentName5}
+                              slotProps={{
+                                formHelperText: {
+                                  sx: { whiteSpace: 'nowrap' },
+                                },
+                              }}
                             >
                             </TextField>
                           </Grid>
@@ -299,7 +408,7 @@ export default function Content() {
                         <Grid container spacing={2}>
                           <Grid item xs={4.8}>
                             <ProfessionsSearch id="professionCode6" onOptionSelect={handleOptionSelect} 
-                              selectedValue={selectedOptions['professionCode6']} />
+                              selectedValue={formValues['professionCode6'] ? formValues['professionCode6'] : null} errorValue={formErrors['professionCode6']} />
                           </Grid>
                         </Grid>
                       </Grid>
@@ -314,6 +423,15 @@ export default function Content() {
                               label="Разряд"
                               type="text"
                               size="small"
+                              onChange={handleInputChange}
+                              error={formErrors.workerCategory7}
+                              helperText={formErrors.workerCategory7 ? formErrors.workerCategory7 : ''}
+                              value={formValues.workerCategory7}
+                              slotProps={{
+                                formHelperText: {
+                                  sx: { whiteSpace: 'nowrap' },
+                                },
+                              }}
                             >
                             </TextField>
                           </Grid>
@@ -325,6 +443,15 @@ export default function Content() {
                               label="Условия труда"
                               type="text"
                               size="small"
+                              onChange={handleInputChange}
+                              error={formErrors.workerConditions8}
+                              helperText={formErrors.workerConditions8 ? formErrors.workerConditions8 : ''}
+                              value={formValues.workerConditions8}
+                              slotProps={{
+                                formHelperText: {
+                                  sx: { whiteSpace: 'nowrap' },
+                                },
+                              }}
                             >
                             </TextField>
                           </Grid>
@@ -336,6 +463,15 @@ export default function Content() {
                               label="Кол-во работающих"
                               type="text"
                               size="small"
+                              onChange={handleInputChange}
+                              error={formErrors.numberEmployees9}
+                              helperText={formErrors.numberEmployees9 ? formErrors.numberEmployees9 : ''}
+                              value={formValues.numberEmployees9}
+                              slotProps={{
+                                formHelperText: {
+                                  sx: { whiteSpace: 'nowrap' },
+                                },
+                              }}
                             >
                             </TextField>
                           </Grid>
@@ -348,6 +484,15 @@ export default function Content() {
                               label="Кол-во одновременно обрабатываемых деталей"
                               type="text"
                               size="small"
+                              onChange={handleInputChange}
+                              error={formErrors.numberProcessedParts10}
+                              helperText={formErrors.numberProcessedParts10 ? formErrors.numberProcessedParts10 : ''}
+                              value={formValues.numberProcessedParts10}
+                              slotProps={{
+                                formHelperText: {
+                                  sx: { whiteSpace: 'nowrap' },
+                                },
+                              }}
                             >
                             </TextField>
                           </Grid>
@@ -364,6 +509,15 @@ export default function Content() {
                               label="Трудоемкость"
                               type="text"
                               size="small"
+                              onChange={handleInputChange}
+                              error={formErrors.toilsomeness11}
+                              helperText={formErrors.toilsomeness11 ? formErrors.toilsomeness11 : ''}
+                              value={formValues.toilsomeness11}
+                              slotProps={{
+                                formHelperText: {
+                                  sx: { whiteSpace: 'nowrap' },
+                                },
+                              }}
                             >
                             </TextField>
                           </Grid>
@@ -402,7 +556,8 @@ export default function Content() {
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
                           <MeasuringToolsSearch id="measuringTools13" 
-                            onOptionSelect={handleOptionSelect} selectedValue={selectedOptions['measuringTools13']} />
+                            onOptionSelect={handleOptionSelect} selectedValue={formValues['measuringTools13'] ? formValues['measuringTools13'] : []}
+                            errorValue={formErrors['measuringTools13']} />
                         </Grid>
                       </Grid>                    
                     </Grid>             
@@ -415,7 +570,7 @@ export default function Content() {
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
                           <RigSearch id="rig14" onOptionSelect={handleOptionSelect}
-                            selectedValue={selectedOptions['rig14']} />
+                            selectedValue={formValues['rig14'] ? formValues['rig14'] : []} errorValue={formErrors['rig14']} />
                         </Grid>
                       </Grid>                    
                     </Grid>             
@@ -428,7 +583,7 @@ export default function Content() {
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
                           <ComponentsSearch id="components15" onOptionSelect={handleOptionSelect}
-                            selectedValue={selectedOptions['components15']} />
+                            selectedValue={formValues['components15'] ? formValues['components15'] : []} errorValue={formErrors['components15']} />
                         </Grid>
                       </Grid>
                     </Grid>                  
@@ -441,7 +596,7 @@ export default function Content() {
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
                           <MaterialsSearch id="materials16" onOptionSelect={handleOptionSelect}
-                            selectedValue={selectedOptions['materials16']} />
+                            selectedValue={formValues['materials16'] ? formValues['materials16'] : []} errorValue={formErrors['materials16']} />
                         </Grid>
                       </Grid>
                     </Grid>                  
@@ -458,11 +613,11 @@ export default function Content() {
               >
                 <Alert
                   onClose={handleClose}
-                  severity="success"
+                  severity={requestStatus === 'success' ? 'success' : 'error'}
                   variant="filled"
                   sx={{ width: '100%' }}
                 >
-                  Успешно сохранено!
+                  {requestStatus === 'success' ? 'Успешно сохранено!' : 'Ошибка при отправке!'}
                 </Alert>
               </Snackbar>
             </Box>

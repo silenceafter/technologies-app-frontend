@@ -12,7 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/componentsSlice';
 import { debounce } from 'lodash';
 
-function ComponentsSearch({ id, selectedValue, onOptionSelect }) {
+function ComponentsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const dispatch = useDispatch();
 
   //TextField
@@ -117,14 +117,16 @@ function ComponentsSearch({ id, selectedValue, onOptionSelect }) {
           )}
           renderInput={(params) => (
               <TextField
-              {...params}
-              required
-              fullWidth
-              id="components-15"
-              placeholder="Комплектующие"
-              variant="outlined"
-              sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-              size='small'           
+                {...params}
+                required
+                fullWidth
+                id="components-15"
+                error={!!errorValue}
+                helperText={errorValue}
+                placeholder="Комплектующие"
+                variant="outlined"
+                sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                size='small'
               />
           )}
           renderTags={(tagValue, getTagProps) =>

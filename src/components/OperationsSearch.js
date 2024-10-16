@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/operationsSlice';
 import { debounce } from 'lodash';
 
-function OperationsSearch({props, id, selectedValue, onOptionSelect }) {
+function OperationsSearch({props, id, selectedValue, onOptionSelect, errorValue }) {
   const dispatch = useDispatch();
 
   //TextField
@@ -120,16 +120,17 @@ function OperationsSearch({props, id, selectedValue, onOptionSelect }) {
           )}
           renderInput={(params) => (
               <TextField
-              {...params}
-              required
-              fullWidth
-              id={props.id}
-              error={props.error}
-              helperText={props.helpText}
-              placeholder={props.placeholder}
-              variant="outlined"
-              sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-              size='small'           
+                {...params}
+                required
+                fullWidth
+                name='operationCode2'
+                id={props.id}
+                error={!!errorValue}
+                helperText={errorValue}
+                placeholder={props.placeholder}
+                variant="outlined"
+                sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                size='small'              
               />
           )}
           sx={{

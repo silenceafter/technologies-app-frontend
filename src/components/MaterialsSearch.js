@@ -12,7 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/materialsSlice';
 import { debounce } from 'lodash';
 
-function MaterialsSearch({ id, selectedValue, onOptionSelect }) {
+function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const dispatch = useDispatch();
 
   //TextField
@@ -117,14 +117,16 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect }) {
           )}
           renderInput={(params) => (
               <TextField
-              {...params}
-              required
-              fullWidth
-              id="materials-16"
-              placeholder="Материалы"
-              variant="outlined"
-              sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-              size='small'           
+                {...params}
+                required
+                fullWidth
+                id="materials-16"
+                error={!!errorValue}
+                helperText={errorValue}
+                placeholder="Материалы"
+                variant="outlined"
+                sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                size='small'
               />
           )}
           renderTags={(tagValue, getTagProps) =>
