@@ -9,10 +9,10 @@ import {
     TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/rigSlice';
+import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/toolingSlice';
 import { debounce } from 'lodash';
 
-function RigSearch({ id, selectedValue, onOptionSelect, errorValue }) {
+function ToolingSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const dispatch = useDispatch();
 
   //TextField
@@ -24,12 +24,12 @@ function RigSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const page = useSelector(selectPage);
 
   //запросы для прокрутки списка
-  const { items, loading, error, hasMore } = useSelector((state) => state.rig);
+  const { items, loading, error, hasMore } = useSelector((state) => state.tooling);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
-  }, 200);
+  }, 1);
 
   useEffect(() => {
     //загрузка данных при пустом поисковом запросе
@@ -120,7 +120,7 @@ function RigSearch({ id, selectedValue, onOptionSelect, errorValue }) {
               {...params}
               required
               fullWidth
-              id="rig-14"
+              id="tooling-14"
               error={!!errorValue}
               helperText={errorValue}
               placeholder="Оснастка"
@@ -153,4 +153,4 @@ function RigSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   );
 }
 
-export { RigSearch };
+export { ToolingSearch };

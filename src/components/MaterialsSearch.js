@@ -29,7 +29,7 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
 
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
-  }, 200);
+  }, 1);
 
   useEffect(() => {
     //загрузка данных при пустом поисковом запросе

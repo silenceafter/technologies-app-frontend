@@ -37,7 +37,7 @@ function HeaderSearch(props) {
 
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
-  }, 200); //задержка в 500 мс
+  }, 1); //задержка в 500 мс
 
   useEffect(() => {
     //загрузка данных при пустом поисковом запросе

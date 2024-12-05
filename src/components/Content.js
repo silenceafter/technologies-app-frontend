@@ -20,7 +20,7 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { OperationsSearch } from './OperationsSearch';
 import { ProfessionsSearch } from './ProfessionsSearch';
 import { MeasuringToolsSearch } from './MeasuringToolsSearch';
-import { RigSearch } from './RigSearch';
+import { ToolingSearch } from './ToolingSearch';
 import { ComponentsSearch } from './ComponentsSearch';
 import { MaterialsSearch } from './MaterialsSearch';
 import { Snackbar } from '@mui/material';
@@ -59,7 +59,7 @@ export default function Content() {
     toilsomeness11: '',
     operationDescription12: '',
     measuringTools13: '',
-    rig14: '',
+    tooling14: '',
     components15: '',
     materials16: ''
   });
@@ -79,7 +79,7 @@ export default function Content() {
     toilsomeness11: '',
     operationDescription12: '',
     measuringTools13: '',
-    rig14: '',
+    tooling14: '',
     components15: '',
     materials16: ''
   });
@@ -151,9 +151,9 @@ export default function Content() {
       errors.measuringTools13 = autocompleteTextFieldMessage;
     }
 
-    //rig14
-    if (formValues.rig14.length == 0) {
-      errors.rig14 = autocompleteTextFieldMessage;
+    //tooling14
+    if (formValues.tooling14.length == 0) {
+      errors.tooling14 = autocompleteTextFieldMessage;
     }
 
     //components15
@@ -285,7 +285,7 @@ export default function Content() {
                 <Tabs value={tabsValue} onChange={handleTabsChange} textColor="inherit">
                   <Tab label="Параметры" />
                   <Tab label="Описание операции" />
-                  <Tab label="Мерительный инструмент" />
+                  <Tab label="Измерительный инструмент" />
                   <Tab label="Оснастка" />
                   <Tab label="Комплектующие" />
                   <Tab label="Материалы" />
@@ -528,7 +528,7 @@ export default function Content() {
                 }
                 {tabsValue === 1 && 
                   <TabPanel value={tabsValue} index={1}>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} >
                     {/* Первая строка */}
                       <Grid item xs={12}>
                         <Grid container spacing={2}>
@@ -550,7 +550,7 @@ export default function Content() {
                   </TabPanel>
                 }
                 {tabsValue === 2 && 
-                  <Grid container spacing={2}>
+                  <Grid container spacing={2} sx={{ padding: '24px 24px'}}>
                   {/* Первая строка */}
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
@@ -564,20 +564,20 @@ export default function Content() {
                   </Grid>
                 }
                 {tabsValue === 3 &&
-                  <Grid container spacing={2}>
+                  <Grid container spacing={2} sx={{ padding: '24px 24px'}}>
                   {/* Первая строка */}
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
-                          <RigSearch id="rig14" onOptionSelect={handleOptionSelect}
-                            selectedValue={formValues['rig14'] ? formValues['rig14'] : []} errorValue={formErrors['rig14']} />
+                          <ToolingSearch id="tooling14" onOptionSelect={handleOptionSelect}
+                            selectedValue={formValues['tooling14'] ? formValues['tooling14'] : []} errorValue={formErrors['tooling14']} />
                         </Grid>
                       </Grid>                    
                     </Grid>             
                   </Grid>
                 }
                 {tabsValue === 4 &&
-                  <Grid container spacing={2}>
+                  <Grid container spacing={2} sx={{ padding: '24px 24px'}}>
                   {/* Первая строка */}
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
@@ -590,7 +590,7 @@ export default function Content() {
                   </Grid>
                 }
                 {tabsValue === 5 &&
-                  <Grid container spacing={2}>
+                  <Grid container spacing={2} sx={{ padding: '24px 24px'}}>
                   {/* Первая строка */}
                     <Grid item xs={12}>
                       <Grid container spacing={2}>

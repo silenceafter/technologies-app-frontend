@@ -29,7 +29,7 @@ function MeasuringToolsSearch({ id, selectedValue, onOptionSelect, errorValue })
 
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
-  }, 200);
+  }, 1);
 
   useEffect(() => {
     //загрузка данных при пустом поисковом запросе
@@ -119,7 +119,7 @@ function MeasuringToolsSearch({ id, selectedValue, onOptionSelect, errorValue })
               id="measuring-tools-13"
               error={!!errorValue}
               helperText={errorValue}
-              placeholder="Мерительный инструмент"
+              placeholder="Измерительный инструмент"
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}
               size='small'

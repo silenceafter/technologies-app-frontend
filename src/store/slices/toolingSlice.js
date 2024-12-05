@@ -11,10 +11,10 @@ const initialState = {
 };
 
 export const fetchData = createAsyncThunk(
-  'rig/fetchData',
+  'tooling/fetchData',
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getrig.v0.php?search=${search}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getTooling.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -26,8 +26,8 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-const rigSlice = createSlice({
-  name: 'rig',
+const toolingSlice = createSlice({
+  name: 'tooling',
   initialState,
   reducers: {
     setSearch: (state, action) => {
@@ -72,9 +72,9 @@ const rigSlice = createSlice({
 });
 
 //селекторы
-export const selectSearch = (state) => state.rig.search;
-export const selectLimit = (state) => state.rig.limit;
-export const selectPage = (state) => state.rig.page;
+export const selectSearch = (state) => state.tooling.search;
+export const selectLimit = (state) => state.tooling.limit;
+export const selectPage = (state) => state.tooling.page;
 
-export const { setSearch, setLimit, setPage } = rigSlice.actions;
-export default rigSlice.reducer;
+export const { setSearch, setLimit, setPage } = toolingSlice.actions;
+export default toolingSlice.reducer;

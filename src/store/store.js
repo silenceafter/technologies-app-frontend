@@ -5,7 +5,7 @@ import headerReducer from './slices/headerSlice';
 import operationsReducer from './slices/operationsSlice';
 import professionsReducer from './slices/professionsSlice';
 import measuringToolsReducer from './slices/measuringToolsSlice';
-import rigReducer from './slices/rigSlice';
+import toolingReducer from './slices/toolingSlice';
 import componentsReducer from './slices/componentsSlice';
 import materialsReducer from './slices/materialsSlice';
 /*import postRequestReducer from './reducers/postRequestReducer';
@@ -21,7 +21,7 @@ const rootReducer = combineReducers({
   operations: operationsReducer,
   professions: professionsReducer,
   measuringTools: measuringToolsReducer,
-  rig: rigReducer /* оснастка */,
+  tooling: toolingReducer /* оснастка */,
   components: componentsReducer,
   materials: materialsReducer,
   /*router: routerReducer,*/
