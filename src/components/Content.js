@@ -26,12 +26,17 @@ import { MaterialsSearch } from './MaterialsSearch';
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import { TabPanel } from './TabPanel';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 export default function Content() {
+  const dispatch = useDispatch();
+  const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
+
   //список числовых полей (для последующей валидации вместо type="number")
   const numericFields = [
     'operationNumber1', 
@@ -216,6 +221,7 @@ export default function Content() {
       setOpen(true);
       validateForm();
       setLoading((prev) => ({ ...prev, save: false }));
+      dispatch(setUnsavedChanges(false));
     }, 2000));
   }
 
@@ -229,6 +235,7 @@ export default function Content() {
     //
     setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
     setFormErrors((prevErrors) => ({ ...prevErrors, [name]: errorMessage }));
+    dispatch(setUnsavedChanges(true));
   };
   //
   return (

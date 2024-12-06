@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -13,13 +13,16 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import Box from '@mui/material/Box';
 import { Tabs, Tab } from '@mui/material';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchData, setSearch, selectSearch } from '../store/slices/drawingsAllTreeSlice';
+import { selectSearch as selectSearchHeader } from '../store/slices/headerSlice';
 
 const MUI_X_PRODUCTS = [
     {
       id: 'grid',
       label: 'Data Grid',
       children: [
-        { id: 'grid-community', label: '@mui/x-data-grid' },
+        { id: 'grid-community', label: '@mui/x-data-grid', children: [ { id: 'id1', label: 'label-id1'} ] },
         { id: 'grid-pro', label: '@mui/x-data-grid-pro' },
         { id: 'grid-premium', label: '@mui/x-data-grid-premium' },
       ],
@@ -45,8 +48,29 @@ const MUI_X_PRODUCTS = [
   ];
 
 export default function DrawingsAllTree() {
+  const dispatch = useDispatch();
+
+  //запросы
+  const searchHeader = useSelector(selectSearchHeader);//значение строки поиска (чертежей)
+  const search = useSelector(selectSearch);
+  const { items, loading, error } = useSelector((state) => state.drawingsAllTree);
+
+  /*useEffect(() => {
+    //загрузка данных при пустом поисковом запросе
+    if (!search) {
+      dispatch(fetchData({ search: searchHeader}));
+    }
+  }, [dispatch, search]);
+
+  useEffect(() => {
+    //поиск при изменении значения в поле ввода
+    if (searchHeader !== search) {
+      dispatch(setSearch(searchHeader));
+    }
+  }, [searchHeader, search, dispatch]);*/
+
   return (
-    <>
+    <>    
         <AppBar
             position="static"
             color="primary"

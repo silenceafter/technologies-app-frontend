@@ -8,6 +8,8 @@ import measuringToolsReducer from './slices/measuringToolsSlice';
 import toolingReducer from './slices/toolingSlice';
 import componentsReducer from './slices/componentsSlice';
 import materialsReducer from './slices/materialsSlice';
+import unsavedChangesReducer from './slices/unsavedChangesSlice';
+import drawingsAllTreeReducer from './slices/drawingsAllTreeSlice';
 /*import postRequestReducer from './reducers/postRequestReducer';
 import routerReducer from './reducers/routerReducer';
 import sidebarReducer from './slices/sidebarSlice';*/
@@ -24,6 +26,8 @@ const rootReducer = combineReducers({
   tooling: toolingReducer /* оснастка */,
   components: componentsReducer,
   materials: materialsReducer,
+  unsavedChanges: unsavedChangesReducer,
+  drawingsAllTree: drawingsAllTreeReducer,
   /*router: routerReducer,*/
 });
 
