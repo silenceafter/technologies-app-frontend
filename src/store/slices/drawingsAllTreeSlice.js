@@ -1,28 +1,33 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { selectSearch } from './headerSlice';
 import { method } from 'lodash';
 
 const initialState = {
   items: [],
   loading: false,
   error: null,
-  search: '',
+  limit: 50,
+  page: 1,
+  hasMore: true,
 };
 
 export const fetchData = createAsyncThunk(
   'drawingsAllTree/fetchData',
-  async ({ search }, { rejectWithValue }) => {
+  async ({ limit, page }, { getState, rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateDataTree.v0.php`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ search }),
-      });
+      const state = getState();
+      //const { limit, page } = state.drawingsAllTree;
+      const search = selectSearch(state);
+      console.log(search);
+      //
+      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateDataTree.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
       }
+
+      console.log(typeof data);
+
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -34,10 +39,9 @@ const drawingsAllTreeSlice = createSlice({
   name: 'drawingsAllTree',
   initialState,
   reducers: {
-    setSearch: (state, action) => {
-      state.search = action.payload;
-      state.items = [];
-    },    
+    setPage: (state, action) => {
+      state.page = action.payload;
+   }
   },
   extraReducers: (builder) => {
     builder
@@ -47,23 +51,23 @@ const drawingsAllTreeSlice = createSlice({
       })
       .addCase(fetchData.fulfilled, (state, action) => {
         state.loading = false;
-        const newItems = action.payload.data.filter(newItem => 
-          !state.items.some(existingItem => {
-            return `${existingItem.id}-${existingItem.label}` === 
-                `${newItem.id}-${newItem.label}`;
-            })
+        const newItems = action.payload.filter(newItem => 
+          !state.items.some(existingItem => existingItem.id === newItem.id)
         );
         //
-        state.items = [...state.items, ...newItems];//добавляем только новые данные к существующему списку
+        state.items = [...state.items, ...newItems];//добавляем только новые данные к существующему списку        
+        if (newItems.length < state.limit) {
+          state.hasMore = false;//если меньше лимита, прекращаем подгрузку
+        }
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.hasMore = false;
       });
   },
 });
 
-//селекторы
-export const selectSearch = (state) => state.drawingsAllTree.search;
-export const { setSearch } = drawingsAllTreeSlice.actions;
+export const { setPage } = drawingsAllTreeSlice.actions;
+export const selectItems = (state) => state.drawingsAllTreeSlice.items || [];
 export default drawingsAllTreeSlice.reducer;
