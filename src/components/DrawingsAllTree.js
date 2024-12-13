@@ -13,13 +13,16 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import Box from '@mui/material/Box';
 import { Tabs, Tab } from '@mui/material';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
+import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
+import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
+import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
+
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setPage, setSearch, selectItems } from '../store/slices/drawingsAllTreeSlice';
 import { selectSearch as selectSearchHeader } from '../store/slices/headerSlice';
 
-const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
+const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
   color: theme.palette.grey[200],
   [`& .${treeItemClasses.content}`]: {
     borderRadius: theme.spacing(0.5),
@@ -49,46 +52,55 @@ const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
   ...theme.applyStyles('light', {
     color: theme.palette.grey[800],
   }),
+  ...(hasSecondaryLabel && {
+    paddingLeft: theme.spacing(1),
+    marginTop: theme.spacing(0.5),
+    [`& .${treeItemClasses.label}`]: {
+      color: theme.palette.text.secondary,
+    },
+  }),
 }));
 
-let MUI_X_PRODUCTS = [
-    {
-      id: 'grid',
-      label: 'Data Grid',
-      children: [
-        { id: 'grid-community', label: '@mui/x-data-grid', children: [ { id: 'id1', label: 'label-id1'} ] },
-        { id: 'grid-pro', label: '@mui/x-data-grid-pro' },
-        { id: 'grid-premium', label: '@mui/x-data-grid-premium' },
-      ],
-    },
-    {
-      id: 'pickers',
-      label: 'Date and Time Pickers',
-      children: [
-        { id: 'pickers-community', label: '@mui/x-date-pickers' },
-        { id: 'pickers-pro', label: '@mui/x-date-pickers-pro' },
-      ],
-    },
-    {
-      id: 'charts',
-      label: 'Charts',
-      children: [{ id: 'charts-community', label: '@mui/x-charts' }],
-    },
-    {
-      id: 'tree-view',
-      label: 'Tree View',
-      children: [{ id: 'tree-view-community', label: '@mui/x-tree-view' }],
-    },
-  ];
+function CustomLabel({ children, className, secondaryLabel }) {
+  return (
+    <div className={className}>
+      <Typography>{children}</Typography>
+      {secondaryLabel && (
+        <Typography variant="caption" color="secondary">
+          {secondaryLabel}
+        </Typography>
+      )}
+    </div>
+  );
+}
+
+const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props }, ref) {
+  const { publicAPI } = useTreeItem2Utils({
+    itemId: props.itemId,
+    children: props.children,
+  });
+  const item = publicAPI.getItem(props.itemId);
+  //
+  return (
+    <StyledTreeItem2
+      {...props}
+      ref={ref}
+      slots={{
+        label: CustomLabel,
+      }}
+      slotProps={{
+        label: { 
+          secondaryLabel: item?.secondaryLabel || '',
+        },
+      }}
+    >      
+    </StyledTreeItem2>
+  );
+});
 
 export default function DrawingsAllTree() {
   const dispatch = useDispatch();
-  let items = useSelector((state) => state.drawingsAllTree.items);
-  if (typeof items == 'object') {
-    
-    MUI_X_PRODUCTS = items;
-  }
-
+  const items = useSelector((state) => state.drawingsAllTree.items);
   const limit = useSelector((state) => state.drawingsAllTree.limit);
   const page = useSelector((state) => state.drawingsAllTree.page);
   const hasMore = useSelector((state) => state.drawingsAllTree.hasMore);
@@ -104,6 +116,7 @@ export default function DrawingsAllTree() {
     return () => window.removeEventListener('scroll', handleScroll);//чистим обработчик при размонтировании
   }, [loading, hasMore]);
 
+  //прокрутка RichTreeView
   const handleScroll = (event) => {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
       if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
@@ -112,7 +125,10 @@ export default function DrawingsAllTree() {
       }
   };
 
-
+  //нажатие на элемент списка
+  const handleItemClick = (e) => {
+    //console.log('Node clicked:', e);
+  };
 
   //запросы
   //const searchHeader = useSelector(selectSearchHeader);//значение строки поиска (чертежей)
@@ -132,35 +148,35 @@ export default function DrawingsAllTree() {
       dispatch(setSearch(searchHeader));
     }
   }, [searchHeader, search, dispatch]);*/
-
   return (
     <>
-        <AppBar
-            position="static"
-            color="primary"
-            elevation={0}
-            sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
-        >
-            <Toolbar>
-                <Typography color="inherit">
-                    Изделия
-                </Typography>
-            </Toolbar>
-        </AppBar>
-        <Box
-            sx={{
-                height: 323,
-                overflowY: 'auto',
-                overflowX: 'auto',
-                border: '1px solid rgba(0, 0, 0, 0.12)',              
-            }}
-            onScroll={handleScroll}
-        >
-          <RichTreeView
-            defaultExpandedItems={['grid']}
-            slots={{ item: CustomTreeItem }}
-            items={MUI_X_PRODUCTS}
-          />
+      <AppBar
+          position="static"
+          color="primary"
+          elevation={0}
+          sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
+      >
+          <Toolbar>
+              <Typography color="inherit">
+                  Изделия
+              </Typography>
+          </Toolbar>
+      </AppBar>
+      <Box
+          sx={{
+              height: 323,
+              overflowY: 'auto',
+              overflowX: 'auto',
+              border: '1px solid rgba(0, 0, 0, 0.12)',              
+          }}
+          onScroll={handleScroll}
+      >
+        <RichTreeView
+          defaultExpandedItems={[]}
+          slots={{ item: CustomTreeItem }}
+          items={items}
+          onItemClick={handleItemClick}
+        />
       </Box>       
     </>
   );

@@ -18,7 +18,6 @@ export const fetchData = createAsyncThunk(
       const state = getState();
       //const { limit, page } = state.drawingsAllTree;
       const search = selectSearch(state);
-      console.log(search);
       //
       const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateDataTree.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
@@ -26,9 +25,15 @@ export const fetchData = createAsyncThunk(
         throw new Error(data.message || 'Network response was not ok');
       }
 
-      console.log(typeof data);
-
-      return data;
+      //приведем к нужному виду
+      const processItem = (item) => ({
+        ...item,
+        id: item.id || item.ItemId,
+        label: item.label || 'Unnamed Item',
+        secondaryLabel: item.secondaryLabel || null,
+        children: item.children.map(processItem) || []
+      });
+      return data.map(processItem);
     } catch (error) {
       return rejectWithValue(error.message);
     }
