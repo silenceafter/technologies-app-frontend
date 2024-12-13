@@ -80,6 +80,12 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props
     children: props.children,
   });
   const item = publicAPI.getItem(props.itemId);
+
+  //нажатие на элемент списка
+  const handleItemClick = () => {
+    console.log('Node clicked:', item.id);
+  };
+
   //
   return (
     <StyledTreeItem2
@@ -93,8 +99,8 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props
           secondaryLabel: item?.secondaryLabel || '',
         },
       }}
-    >      
-    </StyledTreeItem2>
+      onClick={handleItemClick}
+    />
   );
 });
 
@@ -126,9 +132,9 @@ export default function DrawingsAllTree() {
   };
 
   //нажатие на элемент списка
-  const handleItemClick = (e) => {
-    //console.log('Node clicked:', e);
-  };
+  /*const handleItemClick = (event, node) => {
+    console.log('Node clicked:', node.id);
+  };*/
 
   //запросы
   //const searchHeader = useSelector(selectSearchHeader);//значение строки поиска (чертежей)
@@ -175,7 +181,7 @@ export default function DrawingsAllTree() {
           defaultExpandedItems={[]}
           slots={{ item: CustomTreeItem }}
           items={items}
-          onItemClick={handleItemClick}
+          /*onItemClick={handleItemClick}*/
         />
       </Box>       
     </>

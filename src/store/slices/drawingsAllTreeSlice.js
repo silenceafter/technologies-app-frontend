@@ -4,6 +4,7 @@ import { method } from 'lodash';
 
 const initialState = {
   items: [],
+  itemsDetails: [],
   loading: false,
   error: null,
   limit: 50,
@@ -11,6 +12,7 @@ const initialState = {
   hasMore: true,
 };
 
+//загрузка списка изделий (корневые элементы)
 export const fetchData = createAsyncThunk(
   'drawingsAllTree/fetchData',
   async ({ limit, page }, { getState, rejectWithValue }) => {
@@ -39,6 +41,26 @@ export const fetchData = createAsyncThunk(
     }
   }
 );
+
+//загрузка элементов списка (вложенные элементы)
+export const fetchDataDetails = createAsyncThunk(
+  'drawingsAllTree/fetchDataDetails',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState();
+      const search = selectSearch(state);
+      //
+      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/GetDataTreeItem.v0.php?search=${search}`);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Network response was not ok');
+      }
+    } catch(error) {
+
+    }
+  }
+);
+
 
 const drawingsAllTreeSlice = createSlice({
   name: 'drawingsAllTree',
@@ -69,10 +91,23 @@ const drawingsAllTreeSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.hasMore = false;
+      })
+      .addCase(fetchDataDetails.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchDataDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        const { itemId, details } = action.payload;
+        state.DataDetails[itemId] = details;
+      })
+      .addCase(fetchDataDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
 export const { setPage } = drawingsAllTreeSlice.actions;
 export const selectItems = (state) => state.drawingsAllTreeSlice.items || [];
+export const selectDataDetails = (state, itemId) => state.drawingsAllTree.DataDetails[itemId] || null;
 export default drawingsAllTreeSlice.reducer;
