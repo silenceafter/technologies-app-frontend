@@ -82,9 +82,17 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props
   const item = publicAPI.getItem(props.itemId);
 
   //нажатие на элемент списка
-  const handleItemClick = () => {
-    console.log('Node clicked:', item.id);
+  const handleRootClick = (e) => {
+    e.stopPropagation();
+    console.log('Root node clicked:', item.id);
   };
+
+  const handleChildClick = (e) => {
+    e.stopPropagation();
+    console.log('Child node clicked:', item.id);
+  };
+
+  const handleClick = item.type === 'root' ? handleRootClick : handleChildClick;
 
   //
   return (
@@ -99,7 +107,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props
           secondaryLabel: item?.secondaryLabel || '',
         },
       }}
-      onClick={handleItemClick}
+      onClick={handleClick}
     />
   );
 });
@@ -132,9 +140,9 @@ export default function DrawingsAllTree() {
   };
 
   //нажатие на элемент списка
-  /*const handleItemClick = (event, node) => {
+  const handleItemClick = (event, node) => {
     console.log('Node clicked:', node.id);
-  };*/
+  };
 
   //запросы
   //const searchHeader = useSelector(selectSearchHeader);//значение строки поиска (чертежей)
