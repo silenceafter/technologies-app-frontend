@@ -42,25 +42,27 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-//загрузка элементов списка (вложенные элементы)
-export const fetchDataDetails = createAsyncThunk(
-  'drawingsAllTree/fetchDataDetails',
-  async (_, { getState, rejectWithValue }) => {
+//загрузка элементов списка (вложенные элементы; загрузка только новых элементов)
+export const fetchItemDetails = createAsyncThunk(
+  'drawingsAllTree/fetchItemDetails',
+  async (payload, { getState, rejectWithValue }) => {
     try {
-      const state = getState();
-      const search = selectSearch(state);
+      /*const state = getState();
+      const search = selectSearch(state);*/
       //
-      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/GetDataTreeItem.v0.php?search=${search}`);
+      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/GetDataTreeItem.v0.php`, {
+        method: 'POST',
+        /*headers: { 'Content-Type': 'application/json' },*/
+        body: JSON.stringify(payload),
+      });
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Network response was not ok');
-      }
+      if (!response.ok) throw new Error(data.message || 'Ошибка запроса');      
+      return { payload, children: data.items, parentId: data.parentId, childId: data.childId, subChildId: data.subChildId };
     } catch(error) {
 
     }
   }
 );
-
 
 const drawingsAllTreeSlice = createSlice({
   name: 'drawingsAllTree',
@@ -92,15 +94,69 @@ const drawingsAllTreeSlice = createSlice({
         state.error = action.payload;
         state.hasMore = false;
       })
-      .addCase(fetchDataDetails.pending, (state) => {
+      .addCase(fetchItemDetails.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchDataDetails.fulfilled, (state, action) => {
+      .addCase(fetchItemDetails.fulfilled, (state, action) => {
         state.loading = false;
-        const { itemId, details } = action.payload;
-        state.DataDetails[itemId] = details;
+        const { itemId, children, parentId, childId, subChildId } = action.payload;
+        const parentItem = state.items.find((item) => item.id === parentId);
+
+        /*if (parentItem) {
+          const existingChildIds = new Set(parentItem.children.map((child) => child.id));
+          const newChildren = children.filter((child) => !existingChildIds.has(child.id));
+
+          parentItem.children = [...parentItem.children, ...newChildren];
+        }*/
+          const removeSubChild = (items, subChildId) => {
+            return items.map(item => {
+              if (item.children) {
+                // Рекурсивно обходим дочерние элементы
+                item.children = item.children.map(child => {
+                  if (child.children) {
+                    // Фильтруем subchild
+                    child.children = child.children.filter(subChild => subChild.id !== subChildId);
+                    // Рекурсивно вызываем для subchild
+                    child.children = removeSubChild(child.children, subChildId);
+                  }
+                  return child;
+                });
+              }
+              return item;
+            });
+          };
+          
+          const addSubChild = (items, parentId, newChild) => {
+            return items.map(item => {
+              if (item.children) {
+                item.children = item.children.map(child => {
+                  if (child.id === parentId) {
+                    // Добавляем новый subchild
+                    child.children = [...(child.children || []), newChild];
+                  } else if (child.children) {
+                    // Рекурсивно обходим subchild
+                    child.children = addSubChild(child.children, parentId, newChild);
+                  }
+                  return child;
+                });
+              }
+              return item;
+            });
+          };
+          
+
+          const newSubChild = { id: 401, label: 'Новый SubChild' };
+          
+          // Удаление subchild
+          state.items = removeSubChild(state.items, subChildId);
+          
+          // Добавление нового subchild
+          state.items = addSubChild(state.items, childId, newSubChild);
+        
+    
+        let y;
       })
-      .addCase(fetchDataDetails.rejected, (state, action) => {
+      .addCase(fetchItemDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -109,5 +165,5 @@ const drawingsAllTreeSlice = createSlice({
 
 export const { setPage } = drawingsAllTreeSlice.actions;
 export const selectItems = (state) => state.drawingsAllTreeSlice.items || [];
-export const selectDataDetails = (state, itemId) => state.drawingsAllTree.DataDetails[itemId] || null;
+//export const selectItemDetails = (state, itemId) => state.drawingsAllTree.ItemDetails[itemId] || null;
 export default drawingsAllTreeSlice.reducer;

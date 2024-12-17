@@ -19,8 +19,9 @@ import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
 
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setPage, setSearch, selectItems } from '../store/slices/drawingsAllTreeSlice';
+import { fetchData, fetchItemDetails, setPage, setSearch, selectItems } from '../store/slices/drawingsAllTreeSlice';
 import { selectSearch as selectSearchHeader } from '../store/slices/headerSlice';
+import { split } from 'lodash';
 
 const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
   color: theme.palette.grey[200],
@@ -75,6 +76,8 @@ function CustomLabel({ children, className, secondaryLabel }) {
 }
 
 const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props }, ref) {
+  const dispatch = useDispatch();
+  const items = useSelector((state) => state.drawingsAllTree.items);
   const { publicAPI } = useTreeItem2Utils({
     itemId: props.itemId,
     children: props.children,
@@ -89,7 +92,49 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props
 
   const handleChildClick = (e) => {
     e.stopPropagation();
-    console.log('Child node clicked:', item.id);
+    //найти родительский элемент в items
+    const findParent = (items, childId) => {
+      return items.find((item) => item.id === childId);
+    };
+
+    try {
+      const parent = findParent(items, item.id.split('-')[0]);
+      const product = parent.nizd;
+      const modification = parent.mod;
+      //
+      dispatch(fetchItemDetails({
+        parent: { id: parent.id },
+        child: { id: item.id },
+        subChild: { id: item.children[0].id },
+        data: {
+          products_nodes: {
+            nizd: product,
+            mod: modification,
+            chtr: item.label,
+            naim: item.secondaryLabel,
+            type: 'product'
+          },
+          products: {
+            nizd: product,
+            mod: modification,
+            kudar: item.label,
+            naim: item.secondaryLabel,
+            dtv: ''
+          },
+          kod: item.label
+        },
+        options: {
+          components: false,
+          materials: false,
+          product_info: {            
+            type: 'product',            
+          },
+          uncovered: [false, false]
+        }
+      }));
+    } catch(error) {
+      //уведомление об ошибке
+    }
   };
 
   const handleClick = item.type === 'root' ? handleRootClick : handleChildClick;
@@ -137,11 +182,6 @@ export default function DrawingsAllTree() {
         dispatch(setPage(page + 1));
         dispatch(fetchData({ limit, page: page + 1 }));
       }
-  };
-
-  //нажатие на элемент списка
-  const handleItemClick = (event, node) => {
-    console.log('Node clicked:', node.id);
   };
 
   //запросы
