@@ -99,43 +99,30 @@ const drawingsAllTreeSlice = createSlice({
       })
       .addCase(fetchItemDetails.fulfilled, (state, action) => {
         state.loading = false;
-        const { itemId, children, parentId, childId, subChildId } = action.payload;
+        const { parentId, children } = action.payload;
         const parentItem = state.items.find((item) => item.id === parentId);
 
         /*if (parentItem) {
           const existingChildIds = new Set(parentItem.children.map((child) => child.id));
           const newChildren = children.filter((child) => !existingChildIds.has(child.id));
-
+        
           parentItem.children = [...parentItem.children, ...newChildren];
         }*/
-          const removeSubChild = (items, subChildId) => {
-            return items.map(item => {
-              if (item.children) {
-                // Рекурсивно обходим дочерние элементы
-                item.children = item.children.map(child => {
-                  if (child.children) {
-                    // Фильтруем subchild
-                    child.children = child.children.filter(subChild => subChild.id !== subChildId);
-                    // Рекурсивно вызываем для subchild
-                    child.children = removeSubChild(child.children, subChildId);
-                  }
-                  return child;
-                });
-              }
-              return item;
-            });
-          };
+
           
-          const addSubChild = (items, parentId, newChild) => {
+
+          const removeAllChildren = (items) => items.children[0].children = children;
+          
+          const addMultipleSubChildren = (items, parentId, newChildren) => {
             return items.map(item => {
               if (item.children) {
                 item.children = item.children.map(child => {
                   if (child.id === parentId) {
-                    // Добавляем новый subchild
-                    child.children = [...(child.children || []), newChild];
+                    // Добавляем новые subchildren
+                    child.children = [...(child.children || []), ...newChildren];
                   } else if (child.children) {
                     // Рекурсивно обходим subchild
-                    child.children = addSubChild(child.children, parentId, newChild);
+                    child.children = addMultipleSubChildren(child.children, parentId, newChildren);
                   }
                   return child;
                 });
@@ -143,15 +130,11 @@ const drawingsAllTreeSlice = createSlice({
               return item;
             });
           };
-          
-
-          const newSubChild = { id: 401, label: 'Новый SubChild' };
-          
           // Удаление subchild
-          state.items = removeSubChild(state.items, subChildId);
+          removeAllChildren(parentItem);
           
           // Добавление нового subchild
-          state.items = addSubChild(state.items, childId, newSubChild);
+          //state.items = addMultipleSubChildren(state.items, parentId, children);
         
     
         let y;

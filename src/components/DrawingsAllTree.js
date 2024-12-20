@@ -22,6 +22,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, fetchItemDetails, setPage, setSearch, selectItems } from '../store/slices/drawingsAllTreeSlice';
 import { selectSearch as selectSearchHeader } from '../store/slices/headerSlice';
 import { split } from 'lodash';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
   color: theme.palette.grey[200],
@@ -83,22 +84,23 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props
     children: props.children,
   });
   const item = publicAPI.getItem(props.itemId);
+  const [isLoading, setIsLoading] = useState(false);
 
   //нажатие на элемент списка
   const handleRootClick = (e) => {
-    e.stopPropagation();
-    console.log('Root node clicked:', item.id);
+    e.stopPropagation();    
   };
 
   const handleChildClick = (e) => {
     e.stopPropagation();
+    setIsLoading(true);
     //найти родительский элемент в items
-    const findParent = (items, childId) => {
-      return items.find((item) => item.id === childId);
+    const findParent = (items, parentId) => {
+      return items.find((item) => item.id === parentId);
     };
 
     try {
-      const parent = findParent(items, item.id.split('-')[0]);
+      const parent = findParent(items, item.parentId);
       const product = parent.nizd;
       const modification = parent.mod;
       //
@@ -131,9 +133,12 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props
           },
           uncovered: [false, false]
         }
-      }));
+      })).finally(() => {
+        setIsLoading(false);
+      });
     } catch(error) {
       //уведомление об ошибке
+      setIsLoading(false);
     }
   };
 
