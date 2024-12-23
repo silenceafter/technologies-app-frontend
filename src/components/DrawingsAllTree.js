@@ -23,6 +23,7 @@ import { fetchData, fetchItemDetails, setPage, setSearch, selectItems } from '..
 import { selectSearch as selectSearchHeader } from '../store/slices/headerSlice';
 import { split } from 'lodash';
 import CircularProgress from '@mui/material/CircularProgress';
+import ShowCircularProgress from './ShowCircularProgress';
 
 const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
   color: theme.palette.grey[200],
@@ -84,16 +85,18 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props
     children: props.children,
   });
   const item = publicAPI.getItem(props.itemId);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   //нажатие на элемент списка
   const handleRootClick = (e) => {
-    e.stopPropagation();    
+    e.stopPropagation();
   };
 
   const handleChildClick = (e) => {
     e.stopPropagation();
-    setIsLoading(true);
+    //if (isLoading) return;
+    //setIsLoading(true);
     //найти родительский элемент в items
     const findParent = (items, parentId) => {
       return items.find((item) => item.id === parentId);
@@ -134,31 +137,32 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem({ node, ...props
           uncovered: [false, false]
         }
       })).finally(() => {
-        setIsLoading(false);
+        /*setIsLoading(false);
+        setIsExpanded(true);*/
       });
     } catch(error) {
       //уведомление об ошибке
-      setIsLoading(false);
+      //setIsLoading(false);
     }
   };
-
-  const handleClick = item.type === 'root' ? handleRootClick : handleChildClick;
-
   //
   return (
-    <StyledTreeItem2
-      {...props}
-      ref={ref}
-      slots={{
-        label: CustomLabel,
-      }}
-      slotProps={{
-        label: { 
-          secondaryLabel: item?.secondaryLabel || '',
-        },
-      }}
-      onClick={handleClick}
-    />
+      <StyledTreeItem2
+        {...props}
+        ref={ref}
+        slots={{
+          label: CustomLabel,
+        }}
+        slotProps={{
+          label: { 
+            secondaryLabel: item?.secondaryLabel || '',
+          },
+        }}
+        onClick={item.type === 'root' ? handleRootClick : handleChildClick}
+        /*expanded={isExpanded}*/
+        disabled={true}
+      >
+      </StyledTreeItem2>
   );
 });
 
@@ -226,7 +230,7 @@ export default function DrawingsAllTree() {
               height: 323,
               overflowY: 'auto',
               overflowX: 'auto',
-              border: '1px solid rgba(0, 0, 0, 0.12)',              
+              border: '1px solid rgba(0, 0, 0, 0.12)',
           }}
           onScroll={handleScroll}
       >
