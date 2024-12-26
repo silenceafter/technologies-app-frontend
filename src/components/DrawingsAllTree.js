@@ -16,6 +16,7 @@ import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
 import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
+import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
@@ -24,31 +25,14 @@ import { selectSearch as selectSearchHeader } from '../store/slices/headerSlice'
 import { split } from 'lodash';
 import CircularProgress from '@mui/material/CircularProgress';
 import ShowCircularProgress from './ShowCircularProgress';
+import Skeleton from '@mui/material/Skeleton';
 
 export default function DrawingsAllTree() {
   const timerRef = useRef(null);
   const [expanded, setExpanded] = useState([]);
-
-  const handleToggle = (nodeId) => {
-    setExpanded((prevExpanded) =>
-      prevExpanded.includes(nodeId)
-        ? prevExpanded.filter((id) => id !== nodeId)
-        : [...prevExpanded, nodeId]
-    );
-    /*if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      setExpanded((prevExpanded) => {
-      return prevExpanded.includes(nodeId)
-        ? prevExpanded.filter((id) => id !== nodeId) // Если уже развернут — свернуть
-        : [...prevExpanded, nodeId]; // Если свернут — развернуть
-      }
-    );
-    }, 2000);*/ // Таймер на 2 секунды
-  };
-
-  useEffect(() => {
-    return () => clearTimeout(timerRef.current);
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerCompleted, setTimerCompleted] = useState(false);
+  const MIN_LOADING_TIME = 5000;
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -86,14 +70,7 @@ export default function DrawingsAllTree() {
       [`& .${treeItemClasses.label}`]: {
         color: theme.palette.text.secondary,
       },
-    }),
-    /*[`& .${treeItemClasses.disabled}`]: {
-      opacity: 0.5,
-      pointerEvents: `none`, 
-      cursor: `not-allowed`,
-      backgroundColor: `#f0f0f0`,
-      color: `#a0a0a0`
-    }*/
+    })
   }));
   
   function CustomLabel({ children, className, secondaryLabel }) {
@@ -109,7 +86,7 @@ export default function DrawingsAllTree() {
     );
   }
   
-  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ onToggle, isExpanded, ...props }, ref) {
+  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ isLoading, ...props }, ref) {
     const dispatch = useDispatch();
     const items = useSelector((state) => state.drawingsAllTree.items);
     const { publicAPI } = useTreeItem2Utils({
@@ -117,76 +94,107 @@ export default function DrawingsAllTree() {
       children: props.children,
     });
     const item = publicAPI.getItem(props.itemId);
-    //[isExpanded, setIsExpanded] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
 
-    const handleClick = () => {
-      onToggle(props.itemId); // Вызываем toggle-функцию при клике
-    };
+    const { interactions, status } = useTreeItem2Utils({
+      itemId: props.itemId,
+      children: props.children,
+    });
 
-    
-  
     //нажатие на элемент списка
     const handleRootClick = (e) => {
       e.stopPropagation();
     };
   
-    const handleChildClick = (e) => {
-      e.preventDefault();
-      //if (isLoading) return;
-      //setIsLoading(true);
+    const handleChildClick = async (e) => {
+      setIsLoading(true);
+      setTimerCompleted(false);
+
       //найти родительский элемент в items
       const findParent = (items, parentId) => {
         return items.find((item) => item.id === parentId);
       };
-  
+      
+      const parent = findParent(items, item.parentId);
+      const product = parent.nizd;
+      const modification = parent.mod;
+      
+      timerRef.current = setTimeout(() => {
+        clearTimeout(timerRef.current);
+        setTimerCompleted(true);
+        setIsLoading(false);
+      }, MIN_LOADING_TIME);
+
       try {
-        const parent = findParent(items, item.parentId);
-        //handleDelayedExpansion(parent.id);
-        const product = parent.nizd;
-        const modification = parent.mod;
-        //
-        dispatch(fetchItemDetails({
-          parent: { id: parent.id },
-          child: { id: item.id },
-          subChild: { id: item.children[0].id },
-          data: {
-            products_nodes: {
-              nizd: product,
-              mod: modification,
-              chtr: item.label,
-              naim: item.secondaryLabel,
-              type: 'product'
+        await new Promise((resolve, reject) => {
+          dispatch(fetchItemDetails({
+            /*parent: { id: parent.id },
+            child: { id: item.id },
+            subChild: { id: item.children[0].id },*/
+            data: {
+              products_nodes: {
+                nizd: product,
+                mod: modification,
+                chtr: item.label,
+                naim: item.secondaryLabel,
+                type: 'product'
+              },
+              products: {
+                nizd: product,
+                mod: modification,
+                kudar: item.label,
+                naim: item.secondaryLabel,
+                dtv: ''
+              },
+              kod: item.label
             },
-            products: {
-              nizd: product,
-              mod: modification,
-              kudar: item.label,
-              naim: item.secondaryLabel,
-              dtv: ''
-            },
-            kod: item.label
-          },
-          options: {
-            components: false,
-            materials: false,
-            product_info: {            
-              type: 'product',            
-            },
-            uncovered: [false, false]
-          }
-        })).finally(() => {
-          /*setIsLoading(false);
-          setIsExpanded(true);*/
-        });
+            options: {
+              components: false,
+              materials: false,
+              product_info: {            
+                type: 'product',            
+              },
+              uncovered: [false, false]
+            }
+          }))
+          .then(() => resolve())
+          .catch((error) => reject(error));
+
+        if (!timerCompleted) {
+          /*clearTimeout(timerRef.current);
+          setTimerCompleted(true);
+          setIsLoading(false);*/
+
+          /*setTimeout(() => {
+            reject(new Error("Загрузка заняла слишком много времени"));
+          }, MIN_LOADING_TIME);*/
+        }
+      });
       } catch(error) {
         //уведомление об ошибке
+        setTimerCompleted(true);
+        setIsLoading(false);
+      } finally {        
+        //clearTimeout(timerRef.current);  // Очищаем таймер
         //setIsLoading(false);
       }
     };
-    //
-    console.log(`CustomTreeItem ${props.itemId} isExpanded:`, isExpanded);
-    return (
+
+    //удалить состояние элемента
+    /*setExpanded((prevExpanded) => {
+      if (prevExpanded.includes(props.itemId)) {
+        return prevExpanded.filter((id) => id !== props.itemId);
+      } else {
+        return [...prevExpanded, props.itemId];
+      }
+    });*/
+
+    //убрать анимацию загрузки для скрытия элемента
+    /*if (isExpanded) {
+      setIsLoading(false);
+    }*/
+
+    if (isLoading) {
+      return (
         <StyledTreeItem2
           {...props}
           ref={ref}
@@ -198,12 +206,43 @@ export default function DrawingsAllTree() {
               secondaryLabel: item?.secondaryLabel || '',
             },
           }}
-          nodeId={props.itemId}
-          onClick={/*item.type === 'root' ? handleRootClick : handleChildClick*/ handleClick}        
-          expanded={isExpanded}
+          id={props.itemId}      
+          expanded={expanded.includes(props.itemId) ? true : undefined}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: 'auto',
+              marginTop: '0rem',
+              marginBottom: '0.5rem'
+            }}
+          >
+            <CircularProgress size={40} />
+          </Box>
+        </StyledTreeItem2>
+      );
+    } else {  
+      return (
+        <StyledTreeItem2
+          {...props}
+          ref={ref}
+          slots={{
+            label: CustomLabel,
+          }}
+          slotProps={{
+            label: { 
+              secondaryLabel: item?.secondaryLabel || '',
+            },
+          }}
+          id={props.itemId}
+          onClick={item.type === 'root' ? handleRootClick : handleChildClick}        
+          expanded={expanded.includes(props.itemId) ? true : undefined}
         >
         </StyledTreeItem2>
     );
+    }
   });
 
   const dispatch = useDispatch();
@@ -250,7 +289,6 @@ export default function DrawingsAllTree() {
       dispatch(setSearch(searchHeader));
     }
   }, [searchHeader, search, dispatch]);*/
-  console.log("RichTreeView expanded:", expanded);
   return (
     <>    
       <AppBar
@@ -279,16 +317,16 @@ export default function DrawingsAllTree() {
             item: (props) => (
               <CustomTreeItem
                 {...props}
-                onToggle={handleToggle}
-                isExpanded={expanded.includes(props.itemId)}
+                isLoading={isLoading}
+                expanded={expanded.includes(props.itemId)}
+                nodeId={props.itemId}
               />
             ),
           }}
           items={items}
-          /*onItemClick={handleItemClick}*/
           expanded={expanded}
         />
-      </Box>       
+      </Box>
     </>
   );
 }
