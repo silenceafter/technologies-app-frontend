@@ -29,10 +29,11 @@ import Skeleton from '@mui/material/Skeleton';
 
 export default function DrawingsAllTree() {
   const timerRef = useRef(null);
-  const [expanded, setExpanded] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [timerCompleted, setTimerCompleted] = useState(false);
-  const MIN_LOADING_TIME = 5000;
+  const [expandedItems, setExpandedItems] = useState([]);
+  const MIN_LOADING_TIME = 1000;
+  const itemRef = useRef(null);
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -86,7 +87,7 @@ export default function DrawingsAllTree() {
     );
   }
   
-  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ isLoading, ...props }, ref) {
+  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ isLoading, IsExpanded, ...props }, ref) {
     const dispatch = useDispatch();
     const items = useSelector((state) => state.drawingsAllTree.items);
     const { publicAPI } = useTreeItem2Utils({
@@ -95,10 +96,12 @@ export default function DrawingsAllTree() {
     });
     const item = publicAPI.getItem(props.itemId);
 
-    const { interactions, status } = useTreeItem2Utils({
-      itemId: props.itemId,
-      children: props.children,
-    });
+    const [expanded, setExpanded] = useState(false);
+    useEffect(() => {
+      expandedItems.includes(props.itemId) 
+        ? setExpanded(true) 
+        : setExpanded(false);
+    }, [expandedItems]);
 
     //нажатие на элемент списка
     const handleRootClick = (e) => {
@@ -108,6 +111,8 @@ export default function DrawingsAllTree() {
     const handleChildClick = async (e) => {
       setIsLoading(true);
       setTimerCompleted(false);
+
+      console.log(`nodeId: ${props.itemId}, expanded: ${expanded}`);
 
       //найти родительский элемент в items
       const findParent = (items, parentId) => {
@@ -171,27 +176,13 @@ export default function DrawingsAllTree() {
       });
       } catch(error) {
         //уведомление об ошибке
-        setTimerCompleted(true);
-        setIsLoading(false);
-      } finally {        
+        /*setTimerCompleted(true);
+        setIsLoading(false);*/
+      } finally {
         //clearTimeout(timerRef.current);  // Очищаем таймер
         //setIsLoading(false);
       }
     };
-
-    //удалить состояние элемента
-    /*setExpanded((prevExpanded) => {
-      if (prevExpanded.includes(props.itemId)) {
-        return prevExpanded.filter((id) => id !== props.itemId);
-      } else {
-        return [...prevExpanded, props.itemId];
-      }
-    });*/
-
-    //убрать анимацию загрузки для скрытия элемента
-    /*if (isExpanded) {
-      setIsLoading(false);
-    }*/
 
     if (isLoading) {
       return (
@@ -206,8 +197,8 @@ export default function DrawingsAllTree() {
               secondaryLabel: item?.secondaryLabel || '',
             },
           }}
-          id={props.itemId}      
-          expanded={expanded.includes(props.itemId) ? true : undefined}
+          id={`treeitem-${props.itemId}`}      
+          /*expanded={expanded.includes(props.itemId) ? true : undefined}*/
         >
           <Box
             sx={{
@@ -236,12 +227,12 @@ export default function DrawingsAllTree() {
               secondaryLabel: item?.secondaryLabel || '',
             },
           }}
-          id={props.itemId}
+          id={`treeitem-${props.itemId}`}
           onClick={item.type === 'root' ? handleRootClick : handleChildClick}        
-          expanded={expanded.includes(props.itemId) ? true : undefined}
+          /*expanded={expanded.includes(props.itemId) ? true : undefined}*/
         >
         </StyledTreeItem2>
-    );
+      );
     }
   });
 
@@ -269,6 +260,27 @@ export default function DrawingsAllTree() {
         dispatch(setPage(page + 1));
         dispatch(fetchData({ limit, page: page + 1 }));
       }
+  };
+
+  const handleItemExpansionToggle = (event, nodeId, expanded) => {
+    /*if (expanded) {
+      clearTimeout(timerRef.current);
+      setTimerCompleted(true);
+      setIsLoading(false);
+    }*/
+
+    if (expanded) {
+      // Добавляем nodeId в expandedItems, если его еще нет
+      setExpandedItems((prevExpanded) => {
+        if (!prevExpanded.includes(nodeId)) {
+          return [...prevExpanded, nodeId]; // Добавляем nodeId в массив
+        }
+        return prevExpanded; // Если уже существует, не добавляем
+      });
+    } else {
+      // Если элемент сворачивается (expanded === false), удаляем nodeId
+      setExpandedItems((prevExpanded) => prevExpanded.filter((id) => id !== nodeId));
+    }
   };
 
   //запросы
@@ -318,13 +330,16 @@ export default function DrawingsAllTree() {
               <CustomTreeItem
                 {...props}
                 isLoading={isLoading}
-                expanded={expanded.includes(props.itemId)}
-                nodeId={props.itemId}
+                /*expanded={expanded.includes(props.itemId)}*/
+                /*nodeId={props.itemId}*/
+                ref={itemRef}
+                IsExpanded={expandedItems.includes(props.itemId)}
               />
             ),
           }}
           items={items}
-          expanded={expanded}
+          /*expanded={expanded}*/
+          onItemExpansionToggle={handleItemExpansionToggle}
         />
       </Box>
     </>
