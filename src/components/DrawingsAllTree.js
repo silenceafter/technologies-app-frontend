@@ -33,7 +33,7 @@ export default function DrawingsAllTree() {
   const [timerCompleted, setTimerCompleted] = useState(false);
   const [expandedItems, setExpandedItems] = useState([]);
   const [loadedItems, setLoadedItems] = useState([]);
-  const MIN_LOADING_TIME = 1000;
+  const MIN_LOADING_TIME = 3000;
   const itemRef = useRef(null);
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
@@ -88,7 +88,7 @@ export default function DrawingsAllTree() {
     );
   }
   
-  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ isLoading, ...props }, ref) {
+  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ isLoading, loadedItems, ...props }, ref) {
     const dispatch = useDispatch();
     const items = useSelector((state) => state.drawingsAllTree.items);
     const { publicAPI } = useTreeItem2Utils({
@@ -99,7 +99,8 @@ export default function DrawingsAllTree() {
 
     //стейты
     const [expanded, setExpanded] = useState(false);
-    const [loaded, setLoaded] = useState(false);
+    //const [loaded, setLoaded] = useState(false);
+    const [b, setB] = useState(false);
     //
     useEffect(() => {
       //expanded
@@ -108,15 +109,19 @@ export default function DrawingsAllTree() {
         : setExpanded(false);
       
       //loaded
-      loadedItems.includes(props.itemId)
+      /*loadedItems.includes(props.itemId)
         ? setLoaded(true) 
-        : setLoaded(false);
+        : setLoaded(false);*/
 
       //выполнение таймера
       /*if (timerCompleted) {
         setIsLoading(false);
       }*/
-    }, [expandedItems, loadedItems, props.itemId]);
+    }, [expandedItems, /*loadedItems,*/ props.itemId]);
+
+    useEffect(() => {
+      return () => { timerRef.current = false; };
+    }, []);
 
     //нажатие на элемент списка
     const handleRootClick = (e) => {
@@ -124,7 +129,6 @@ export default function DrawingsAllTree() {
     };
   
     const handleChildClick = async (e) => {
-      if (loaded) return;
       setIsLoading(true);  
 
       //найти родительский элемент в items
@@ -135,6 +139,8 @@ export default function DrawingsAllTree() {
       const parent = findParent(items, item.parentId);
       const product = parent.nizd;
       const modification = parent.mod;
+      
+      console.log(props.itemId);
 
       /*timerRef.current = setTimeout(() => {
         clearTimeout(timerRef.current);
@@ -177,11 +183,11 @@ export default function DrawingsAllTree() {
           }))
           .then(() => {
             //добавить элемент списка как загруженный
-            setLoadedItems((prevLoaded) => {
-              if (!prevLoaded.includes(props.itemId)) {
-                return [...prevLoaded, props.itemId];
+            setLoadedItems((prevLoadedItems) => {
+              if (!prevLoadedItems.includes(props.itemId)) {
+                return [...prevLoadedItems, props.itemId];
               }
-              return prevLoaded;
+              return prevLoadedItems;
             });
             resolve();
             })
@@ -190,22 +196,29 @@ export default function DrawingsAllTree() {
             
           //таймер
           new Promise((resolve) => {
-            setTimerCompleted(false);
+            //setTimerCompleted(false);
+            /*setB(true);
             timerRef.current = setTimeout(() => {
               clearTimeout(timerRef.current);
               setTimerCompleted(true);
               setIsLoading(false);
+              console.log('таймер старт');       
               resolve();
-            }, MIN_LOADING_TIME);
+            }, MIN_LOADING_TIME);*/
+
+            console.log('таймер запущен');
+            
           }),
         ]);
       } catch(error) {
         //уведомление об ошибке
         clearTimeout(timerRef.current);
-        setTimerCompleted(true);
+        //setTimerCompleted(true);
         setIsLoading(false);
       } finally {
-        //clearTimeout(timerRef.current);  // Очищаем таймер
+        clearTimeout(timerRef.current);
+        console.log('таймер выкл');
+        setB(false);
         //setIsLoading(false);
       }
     };
@@ -225,9 +238,9 @@ export default function DrawingsAllTree() {
         id={`treeitem-${props.itemId}`}
         onClick={item.type === 'root' ? handleRootClick : handleChildClick}        
         expanded={expanded}
-        loaded={loaded}
+        /*loaded={loaded}*/
       >
-        { isLoading ? (
+        { b ? (
           <Box
             sx={{
               display: 'flex',
@@ -335,6 +348,7 @@ export default function DrawingsAllTree() {
                 isLoading={isLoading}
                 /*expanded={expanded.includes(props.itemId)}*/
                 /*nodeId={props.itemId}*/
+                loadedItems={loadedItems}
                 ref={itemRef}
               />
             ),

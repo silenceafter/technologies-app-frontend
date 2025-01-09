@@ -56,7 +56,7 @@ export const fetchItemDetails = createAsyncThunk(
         body: JSON.stringify(payload),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Ошибка запроса');      
+      if (!response.ok) throw new Error(data.message || 'Ошибка запроса');
       return { payload, children: data.items, parentId: data.parentId, childId: data.childId, subChildId: data.subChildId };
     } catch(error) {
 
