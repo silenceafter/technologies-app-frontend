@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -26,15 +26,13 @@ import { split } from 'lodash';
 import CircularProgress from '@mui/material/CircularProgress';
 import ShowCircularProgress from './ShowCircularProgress';
 import Skeleton from '@mui/material/Skeleton';
+import { current } from '@reduxjs/toolkit';
 
 export default function DrawingsAllTree() {
-  const timerRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerCompleted, setTimerCompleted] = useState(false);
   const [expandedItems, setExpandedItems] = useState([]);
   const [loadedItems, setLoadedItems] = useState([]);
   const MIN_LOADING_TIME = 3000;
-  const itemRef = useRef(null);
+  const itemRef = useRef(null);  
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -88,7 +86,7 @@ export default function DrawingsAllTree() {
     );
   }
   
-  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ isLoading, loadedItems, ...props }, ref) {
+  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ ...props }, ref) {
     const dispatch = useDispatch();
     const items = useSelector((state) => state.drawingsAllTree.items);
     const { publicAPI } = useTreeItem2Utils({
@@ -96,41 +94,27 @@ export default function DrawingsAllTree() {
       children: props.children,
     });
     const item = publicAPI.getItem(props.itemId);
+    const timerRef = useRef(null);
 
     //стейты
     const [expanded, setExpanded] = useState(false);
-    //const [loaded, setLoaded] = useState(false);
-    const [b, setB] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [dataLoaded, setDataLoaded] = useState(false);
     //
     useEffect(() => {
       //expanded
       expandedItems.includes(props.itemId) 
         ? setExpanded(true) 
         : setExpanded(false);
-      
-      //loaded
-      /*loadedItems.includes(props.itemId)
-        ? setLoaded(true) 
-        : setLoaded(false);*/
-
-      //выполнение таймера
-      /*if (timerCompleted) {
-        setIsLoading(false);
-      }*/
-    }, [expandedItems, /*loadedItems,*/ props.itemId]);
-
-    useEffect(() => {
-      return () => { timerRef.current = false; };
-    }, []);
+    }, [expandedItems, props.itemId]);
 
     //нажатие на элемент списка
     const handleRootClick = (e) => {
       e.stopPropagation();
     };
   
-    const handleChildClick = async (e) => {
-      setIsLoading(true);  
-
+    const handleChildClick = async () => {
+      if (dataLoaded) return;
       //найти родительский элемент в items
       const findParent = (items, parentId) => {
         return items.find((item) => item.id === parentId);
@@ -139,15 +123,8 @@ export default function DrawingsAllTree() {
       const parent = findParent(items, item.parentId);
       const product = parent.nizd;
       const modification = parent.mod;
-      
-      console.log(props.itemId);
-
-      /*timerRef.current = setTimeout(() => {
-        clearTimeout(timerRef.current);
-        setTimerCompleted(true);
-        setIsLoading(false);
-      }, MIN_LOADING_TIME);*/
-
+      setIsProcessing(true);
+      //
       try {
         await Promise.allSettled([
           new Promise((resolve, reject) => {
@@ -196,30 +173,17 @@ export default function DrawingsAllTree() {
             
           //таймер
           new Promise((resolve) => {
-            //setTimerCompleted(false);
-            /*setB(true);
             timerRef.current = setTimeout(() => {
-              clearTimeout(timerRef.current);
-              setTimerCompleted(true);
-              setIsLoading(false);
-              console.log('таймер старт');       
-              resolve();
-            }, MIN_LOADING_TIME);*/
-
-            console.log('таймер запущен');
-            
+              setDataLoaded(true);
+              resolve('timerComplete');              
+            }, MIN_LOADING_TIME);
           }),
         ]);
       } catch(error) {
         //уведомление об ошибке
-        clearTimeout(timerRef.current);
-        //setTimerCompleted(true);
-        setIsLoading(false);
       } finally {
-        clearTimeout(timerRef.current);
-        console.log('таймер выкл');
-        setB(false);
-        //setIsLoading(false);
+        clearTimeout(timerRef.current);        
+        setIsProcessing(false);
       }
     };
     //
@@ -235,12 +199,11 @@ export default function DrawingsAllTree() {
             secondaryLabel: item?.secondaryLabel || '',
           },
         }}
-        id={`treeitem-${props.itemId}`}
-        onClick={item.type === 'root' ? handleRootClick : handleChildClick}        
+        id={`StyledTreeItem2-${props.itemId}`}
+        onClick={item.type === 'root' ? handleRootClick : handleChildClick}
         expanded={expanded}
-        /*loaded={loaded}*/
       >
-        { b ? (
+        { isProcessing && !dataLoaded ? (
           <Box
             sx={{
               display: 'flex',
@@ -267,6 +230,19 @@ export default function DrawingsAllTree() {
   const hasMore = useSelector((state) => state.drawingsAllTree.hasMore);
   const loading = useSelector((state) => state.drawingsAllTree.loading);
   const error = useSelector((state) => state.drawingsAllTree.error);
+
+  const memoizedItems = useMemo(() => items, [items]);
+  //мемоизированная функция для slots.item (избегаем перерисовки)
+  const renderCustomTreeItem = useCallback(
+    (props) => (
+      <CustomTreeItem
+        {...props}
+        key={props.itemId}
+        ref={itemRef}
+      />
+    ),
+    [itemRef]  
+  );
   
   useEffect(() => {
     dispatch(fetchData({ limit, page }));
@@ -317,6 +293,7 @@ export default function DrawingsAllTree() {
       dispatch(setSearch(searchHeader));
     }
   }, [searchHeader, search, dispatch]);*/
+
   return (
     <>
       <AppBar
@@ -342,19 +319,9 @@ export default function DrawingsAllTree() {
       >
         <RichTreeView
           slots={{ 
-            item: (props) => (
-              <CustomTreeItem
-                {...props}
-                isLoading={isLoading}
-                /*expanded={expanded.includes(props.itemId)}*/
-                /*nodeId={props.itemId}*/
-                loadedItems={loadedItems}
-                ref={itemRef}
-              />
-            ),
+            item: renderCustomTreeItem
           }}
-          items={items}
-          /*expanded={expanded}*/
+          items={memoizedItems}
           onItemExpansionToggle={handleItemExpansionToggle}
         />
       </Box>
