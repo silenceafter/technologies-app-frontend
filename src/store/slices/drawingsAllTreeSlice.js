@@ -57,7 +57,7 @@ export const fetchItemDetails = createAsyncThunk(
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Ошибка запроса');
-      return { payload, children: data.items, parentId: data.parentId, childId: data.childId, subChildId: data.subChildId };
+      return { payload, children: data.items, parentId: data.parentId };
     } catch(error) {
 
     }
@@ -99,45 +99,32 @@ const drawingsAllTreeSlice = createSlice({
       })
       .addCase(fetchItemDetails.fulfilled, (state, action) => {
         state.loading = false;
-        const { parentId, children } = action.payload;
+        const { parentId, children, payload } = action.payload;
         const parentItem = state.items.find((item) => item.id === parentId);
 
-        /*if (parentItem) {
-          const existingChildIds = new Set(parentItem.children.map((child) => child.id));
-          const newChildren = children.filter((child) => !existingChildIds.has(child.id));
-        
-          parentItem.children = [...parentItem.children, ...newChildren];
-        }*/
-
-          
-
-          const removeAllChildren = (items) => items.children[0].children = children;
-          
-          const addMultipleSubChildren = (items, parentId, newChildren) => {
-            return items.map(item => {
-              if (item.children) {
-                item.children = item.children.map(child => {
-                  if (child.id === parentId) {
-                    // Добавляем новые subchildren
-                    child.children = [...(child.children || []), ...newChildren];
-                  } else if (child.children) {
-                    // Рекурсивно обходим subchild
-                    child.children = addMultipleSubChildren(child.children, parentId, newChildren);
-                  }
-                  return child;
-                });
+                        
+        const findByIdRecursive = (array, id) => {
+          for (const item of array) {
+            if (item.id === id) {
+              return item; // Если нашли совпадение, возвращаем элемент
+            }
+            if (item.children && item.children.length > 0) {
+              const found = findByIdRecursive(item.children, id); // Рекурсивно ищем в children
+              if (found) {
+                return found; // Если нашли в дочерних, возвращаем найденный элемент
               }
-              return item;
-            });
-          };
-          // Удаление subchild
-          removeAllChildren(parentItem);
-          
-          // Добавление нового subchild
-          //state.items = addMultipleSubChildren(state.items, parentId, children);
-        
-    
-        let y;
+            }
+          }
+          return null; // Если не найдено, возвращаем null
+        }
+
+        //id родительского элемента
+        if (payload.options.product_info.type == 'product') {
+          parentItem.children[0].children = children;
+        } else if (payload.options.product_info.type == 'node') {
+          const item = findByIdRecursive(parentItem.children, payload.child.id);
+          item.children = children;
+        }
       })
       .addCase(fetchItemDetails.rejected, (state, action) => {
         state.loading = false;

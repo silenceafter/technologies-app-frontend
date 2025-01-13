@@ -31,7 +31,7 @@ import { current } from '@reduxjs/toolkit';
 export default function DrawingsAllTree() {
   const [expandedItems, setExpandedItems] = useState([]);
   const [loadedItems, setLoadedItems] = useState([]);
-  const MIN_LOADING_TIME = 3000;
+  const MIN_LOADING_TIME = 1000;
   const itemRef = useRef(null);  
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
@@ -153,7 +153,7 @@ export default function DrawingsAllTree() {
               components: false,
               materials: false,
               product_info: {            
-                type: 'product',            
+                type: item.type,
               },
               uncovered: [false, false]
             }
@@ -210,7 +210,7 @@ export default function DrawingsAllTree() {
               justifyContent: 'center',
               alignItems: 'center',
               height: 'auto',
-              marginTop: '0rem',
+              marginTop: '0.5rem',
               marginBottom: '0.5rem'
             }}
           >
