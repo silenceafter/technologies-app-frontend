@@ -249,7 +249,7 @@ export default function Content() {
         backgroundColor: 'background.paper',
         borderRadius: 1,          
         boxShadow: 1,
-        height: '70vh',
+        height: '100%', /* 70vh */
         overflow: 'hidden'
       }}>
         <Box sx={{

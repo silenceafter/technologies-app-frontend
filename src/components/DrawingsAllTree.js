@@ -29,9 +29,9 @@ import Skeleton from '@mui/material/Skeleton';
 import { current } from '@reduxjs/toolkit';
 
 export default function DrawingsAllTree() {
-  const [expandedItems, setExpandedItems] = useState([]);
+  //const [expandedItems, setExpandedItems] = useState([]);
   const [loadedItems, setLoadedItems] = useState([]);
-  const MIN_LOADING_TIME = 1000;
+  const MIN_LOADING_TIME = 500;
   const itemRef = useRef(null);  
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
@@ -97,16 +97,16 @@ export default function DrawingsAllTree() {
     const timerRef = useRef(null);
 
     //стейты
-    const [expanded, setExpanded] = useState(false);
+    //const [expanded, setExpanded] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     //
-    useEffect(() => {
+    /*useEffect(() => {
       //expanded
       expandedItems.includes(props.itemId) 
         ? setExpanded(true) 
         : setExpanded(false);
-    }, [expandedItems, props.itemId]);
+    }, [expandedItems, props.itemId]);*/
 
     //нажатие на элемент списка
     const handleRootClick = (e) => {
@@ -201,7 +201,7 @@ export default function DrawingsAllTree() {
         }}
         id={`StyledTreeItem2-${props.itemId}`}
         onClick={item.type === 'root' ? handleRootClick : handleChildClick}
-        expanded={expanded}
+        /*expanded={expanded}*/
       >
         { isProcessing && !dataLoaded ? (
           <Box
@@ -262,7 +262,7 @@ export default function DrawingsAllTree() {
       }
   };
 
-  const handleItemExpansionToggle = (event, nodeId, expanded) => {
+  /*const handleItemExpansionToggle = (event, nodeId, expanded) => {
     if (expanded) {
       setExpandedItems((prevExpanded) => {
         if (!prevExpanded.includes(nodeId)) {
@@ -273,7 +273,7 @@ export default function DrawingsAllTree() {
     } else {      
       setExpandedItems((prevExpanded) => prevExpanded.filter((id) => id !== nodeId));
     }
-  };
+  };*/
 
   //запросы
   //const searchHeader = useSelector(selectSearchHeader);//значение строки поиска (чертежей)
@@ -310,7 +310,7 @@ export default function DrawingsAllTree() {
       </AppBar>
       <Box
           sx={{
-              height: 323,
+              height: 355,
               overflowY: 'auto',
               overflowX: 'auto',
               border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -322,7 +322,7 @@ export default function DrawingsAllTree() {
             item: renderCustomTreeItem
           }}
           items={memoizedItems}
-          onItemExpansionToggle={handleItemExpansionToggle}
+          /*onItemExpansionToggle={handleItemExpansionToggle}*/
         />
       </Box>
     </>
