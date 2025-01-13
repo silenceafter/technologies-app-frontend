@@ -27,12 +27,15 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ShowCircularProgress from './ShowCircularProgress';
 import Skeleton from '@mui/material/Skeleton';
 import { current } from '@reduxjs/toolkit';
+import InfiniteLoader from 'react-window-infinite-loader';
 
 export default function DrawingsAllTree() {
   //const [expandedItems, setExpandedItems] = useState([]);
   const [loadedItems, setLoadedItems] = useState([]);
+  const [download, setDownload] = useState(false);
   const MIN_LOADING_TIME = 500;
-  const itemRef = useRef(null);  
+  const itemRef = useRef(null);
+  const downloadRef = useRef(null);
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -254,11 +257,33 @@ export default function DrawingsAllTree() {
   }, [loading, hasMore]);
 
   //прокрутка RichTreeView
-  const handleScroll = (event) => {
+  const handleScroll = async (event) => {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
-      if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
-        dispatch(setPage(page + 1));
-        dispatch(fetchData({ limit, page: page + 1 }));
+      if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && hasMore) {
+        try {
+          await new Promise((resolve) => {
+            downloadRef.current = setTimeout(() => {
+              setDownload(true);
+              console.log('старт');
+              resolve('');
+            }, MIN_LOADING_TIME);
+          });
+          
+
+          dispatch(setPage(page + 1));
+          dispatch(fetchData({ limit, page: page + 1 }));
+        } catch (error) {
+          //
+        } finally {
+          clearTimeout(downloadRef.current);
+          setDownload(false);
+          console.log('финиш');
+        }
+
+
+        
+
+        
       }
   };
 
@@ -317,13 +342,28 @@ export default function DrawingsAllTree() {
           }}
           onScroll={handleScroll}
       >
-        <RichTreeView
-          slots={{ 
-            item: renderCustomTreeItem
-          }}
-          items={memoizedItems}
-          /*onItemExpansionToggle={handleItemExpansionToggle}*/
-        />
+        { download ? (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%',
+              overflow: 'hidden',
+              backgroundColor: "rgba(255, 255, 255, 0.5)",
+            }}
+          >
+            <CircularProgress size={50} />
+          </Box>
+        ) : (
+          <RichTreeView
+            slots={{ 
+              item: renderCustomTreeItem
+            }}
+            items={memoizedItems}
+            /*onItemExpansionToggle={handleItemExpansionToggle}*/
+          />
+        ) }        
       </Box>
     </>
   );
