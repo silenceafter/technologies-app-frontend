@@ -33,7 +33,7 @@ export default function DrawingsAllTree() {
   //const [expandedItems, setExpandedItems] = useState([]);
   const [loadedItems, setLoadedItems] = useState([]);
   const [download, setDownload] = useState(false);
-  const MIN_LOADING_TIME = 500;
+  const MIN_LOADING_TIME = 5000;
   const itemRef = useRef(null);
   const downloadRef = useRef(null);
 
@@ -259,31 +259,39 @@ export default function DrawingsAllTree() {
   //прокрутка RichTreeView
   const handleScroll = async (event) => {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
-      if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && hasMore) {
+      if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && hasMore) {        
         try {
-          await new Promise((resolve) => {
-            downloadRef.current = setTimeout(() => {
-              setDownload(true);
-              console.log('старт');
-              resolve('');
-            }, MIN_LOADING_TIME);
-          });
-          
-
-          dispatch(setPage(page + 1));
-          dispatch(fetchData({ limit, page: page + 1 }));
-        } catch (error) {
-          //
+          await Promise.allSettled([
+            new Promise((resolve, reject) => {
+              dispatch(setPage(page + 1));
+              resolve();
+            }),
+            new Promise((resolve) => {
+              dispatch(fetchData({ limit, page: page + 1 }));
+              resolve();
+            }),
+              
+            //таймер
+            new Promise((resolve) => {
+              downloadRef.current = setTimeout(() => {
+                setDownload(true);
+                resolve('timerComplete');              
+              }, MIN_LOADING_TIME);
+            }),
+          ]);
+        } catch(error) {
+          //уведомление об ошибке
         } finally {
           clearTimeout(downloadRef.current);
           setDownload(false);
-          console.log('финиш');
-        }
+        }                
 
+        const previousScrollHeight = scrollHeight;
+        const newScrollHeight = event.target.scrollHeight;
+        const delta = newScrollHeight - previousScrollHeight;
 
-        
-
-        
+        // Корректируем позицию прокрутки
+        event.target.scrollTop = scrollTop + delta;
       }
   };
 
@@ -360,7 +368,7 @@ export default function DrawingsAllTree() {
             slots={{ 
               item: renderCustomTreeItem
             }}
-            items={memoizedItems}
+            items={memoizedItems}            
             /*onItemExpansionToggle={handleItemExpansionToggle}*/
           />
         ) }        
