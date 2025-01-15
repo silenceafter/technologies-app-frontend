@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/headerSlice';
+import { setDrawing } from '../store/slices/drawingsSlice';
+import { fetchData as drawingsAllTreeFetchData} from '../store/slices/drawingsAllTreeSlice';
 import { debounce } from 'lodash';
 
 function HeaderSearch(props) {
@@ -93,6 +95,20 @@ function HeaderSearch(props) {
                 }}
                 onChange={(event, newValue) => {
                   setValue(newValue);
+
+                  //обновить выбранное значение в redux
+                  if (newValue) {
+                    dispatch(setDrawing(
+                      {
+                        externalCode: newValue.ex_code, 
+                        internalCode: newValue.in_code, 
+                        name: newValue.name
+                      }
+                    ));
+                    dispatch(drawingsAllTreeFetchData({limit: 50, page: 1}));
+                  } else {
+                    dispatch(setDrawing({externalCode: '', internalCode: '', name: ''}));                  
+                  }
                 }}
                 inputValue={inputValue}
                 loadingText="поиск данных"
@@ -121,7 +137,11 @@ function HeaderSearch(props) {
                   </div>
                 )}
                 renderOption={(props, option) => (
-                  <ListItem {...props} key={`${option.ex_code}-${option.in_code}-${option.name}`} style={{ padding: '8px 16px' }}>
+                  <ListItem 
+                    {...props} 
+                    key={`${option.ex_code}-${option.in_code}-${option.name}`} 
+                    style={{ padding: '8px 16px' }}
+                  >
                     <ListItemText
                       primary={option.ex_code}
                       secondary={option.name}

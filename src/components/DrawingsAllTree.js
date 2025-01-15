@@ -21,7 +21,8 @@ import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, fetchItemDetails, setPage, setSearch, selectItems } from '../store/slices/drawingsAllTreeSlice';
-import { selectSearch as selectSearchHeader } from '../store/slices/headerSlice';
+//import { selectDrawing as drawingHeader } from '../store/slices/headerSlice';
+import { selectDrawingExternalCode } from '../store/slices/drawingsSlice';
 import { split } from 'lodash';
 import CircularProgress from '@mui/material/CircularProgress';
 import ShowCircularProgress from './ShowCircularProgress';
@@ -33,7 +34,7 @@ export default function DrawingsAllTree() {
   //const [expandedItems, setExpandedItems] = useState([]);
   const [loadedItems, setLoadedItems] = useState([]);
   const [download, setDownload] = useState(false);
-  const MIN_LOADING_TIME = 5000;
+  const MIN_LOADING_TIME = 500;
   const itemRef = useRef(null);
   const downloadRef = useRef(null);
 
@@ -309,8 +310,8 @@ export default function DrawingsAllTree() {
   };*/
 
   //запросы
-  //const searchHeader = useSelector(selectSearchHeader);//значение строки поиска (чертежей)
-  //const search = useSelector(selectSearch);
+  const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
+  //const search = useSelector(drawing);
   //const { items, loading, error } = useSelector((state) => state.drawingsAllTree);
 
   /*useEffect(() => {

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { selectSearch } from './headerSlice';
-import { method } from 'lodash';
+//import { selectSearch } from './headerSlice';
+import { selectDrawingExternalCode } from './drawingsSlice';
 
 const initialState = {
   items: [],
@@ -19,9 +19,9 @@ export const fetchData = createAsyncThunk(
     try {
       const state = getState();
       //const { limit, page } = state.drawingsAllTree;
-      const search = selectSearch(state);
+      const externalCode = selectDrawingExternalCode(state);//const search = selectSearch(state);
       //
-      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateDataTree.v0.php?search=${search}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateDataTree.v0.php?search=${externalCode}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');

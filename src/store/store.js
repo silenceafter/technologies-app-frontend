@@ -10,6 +10,7 @@ import componentsReducer from './slices/componentsSlice';
 import materialsReducer from './slices/materialsSlice';
 import unsavedChangesReducer from './slices/unsavedChangesSlice';
 import drawingsAllTreeReducer from './slices/drawingsAllTreeSlice';
+import drawingsReducer from './slices/drawingsSlice';
 /*import postRequestReducer from './reducers/postRequestReducer';
 import routerReducer from './reducers/routerReducer';
 import sidebarReducer from './slices/sidebarSlice';*/
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
   materials: materialsReducer,
   unsavedChanges: unsavedChangesReducer,
   drawingsAllTree: drawingsAllTreeReducer,
+  drawings: drawingsReducer,
   /*router: routerReducer,*/
 });
 
