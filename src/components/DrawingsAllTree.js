@@ -20,7 +20,7 @@ import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, fetchItemDetails, setPage, setSearch, selectItems } from '../store/slices/drawingsAllTreeSlice';
+import { fetchData, fetchItemDetails, setItems, setPage, setSearch, selectItems } from '../store/slices/drawingsAllTreeSlice';
 //import { selectDrawing as drawingHeader } from '../store/slices/headerSlice';
 import { selectDrawingExternalCode } from '../store/slices/drawingsSlice';
 import { split } from 'lodash';
@@ -260,7 +260,8 @@ export default function DrawingsAllTree() {
   //прокрутка RichTreeView
   const handleScroll = async (event) => {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
-      if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && hasMore) {        
+      if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && hasMore) {
+        setDownload(true);
         try {
           await Promise.allSettled([
             new Promise((resolve, reject) => {
@@ -268,16 +269,16 @@ export default function DrawingsAllTree() {
               resolve();
             }),
             new Promise((resolve) => {
-              dispatch(fetchData({ limit, page: page + 1 }));
+              dispatch(fetchData({ limit: limit, page: page + 1 }));
               resolve();
             }),
               
             //таймер
             new Promise((resolve) => {
               downloadRef.current = setTimeout(() => {
-                setDownload(true);
+                //setDownload(true);
                 resolve('timerComplete');              
-              }, MIN_LOADING_TIME);
+              }, 2000);
             }),
           ]);
         } catch(error) {
@@ -287,12 +288,12 @@ export default function DrawingsAllTree() {
           setDownload(false);
         }                
 
-        const previousScrollHeight = scrollHeight;
+        /*const previousScrollHeight = scrollHeight;
         const newScrollHeight = event.target.scrollHeight;
         const delta = newScrollHeight - previousScrollHeight;
 
         // Корректируем позицию прокрутки
-        event.target.scrollTop = scrollTop + delta;
+        event.target.scrollTop = scrollTop + delta;*/
       }
   };
 
@@ -347,32 +348,25 @@ export default function DrawingsAllTree() {
               height: 355,
               overflowY: 'auto',
               overflowX: 'auto',
-              border: '1px solid rgba(0, 0, 0, 0.12)',
+              border: '1px solid rgba(0, 0, 0, 0.12)'
           }}
           onScroll={handleScroll}
       >
-        { download ? (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%',
-              overflow: 'hidden',
-              backgroundColor: "rgba(255, 255, 255, 0.5)",
-            }}
-          >
-            <CircularProgress size={50} />
-          </Box>
-        ) : (
-          <RichTreeView
-            slots={{ 
-              item: renderCustomTreeItem
-            }}
-            items={memoizedItems}            
-            /*onItemExpansionToggle={handleItemExpansionToggle}*/
-          />
-        ) }        
+        <RichTreeView
+          slots={{ 
+            item: renderCustomTreeItem
+          }}
+          
+          items={memoizedItems}            
+          /*onItemExpansionToggle={handleItemExpansionToggle}*/
+        />
+          {
+            download && (
+             
+                <CircularProgress size={50} />
+             
+            )
+          }        
       </Box>
     </>
   );

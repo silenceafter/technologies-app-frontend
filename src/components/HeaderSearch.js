@@ -15,7 +15,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/headerSlice';
 import { setDrawing } from '../store/slices/drawingsSlice';
-import { fetchData as drawingsAllTreeFetchData} from '../store/slices/drawingsAllTreeSlice';
+import { fetchData as drawingsAllTreeFetchData, setItems } from '../store/slices/drawingsAllTreeSlice';
 import { debounce } from 'lodash';
 
 function HeaderSearch(props) {
@@ -105,6 +105,7 @@ function HeaderSearch(props) {
                         name: newValue.name
                       }
                     ));
+                    dispatch(setItems());
                     dispatch(drawingsAllTreeFetchData({limit: 50, page: 1}));
                   } else {
                     dispatch(setDrawing({externalCode: '', internalCode: '', name: ''}));                  

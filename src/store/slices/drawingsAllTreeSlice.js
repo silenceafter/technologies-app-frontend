@@ -2,23 +2,28 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 //import { selectSearch } from './headerSlice';
 import { selectDrawingExternalCode } from './drawingsSlice';
 
+const LIMIT_DEFAULT = 50;
+const PAGE_DEFAULT = 1;
+const LOADING_DEFAULT = false;
+const HASMORE_DEFAULT = true;
+
 const initialState = {
   items: [],
   itemsDetails: [],
-  loading: false,
+  loading: LOADING_DEFAULT,
   error: null,
-  limit: 50,
-  page: 1,
-  hasMore: true,
+  limit: LIMIT_DEFAULT,
+  page: PAGE_DEFAULT,
+  hasMore: HASMORE_DEFAULT,
+  eventType: ''
 };
 
 //загрузка списка изделий (корневые элементы)
 export const fetchData = createAsyncThunk(
   'drawingsAllTree/fetchData',
-  async ({ limit, page }, { getState, rejectWithValue }) => {
+  async ({ limit, page, eventType }, { getState, rejectWithValue }) => {
     try {
       const state = getState();
-      //const { limit, page } = state.drawingsAllTree;
       const externalCode = selectDrawingExternalCode(state);//const search = selectSearch(state);
       //
       const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateDataTree.v0.php?search=${externalCode}&&limit=${limit}&page=${page}`);
@@ -68,6 +73,13 @@ const drawingsAllTreeSlice = createSlice({
   name: 'drawingsAllTree',
   initialState,
   reducers: {
+    setItems: (state) => {
+      state.items = [];
+      state.page = PAGE_DEFAULT;
+      state.limit = LIMIT_DEFAULT;
+      state.loading = LOADING_DEFAULT;
+      state.hasMore = HASMORE_DEFAULT;
+    },
     setPage: (state, action) => {
       state.page = action.payload;
    }
@@ -84,7 +96,7 @@ const drawingsAllTreeSlice = createSlice({
           !state.items.some(existingItem => existingItem.id === newItem.id)
         );
         //
-        state.items = [...state.items, ...newItems];//добавляем только новые данные к существующему списку        
+        state.items = [...state.items, ...newItems];//добавляем только новые данные к существующему списку
         if (newItems.length < state.limit) {
           state.hasMore = false;//если меньше лимита, прекращаем подгрузку
         }
@@ -93,6 +105,7 @@ const drawingsAllTreeSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.hasMore = false;
+        state.eventType = '';//?
       })
       .addCase(fetchItemDetails.pending, (state) => {
         state.loading = true;
@@ -133,7 +146,7 @@ const drawingsAllTreeSlice = createSlice({
   },
 });
 
-export const { setPage } = drawingsAllTreeSlice.actions;
+export const { setItems, setPage } = drawingsAllTreeSlice.actions;
 export const selectItems = (state) => state.drawingsAllTreeSlice.items || [];
 //export const selectItemDetails = (state, itemId) => state.drawingsAllTree.ItemDetails[itemId] || null;
 export default drawingsAllTreeSlice.reducer;
