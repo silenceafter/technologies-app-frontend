@@ -25,7 +25,7 @@ export const fetchData = createAsyncThunk(
       const state = getState();
       const externalCode = selectDrawingExternalCode(state);//const search = selectSearch(state);
       //
-      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateDataTree.v0.php?search=${externalCode}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateProductsDataTree.v0.php?search=${externalCode}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -51,7 +51,7 @@ export const fetchItemDetails = createAsyncThunk(
   'drawingsAllTree/fetchItemDetails',
   async (payload) => {
     try {
-      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/GetDataTreeItem.v0.php`, {
+      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/GetProductsDataTreeItem.v0.php`, {
         method: 'POST',
         body: JSON.stringify(payload),
       });

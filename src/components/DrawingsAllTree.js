@@ -345,10 +345,10 @@ export default function DrawingsAllTree() {
       </AppBar>
       <Box
           sx={{
-              height: 355,
+              height: 335,
               overflowY: 'auto',
               overflowX: 'auto',
-              border: '1px solid rgba(0, 0, 0, 0.12)'
+              border: '0px solid rgba(0, 0, 0, 0.12)'
           }}
           onScroll={handleScroll}
       >
