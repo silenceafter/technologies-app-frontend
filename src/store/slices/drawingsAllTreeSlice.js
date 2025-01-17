@@ -14,14 +14,13 @@ const initialState = {
   error: null,
   limit: LIMIT_DEFAULT,
   page: PAGE_DEFAULT,
-  hasMore: HASMORE_DEFAULT,
-  eventType: ''
+  hasMore: HASMORE_DEFAULT
 };
 
 //загрузка списка изделий (корневые элементы)
 export const fetchData = createAsyncThunk(
   'drawingsAllTree/fetchData',
-  async ({ limit, page, eventType }, { getState, rejectWithValue }) => {
+  async ({ limit, page }, { getState, rejectWithValue }) => {
     try {
       const state = getState();
       const externalCode = selectDrawingExternalCode(state);//const search = selectSearch(state);
@@ -50,14 +49,10 @@ export const fetchData = createAsyncThunk(
 //загрузка элементов списка (вложенные элементы; загрузка только новых элементов)
 export const fetchItemDetails = createAsyncThunk(
   'drawingsAllTree/fetchItemDetails',
-  async (payload, { getState, rejectWithValue }) => {
+  async (payload) => {
     try {
-      /*const state = getState();
-      const search = selectSearch(state);*/
-      //
       const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/GetDataTreeItem.v0.php`, {
         method: 'POST',
-        /*headers: { 'Content-Type': 'application/json' },*/
         body: JSON.stringify(payload),
       });
       const data = await response.json();
@@ -105,7 +100,6 @@ const drawingsAllTreeSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.hasMore = false;
-        state.eventType = '';//?
       })
       .addCase(fetchItemDetails.pending, (state) => {
         state.loading = true;
