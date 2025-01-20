@@ -31,9 +31,10 @@ let theme = createTheme({
       },
     },
     typography: {
+      fontSize: 13,
       h5: {
         fontWeight: 500,
-        fontSize: 26,
+        fontSize: 24 /* 26 */,
         letterSpacing: 0.5,
       },
     },
@@ -189,7 +190,7 @@ function Main() {
         <CssBaseline />        
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
-          <Box component="main" sx={{ flex: 1, py: 3, px: 2, bgcolor: '#eaeff1' }}>
+          <Box component="main" sx={{ flex: 1, py: 2, px: 2, bgcolor: '#eaeff1' }}>
             <Content />
           </Box>
           <Box component="footer" sx={{ p: 1, bgcolor: '#eaeff1' }}>

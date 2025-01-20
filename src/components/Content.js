@@ -245,7 +245,7 @@ export default function Content() {
         flexDirection: 'row',
         alignItems: 'flex-start',     
         gap: 2,                   
-        padding: 2,               
+        padding: 2,
         backgroundColor: 'background.paper',
         borderRadius: 1,          
         boxShadow: 1,
@@ -265,10 +265,10 @@ export default function Content() {
           width: '40%',
           height: '100%'
         }}>
-          <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '40%', flexGrow: 0, flexShrink: 0 }}>
+          <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '45%', flexGrow: 0, flexShrink: 0 }}>
             <DrawingTree />
           </Paper>
-          <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '60%', flexGrow: 0, flexShrink: 0 }}>
+          <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '55%', flexGrow: 0, flexShrink: 0 }}>
             <DrawingsAllTree />
           </Paper>
         </Box>   

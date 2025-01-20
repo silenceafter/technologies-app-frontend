@@ -29,6 +29,7 @@ import ShowCircularProgress from './ShowCircularProgress';
 import Skeleton from '@mui/material/Skeleton';
 import { current } from '@reduxjs/toolkit';
 import InfiniteLoader from 'react-window-infinite-loader';
+import AddIcon from '@mui/icons-material/Add';
 
 export default function DrawingsAllTree() {
   //const [expandedItems, setExpandedItems] = useState([]);
@@ -107,8 +108,8 @@ export default function DrawingsAllTree() {
     //
     /*useEffect(() => {
       //expanded
-      expandedItems.includes(props.itemId) 
-        ? setExpanded(true) 
+      expandedItems.includes(props.itemId)
+        ? setExpanded(true)
         : setExpanded(false);
     }, [expandedItems, props.itemId]);*/
 
@@ -205,7 +206,7 @@ export default function DrawingsAllTree() {
         }}
         id={`StyledTreeItem2-${props.itemId}`}
         onClick={item.type === 'root' ? handleRootClick : handleChildClick}
-        /*expanded={expanded}*/
+        /*expanded={expanded}*/        
       >
         { isProcessing && !dataLoaded ? (
           <Box
@@ -345,7 +346,7 @@ export default function DrawingsAllTree() {
       </AppBar>
       <Box
           sx={{
-              height: 335,
+              height: 320,
               overflowY: 'auto',
               overflowX: 'auto',
               border: '0px solid rgba(0, 0, 0, 0.12)'

@@ -11,6 +11,13 @@ import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
 import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
 import { fetchData, selectItems } from '../store/slices/drawingsTreeSlice';
 import CircularProgress from '@mui/material/CircularProgress';
+import AddIcon from '@mui/icons-material/Add';
+import IconButton from '@mui/material/IconButton';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import CardActionArea from '@mui/material/CardActionArea';
+import { selectDrawingExternalCode } from '../store/slices/drawingsSlice';
 
 export default function DrawingTree() {
   const [loadedItems, setLoadedItems] = useState([]);
@@ -57,6 +64,25 @@ export default function DrawingTree() {
       },
     })
   }));
+
+  const StyledIconButton = styled(IconButton)(({ theme }) => ({
+    backgroundColor: theme.palette.primary.main,
+    color: 'white',
+    padding: theme.spacing(1),
+    '&:hover': {
+      backgroundColor: theme.palette.primary.dark,
+      transform: 'scale(1.1)',
+      transition: 'transform 0.3s ease-in-out, background-color 0.3s',
+    },
+  }));
+  
+  const StyledAddIcon = styled(AddIcon)(({ theme }) => ({
+    fontSize: '0.8rem',
+    transition: 'transform 0.3s ease-in-out',
+    '&:hover': {
+      transform: 'rotate(45deg)',
+    },
+  }));
   
   function CustomLabel({ children, className, secondaryLabel }) {
     return (
@@ -92,14 +118,19 @@ export default function DrawingTree() {
   
     const handleChildClick = async () => {
       if (dataLoaded) return;
-    }
+    };
+
+    const handleAddIconClick = async (type) => {
+      //добавить новую технологию
+      console.log(type);
+    };
     //
     return (
       <StyledTreeItem2
         {...props}
         ref={ref}
         slots={{
-          label: CustomLabel,
+          label: CustomLabel
         }}
         slotProps={{
           label: { 
@@ -108,6 +139,17 @@ export default function DrawingTree() {
         }}
         id={`StyledTreeItem2-${props.itemId}`}
         onClick={item.type === 'root' ? handleRootClick : handleChildClick}
+        label={(
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <span>{props.label}</span>
+            { item.type == "add-technology" || item.type == "add-operation" ? (
+              <StyledIconButton onClick={() => handleAddIconClick(item.type)} sx={{ marginLeft: '8px' }}>
+                <StyledAddIcon />
+              </StyledIconButton>
+            ) : ""
+            }
+          </Box>
+        )}
       >
         { isProcessing && !dataLoaded ? (
           <Box
@@ -134,6 +176,9 @@ export default function DrawingTree() {
   const loading = useSelector((state) => state.drawingsTree.loading);
   const error = useSelector((state) => state.drawingsTree.error);
 
+  //запросы
+  const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
+
   const memoizedItems = useMemo(() => items, [items]);
   //мемоизированная функция для slots.item (избегаем перерисовки)
   const renderCustomTreeItem = useCallback(
@@ -153,26 +198,47 @@ export default function DrawingTree() {
           position="static"
           color="primary"
           elevation={0}
-          sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
+          sx={{ borderBottom: '0px solid rgba(0, 0, 0, 0.12)' }}
       >
           <Toolbar>
               <Typography color="inherit">
-                  Технологии
+                  Технологии и операции
               </Typography>
           </Toolbar>
       </AppBar>
       <Box
           sx={{
-              height: 220,
+              height: 254,
               overflowY: 'auto',
               overflowX: 'auto',
               border: '0px solid rgba(0, 0, 0, 0.12)'
           }}
       >
-        <RichTreeView
+        {drawingExternalCode ? (
+          <RichTreeView
+            slots={{ item: renderCustomTreeItem }}          
+            items={memoizedItems}            
+          />
+        ) : (<>
+          <Card>
+            
+              <CardContent>
+                <Typography gutterBottom variant="h5" component="div">
+                  Lizard
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Lizards are a widespread group of squamate reptiles, with over 6,000
+                  species, ranging across all continents except Antarctica
+                </Typography>
+              </CardContent>
+            
+          </Card>
+          <RichTreeView
           slots={{ item: renderCustomTreeItem }}          
           items={memoizedItems}            
-        />       
+        /></>
+        ) }
+               
       </Box>
     </>
   );
