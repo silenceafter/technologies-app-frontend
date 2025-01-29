@@ -13,8 +13,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import Box from '@mui/material/Box';
 import { ButtonGroup, Tabs, Tab } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import DrawingTree from './DrawingTree';
-import DrawingsAllTree from './DrawingsAllTree';
+import TechnologiesTree from './TechnologiesTree';
+import ProductsTree from './ProductsTree';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { OperationsSearch } from './OperationsSearch';
@@ -266,10 +266,10 @@ export default function Content() {
           height: '100%'
         }}>
           <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '45%', flexGrow: 0, flexShrink: 0 }}>
-            <DrawingTree />
+            <TechnologiesTree />
           </Paper>
           <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '55%', flexGrow: 0, flexShrink: 0 }}>
-            <DrawingsAllTree />
+            <ProductsTree />
           </Paper>
         </Box>   
         <Box sx={{

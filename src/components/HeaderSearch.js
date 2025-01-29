@@ -15,8 +15,8 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/headerSlice';
 import { setDrawing } from '../store/slices/drawingsSlice';
-import { fetchData as drawingsAllTreeFetchData, setItems } from '../store/slices/drawingsAllTreeSlice';
-import { fetchData as drawingsTreeFetchData, setItems as setdrawingsTreeItems } from '../store/slices/drawingsTreeSlice';
+import { fetchData as productsFetchData, setItems as productsSetItems } from '../store/slices/productsSlice';
+import { fetchData as technologiesFetchData, setItems as technologiesSetItems, setAdditionalItems as technologiesSetAdditionalItems } from '../store/slices/technologiesSlice';
 import { debounce } from 'lodash';
 
 function HeaderSearch(props) {
@@ -95,9 +95,9 @@ function HeaderSearch(props) {
                   setInputValue(newInputValue);
                 }}
                 onChange={(event, newValue) => {
-                  setValue(newValue);
+                  setValue(newValue);              
 
-                  //обновить выбранное значение в redux
+                  //обновить выбранное значение в redux                 
                   if (newValue) {
                     dispatch(setDrawing(
                       {
@@ -106,13 +106,19 @@ function HeaderSearch(props) {
                         name: newValue.name
                       }
                     ));
-                    dispatch(setItems());
-                    dispatch(drawingsAllTreeFetchData({limit: 50, page: 1}));
-                    dispatch(drawingsTreeFetchData({}));
+                    /*dispatch(productsSetItems());
+                    dispatch(technologiesSetItems());*/
                   } else {
                     dispatch(setDrawing({externalCode: '', internalCode: '', name: ''}));                  
                   }
+                  //
+                  dispatch(productsSetItems());
+                  dispatch(technologiesSetItems());
+                  dispatch(technologiesSetAdditionalItems());
+                  dispatch(productsFetchData({limit: 50, page: 1}));
+                  dispatch(technologiesFetchData({}));
                 }}
+                onClose={console.log('clear')}
                 inputValue={inputValue}
                 loadingText="поиск данных"
                 noOptionsText="нет результатов"

@@ -19,7 +19,7 @@ const initialState = {
 
 //загрузка списка изделий (корневые элементы)
 export const fetchData = createAsyncThunk(
-  'drawingsAllTree/fetchData',
+  'products/fetchData',
   async ({ limit, page }, { getState, rejectWithValue }) => {
     try {
       const state = getState();
@@ -48,7 +48,7 @@ export const fetchData = createAsyncThunk(
 
 //загрузка элементов списка (вложенные элементы; загрузка только новых элементов)
 export const fetchItemDetails = createAsyncThunk(
-  'drawingsAllTree/fetchItemDetails',
+  'products/fetchItemDetails',
   async (payload) => {
     try {
       const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/GetProductsDataTreeItem.v0.php`, {
@@ -64,8 +64,8 @@ export const fetchItemDetails = createAsyncThunk(
   }
 );
 
-const drawingsAllTreeSlice = createSlice({
-  name: 'drawingsAllTree',
+const productsSlice = createSlice({
+  name: 'products',
   initialState,
   reducers: {
     setItems: (state) => {
@@ -140,7 +140,6 @@ const drawingsAllTreeSlice = createSlice({
   },
 });
 
-export const { setItems, setPage } = drawingsAllTreeSlice.actions;
-export const selectItems = (state) => state.drawingsAllTreeSlice.items || [];
-//export const selectItemDetails = (state, itemId) => state.drawingsAllTree.ItemDetails[itemId] || null;
-export default drawingsAllTreeSlice.reducer;
+export const { setItems, setPage } = productsSlice.actions;
+export const selectItems = (state) => state.productsSlice.items || [];
+export default productsSlice.reducer;

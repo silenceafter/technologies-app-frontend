@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-
 import getRequestReducer from './reducers/getRequestReducer';
 import headerReducer from './slices/headerSlice';
 import operationsReducer from './slices/operationsSlice';
@@ -9,9 +8,9 @@ import toolingReducer from './slices/toolingSlice';
 import componentsReducer from './slices/componentsSlice';
 import materialsReducer from './slices/materialsSlice';
 import unsavedChangesReducer from './slices/unsavedChangesSlice';
-import drawingsAllTreeReducer from './slices/drawingsAllTreeSlice';
+import productsReducer from './slices/productsSlice';
 import drawingsReducer from './slices/drawingsSlice';
-import drawingsTreeReducer from './slices/drawingsTreeSlice';
+import technologiesReducer from './slices/technologiesSlice';
 /*import postRequestReducer from './reducers/postRequestReducer';
 import routerReducer from './reducers/routerReducer';
 import sidebarReducer from './slices/sidebarSlice';*/
@@ -28,10 +27,10 @@ const rootReducer = combineReducers({
   tooling: toolingReducer /* оснастка */,
   components: componentsReducer,
   materials: materialsReducer,
-  unsavedChanges: unsavedChangesReducer,
-  drawingsAllTree: drawingsAllTreeReducer,
+  unsavedChanges: unsavedChangesReducer,  
   drawings: drawingsReducer,
-  drawingsTree: drawingsTreeReducer,
+  technologies: technologiesReducer,
+  products: productsReducer,
   /*router: routerReducer,*/
 });
 

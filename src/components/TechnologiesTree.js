@@ -9,7 +9,7 @@ import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
 import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
-import { fetchData, selectItems } from '../store/slices/drawingsTreeSlice';
+import { fetchData, selectItems, setAdditionalItems, selectAdditionalItems } from '../store/slices/technologiesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
@@ -18,13 +18,28 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
 import { selectDrawingExternalCode } from '../store/slices/drawingsSlice';
+import { makeStyles } from '@mui/styles';
+
+//добавить кастомный класс и кастомное свойство элементу Box
+const useStyles = makeStyles({
+  technologyCustomClass: {
+    'component-type': (props) => props.itemType
+  }
+});
 
 export default function DrawingTree() {
   const [loadedItems, setLoadedItems] = useState([]);
-  const [download, setDownload] = useState(false);
+  const [download, setDownload] = useState(false);  
   const MIN_LOADING_TIME = 500;
   const itemRef = useRef(null);
-  const downloadRef = useRef(null);
+  const downloadRef = useRef(null);  
+  
+  //селекторы
+  const dispatch = useDispatch();
+  const items = useSelector((state) => state.technologies.items);
+  const additionalItemsbb = useSelector((state) => state.technologies.additionalItems);
+  const loading = useSelector((state) => state.technologies.loading);
+  const error = useSelector((state) => state.technologies.error);
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -99,7 +114,7 @@ export default function DrawingTree() {
   
   const CustomTreeItem = React.forwardRef(function CustomTreeItem({ ...props }, ref) {
     const dispatch = useDispatch();
-    const items = useSelector((state) => state.drawingsTree.items);
+    const items = useSelector((state) => state.technologies.items);
     const { publicAPI } = useTreeItem2Utils({
       itemId: props.itemId,
       children: props.children,
@@ -110,6 +125,7 @@ export default function DrawingTree() {
     //стейты
     const [isProcessing, setIsProcessing] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
+    //const [additionalItems, setAdditionalItems] = useState([]);
 
     //нажатие на элемент списка
     const handleRootClick = (e) => {
@@ -124,8 +140,30 @@ export default function DrawingTree() {
       //добавить новую технологию
       console.log(type);
     };
+    const classes = useStyles({ itemType: item.type});
+    
+    //дополнительный код
+    const additionalItem = (
+      <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center' }}>
+          <span>{props.label}</span>
+          { item.type == "add-technology" || item.type == "add-operation" ? (
+            <StyledIconButton onClick={() => handleAddIconClick(item.type)} sx={{ marginLeft: '8px' }}>
+              <StyledAddIcon />
+            </StyledIconButton>
+          ) : null
+          }
+      </Box>);
+
+    useEffect(() => {
+      if (item.type == "add-technology" || item.type == "add-operation") {
+        dispatch(setAdditionalItems(additionalItem));
+        //setAdditionalItems(prev => [...prev, additionalItem]);
+      }
+    }, [item]);
     //
     return (
+      <>
+      {console.log(additionalItemsbb)}
       <StyledTreeItem2
         {...props}
         ref={ref}
@@ -139,17 +177,7 @@ export default function DrawingTree() {
         }}
         id={`StyledTreeItem2-${props.itemId}`}
         onClick={item.type === 'root' ? handleRootClick : handleChildClick}
-        label={(
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <span>{props.label}</span>
-            { item.type == "add-technology" || item.type == "add-operation" ? (
-              <StyledIconButton onClick={() => handleAddIconClick(item.type)} sx={{ marginLeft: '8px' }}>
-                <StyledAddIcon />
-              </StyledIconButton>
-            ) : ""
-            }
-          </Box>
-        )}
+        label={additionalItem}
       >
         { isProcessing && !dataLoaded ? (
           <Box
@@ -168,13 +196,9 @@ export default function DrawingTree() {
           props.children
         )}
       </StyledTreeItem2>
+      </>
     );
   });
-
-  const dispatch = useDispatch();
-  const items = useSelector((state) => state.drawingsTree.items);
-  const loading = useSelector((state) => state.drawingsTree.loading);
-  const error = useSelector((state) => state.drawingsTree.error);
 
   //запросы
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
@@ -193,7 +217,7 @@ export default function DrawingTree() {
   );
   //
   return (
-    <>
+    <>    
       <AppBar
           position="static"
           color="primary"
@@ -234,8 +258,8 @@ export default function DrawingTree() {
             
           </Card>
           <RichTreeView
-          slots={{ item: renderCustomTreeItem }}          
-          items={memoizedItems}            
+          slots={{ item: renderCustomTreeItem }}
+          items={memoizedItems}
         /></>
         ) }
                

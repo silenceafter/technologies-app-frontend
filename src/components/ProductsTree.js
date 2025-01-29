@@ -20,7 +20,7 @@ import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, fetchItemDetails, setItems, setPage, setSearch, selectItems } from '../store/slices/drawingsAllTreeSlice';
+import { fetchData, fetchItemDetails, setItems, setPage, setSearch, selectItems } from '../store/slices/productsSlice';
 //import { selectDrawing as drawingHeader } from '../store/slices/headerSlice';
 import { selectDrawingExternalCode } from '../store/slices/drawingsSlice';
 import { split } from 'lodash';
@@ -93,7 +93,7 @@ export default function DrawingsAllTree() {
   
   const CustomTreeItem = React.forwardRef(function CustomTreeItem({ ...props }, ref) {
     const dispatch = useDispatch();
-    const items = useSelector((state) => state.drawingsAllTree.items);
+    const items = useSelector((state) => state.products.items);
     const { publicAPI } = useTreeItem2Utils({
       itemId: props.itemId,
       children: props.children,
@@ -229,12 +229,12 @@ export default function DrawingsAllTree() {
   });
 
   const dispatch = useDispatch();
-  const items = useSelector((state) => state.drawingsAllTree.items);
-  const limit = useSelector((state) => state.drawingsAllTree.limit);
-  const page = useSelector((state) => state.drawingsAllTree.page);
-  const hasMore = useSelector((state) => state.drawingsAllTree.hasMore);
-  const loading = useSelector((state) => state.drawingsAllTree.loading);
-  const error = useSelector((state) => state.drawingsAllTree.error);
+  const items = useSelector((state) => state.products.items);
+  const limit = useSelector((state) => state.products.limit);
+  const page = useSelector((state) => state.products.page);
+  const hasMore = useSelector((state) => state.products.hasMore);
+  const loading = useSelector((state) => state.products.loading);
+  const error = useSelector((state) => state.products.error);
 
   const memoizedItems = useMemo(() => items, [items]);
   //мемоизированная функция для slots.item (избегаем перерисовки)
