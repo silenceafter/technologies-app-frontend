@@ -332,7 +332,7 @@ export default function ProductsTree() {
 
   return (
     <>
-      <AppBar
+      {/*<AppBar
           position="static"
           color="primary"
           elevation={0}
@@ -343,16 +343,8 @@ export default function ProductsTree() {
                   Изделия
               </Typography>
           </Toolbar>
-      </AppBar>
-      <Box
-          sx={{
-              height: 320,
-              overflowY: 'auto',
-              overflowX: 'auto',
-              border: '0px solid rgba(0, 0, 0, 0.12)'
-          }}
-          onScroll={handleScroll}
-      >
+      </AppBar>*/}
+      
         <RichTreeView
           slots={{ 
             item: renderCustomTreeItem
@@ -362,13 +354,10 @@ export default function ProductsTree() {
           /*onItemExpansionToggle={handleItemExpansionToggle}*/
         />
           {
-            download && (
-             
-                <CircularProgress size={50} />
-             
+            download && (             
+              <CircularProgress size={50} />             
             )
-          }        
-      </Box>
+          }
     </>
   );
 }

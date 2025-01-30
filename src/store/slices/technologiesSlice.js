@@ -5,7 +5,7 @@ const LOADING_DEFAULT = false;
 const initialState = {
   items: [], /* основные элементы дерева */
   loading: LOADING_DEFAULT,
-  error: null
+  error: null,
 };
 
 //загрузка списка изделий (корневые элементы)

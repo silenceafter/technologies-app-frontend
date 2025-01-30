@@ -91,7 +91,7 @@ export default function TechnologiesTree() {
   }));
   
   const StyledAddIcon = styled(AddIcon)(({ theme }) => ({
-    fontSize: '0.8rem',
+    fontSize: '0.65rem',
     transition: 'transform 0.3s ease-in-out',
     '&:hover': {
       transform: 'rotate(45deg)',
@@ -146,12 +146,14 @@ export default function TechnologiesTree() {
       <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center' }}>
           <span>{props.label}</span>
           { item.type == "add-technology" || item.type == "add-operation" ? (
-            <StyledIconButton onClick={() => handleAddIconClick(item.type)} sx={{ marginLeft: '8px' }}>
-              <StyledAddIcon />
-            </StyledIconButton>
+            <IconButton onClick={() => handleAddIconClick(item.type)} sx={{ marginLeft: '8px' }}>
+            </IconButton>
           ) : null
           }
       </Box>);
+      /*<StyledIconButton onClick={() => handleAddIconClick(item.type)} sx={{ marginLeft: '8px' }}>
+          <StyledAddIcon />
+        </StyledIconButton> */
     //
     return (
       <>
@@ -208,7 +210,7 @@ export default function TechnologiesTree() {
   //
   return (
     <>    
-      <AppBar
+      {/*<AppBar
           position="static"
           color="primary"
           elevation={0}
@@ -219,41 +221,18 @@ export default function TechnologiesTree() {
                   Технологии и операции
               </Typography>
           </Toolbar>
-      </AppBar>
-      <Box
-          sx={{
-              height: 254,
-              overflowY: 'auto',
-              overflowX: 'auto',
-              border: '0px solid rgba(0, 0, 0, 0.12)'
-          }}
-      >
-        {drawingExternalCode ? (
-          <RichTreeView
-            slots={{ item: renderCustomTreeItem }}          
-            items={items}            
-          />
-        ) : (<>
-          {/*<Card>
-            
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="div">
-                  Lizard
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Lizards are a widespread group of squamate reptiles, with over 6,000
-                  species, ranging across all continents except Antarctica
-                </Typography>
-              </CardContent>
-            
-          </Card>*/}
-          <RichTreeView
-            slots={{ item: renderCustomTreeItem }}
-            items={items}
-        /></>
-        ) }
-               
-      </Box>
+      </AppBar>*/}
+      {drawingExternalCode ? (
+        <RichTreeView
+          slots={{ item: renderCustomTreeItem }}          
+          items={items}            
+        />
+      ) : (<>
+        <RichTreeView
+          slots={{ item: renderCustomTreeItem }}
+          items={items}
+      /></>
+      )}
     </>
   );
 

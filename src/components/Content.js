@@ -29,6 +29,14 @@ import { TabPanel } from './TabPanel';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 
+import Accordion from '@mui/material/Accordion';
+import AccordionActions from '@mui/material/AccordionActions';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -249,28 +257,50 @@ export default function Content() {
         backgroundColor: 'background.paper',
         borderRadius: 1,          
         boxShadow: 1,
-        height: '100%', /* 70vh */
+        height: '700px',
         overflow: 'hidden'
       }}>
         <Box sx={{
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-start',     
-          gap: 2,                   
-          padding: 0,
-          paddingBottom: 2,               
-          backgroundColor: 'background.paper',
-          borderRadius: 1,          
-          boxShadow: 0,
+          alignItems: 'flex-start',
           width: '40%',
           height: '100%'
         }}>
-          <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '45%', flexGrow: 0, flexShrink: 0 }}>
+          <Accordion sx={{ bgcolor: 'white', color: 'white', width: '100%', height: 'auto', overflow: 'hidden' }}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+              sx={{ backgroundColor: 'primary.main' }}
+            >
+              <Typography component="span">Технологии и операции</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ padding: 0, overflow: 'auto', minHeight: '16.5rem', maxHeight: '35rem'}}>           
+              <TechnologiesTree />              
+            </AccordionDetails>
+          </Accordion>
+          <Accordion defaultExpanded sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden' }}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel2-content"
+              id="panel2-header"
+              sx={{ backgroundColor: 'primary.main' }}
+            >
+              <Typography component="span">Изделия</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ padding: 0, overflow: 'auto', minHeight: '16.5rem', maxHeight: '35rem' }}>             
+                <ProductsTree />
+            </AccordionDetails>          
+          </Accordion>
+
+          {/*<Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '45%', flexGrow: 0, flexShrink: 0 }}>
             <TechnologiesTree />
           </Paper>
           <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '55%', flexGrow: 0, flexShrink: 0 }}>
             <ProductsTree />
-          </Paper>
+          </Paper>*/}
+
         </Box>   
         <Box sx={{
           display: 'flex',
@@ -288,15 +318,25 @@ export default function Content() {
         }}>
           <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
             <Box sx={{ overflow: 'hidden' }}>
-              <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0 }}>
-                <Tabs value={tabsValue} onChange={handleTabsChange} textColor="inherit">
+              <AppBar
+                position="static"
+                color="primary"
+                elevation={0}
+                sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
+              >
+                <Toolbar>
+                  <Typography color="inherit">
+                      Операции
+                  </Typography>
+                </Toolbar>
+                {/*<Tabs value={tabsValue} onChange={handleTabsChange} textColor="inherit">
                   <Tab label="Параметры" />
                   <Tab label="Описание операции" />
                   <Tab label="Измерительный инструмент" />
                   <Tab label="Оснастка" />
                   <Tab label="Комплектующие" />
                   <Tab label="Материалы" />
-                </Tabs>
+                </Tabs>*/}
               </AppBar>
             </Box>            
             <Box sx={{           
@@ -304,312 +344,241 @@ export default function Content() {
               overflowY: 'auto',
               padding: 2,          
             }}>
-              <form>
-                {tabsValue === 0 && 
-                  <TabPanel value={tabsValue} index={0}>
-                    <Grid container spacing={2}>
-                      {/* Первая строка */}
-                      <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={2.4}>
-                            <TextField
-                              required
-                              name='operationNumber1'
-                              id="operation-number-1"
-                              label="Номер операции"
-                              type="text"
-                              size="small"
-                              onChange={handleInputChange}
-                              error={formErrors.operationNumber1}
-                              helperText={formErrors.operationNumber1 ? formErrors.operationNumber1 : ''}
-                              value={formValues.operationNumber1}
-                              slotProps={{
-                                formHelperText: {
-                                  sx: { whiteSpace: 'nowrap' },
-                                },
-                              }}
-                            >
-                            </TextField>
-                          </Grid>
-                        </Grid>                    
-                      </Grid>
-                      {/* Вторая строка */}
-                      <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={4.8}>
-                            <OperationsSearch props={
-                              {
-                                id: "operation-code-2",
-                                placeholder: "Код операции"
-                              }
+              <Stack direction="row" spacing={0} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                <Typography variant="h6">
+                  Параметры
+                </Typography>
+                <form>
+                  <Grid container spacing={2} columns={{xs:5}}>
+                    {/* Первая строка */}
+                    <Grid item xs={12}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={2.4}>
+                          <TextField
+                            required
+                            name='operationNumber1'
+                            id="operation-number-1"
+                            label="Номер операции"
+                            type="text"
+                            size="small"
+                            onChange={handleInputChange}
+                            error={formErrors.operationNumber1}
+                            helperText={formErrors.operationNumber1 ? formErrors.operationNumber1 : ''}
+                            value={formValues.operationNumber1}
+                            slotProps={{
+                              formHelperText: {
+                                sx: { whiteSpace: 'nowrap' },
+                              },
+                            }}
+                          >
+                          </TextField>
+                        </Grid>
+                      </Grid>                    
+                    </Grid>
+                    {/* Вторая строка */}
+                    <Grid item xs={12}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={4.8}>
+                          <OperationsSearch props={
+                            {
+                              id: "operation-code-2",
+                              placeholder: "Код операции"
                             }
-                            id="operationCode2" onOptionSelect={handleOptionSelect}
-                              selectedValue={ formValues['operationCode2'] ? formValues['operationCode2'] : null} errorValue={formErrors['operationCode2']} />
-                          </Grid>
-                        </Grid>                  
-                      </Grid>
-                      {/* Третья строка */}
-                      <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={2.4}>
-                            <TextField
-                              required
-                              name='workshopNumber3'
-                              id="workshop-number-3"
-                              label="Номер цеха"
-                              type="text"
-                              size="small"
-                              onChange={handleInputChange}
-                              error={formErrors.workshopNumber3}
-                              helperText={formErrors.workshopNumber3 ? formErrors.workshopNumber3 : ''}
-                              value={formValues.workshopNumber3}
-                              slotProps={{
-                                formHelperText: {
-                                  sx: { whiteSpace: 'nowrap' },
-                                },
-                              }}
-                            >
-                            </TextField>
-                          </Grid>
-                          <Grid item xs={2.4}>
-                            <TextField
-                              name='workshopAreaNumber4'
-                              id="workshop-area-number-4"
-                              label="Номер участка"
-                              type="text"
-                              size="small"
-                              onChange={handleInputChange}
-                              value={formValues.workshopAreaNumber4}
-                            >
-                            </TextField>
-                          </Grid>                      
-                        </Grid>                    
-                      </Grid>
-                      {/* Четвертая строка */}
-                      <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={4.8}>
-                            <TextField
-                              required
-                              fullWidth
-                              name='documentName5'
-                              id="document-name-5"
-                              label="Обозначение документа"
-                              size="small"
-                              onChange={handleInputChange}
-                              error={formErrors.documentName5}
-                              helperText={formErrors.documentName5 ? formErrors.documentName5 : ''}
-                              value={formValues.documentName5}
-                              slotProps={{
-                                formHelperText: {
-                                  sx: { whiteSpace: 'nowrap' },
-                                },
-                              }}
-                            >
-                            </TextField>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                      {/* Пятая строка */}
-                      <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={4.8}>
-                            <ProfessionsSearch id="professionCode6" onOptionSelect={handleOptionSelect} 
-                              selectedValue={formValues['professionCode6'] ? formValues['professionCode6'] : null} errorValue={formErrors['professionCode6']} />
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                      {/* Шестая строка */}
-                      <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={2.4}>
-                            <TextField
-                              required
-                              name='workerCategory7'
-                              id="worker-category-7"
-                              label="Разряд"
-                              type="text"
-                              size="small"
-                              onChange={handleInputChange}
-                              error={formErrors.workerCategory7}
-                              helperText={formErrors.workerCategory7 ? formErrors.workerCategory7 : ''}
-                              value={formValues.workerCategory7}
-                              slotProps={{
-                                formHelperText: {
-                                  sx: { whiteSpace: 'nowrap' },
-                                },
-                              }}
-                            >
-                            </TextField>
-                          </Grid>
-                          <Grid item xs={2.4}>
-                            <TextField
-                              required
-                              name='workerConditions8'
-                              id="worker-conditions-8"
-                              label="Условия труда"
-                              type="text"
-                              size="small"
-                              onChange={handleInputChange}
-                              error={formErrors.workerConditions8}
-                              helperText={formErrors.workerConditions8 ? formErrors.workerConditions8 : ''}
-                              value={formValues.workerConditions8}
-                              slotProps={{
-                                formHelperText: {
-                                  sx: { whiteSpace: 'nowrap' },
-                                },
-                              }}
-                            >
-                            </TextField>
-                          </Grid>
-                          <Grid item xs={2.4}>
-                            <TextField
-                              required
-                              name='numberEmployees9'
-                              id="number-employees-9"
-                              label="Кол-во работающих"
-                              type="text"
-                              size="small"
-                              onChange={handleInputChange}
-                              error={formErrors.numberEmployees9}
-                              helperText={formErrors.numberEmployees9 ? formErrors.numberEmployees9 : ''}
-                              value={formValues.numberEmployees9}
-                              slotProps={{
-                                formHelperText: {
-                                  sx: { whiteSpace: 'nowrap' },
-                                },
-                              }}
-                            >
-                            </TextField>
-                          </Grid>
-                          <Grid item xs={4.8}>
-                            <TextField
-                              required
-                              fullWidth
-                              name='numberProcessedParts10'
-                              id="number-processed-parts-10"
-                              label="Кол-во одновременно обрабатываемых деталей"
-                              type="text"
-                              size="small"
-                              onChange={handleInputChange}
-                              error={formErrors.numberProcessedParts10}
-                              helperText={formErrors.numberProcessedParts10 ? formErrors.numberProcessedParts10 : ''}
-                              value={formValues.numberProcessedParts10}
-                              slotProps={{
-                                formHelperText: {
-                                  sx: { whiteSpace: 'nowrap' },
-                                },
-                              }}
-                            >
-                            </TextField>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                      {/* Седьмая строка */}
-                      <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={2.4}>
-                            <TextField
-                              required
-                              name='toilsomeness11'
-                              id="toilsomeness-11"
-                              label="Трудоемкость"
-                              type="text"
-                              size="small"
-                              onChange={handleInputChange}
-                              error={formErrors.toilsomeness11}
-                              helperText={formErrors.toilsomeness11 ? formErrors.toilsomeness11 : ''}
-                              value={formValues.toilsomeness11}
-                              slotProps={{
-                                formHelperText: {
-                                  sx: { whiteSpace: 'nowrap' },
-                                },
-                              }}
-                            >
-                            </TextField>
-                          </Grid>
+                          }
+                          id="operationCode2" onOptionSelect={handleOptionSelect}
+                            selectedValue={ formValues['operationCode2'] ? formValues['operationCode2'] : null} errorValue={formErrors['operationCode2']} />
                         </Grid>
                       </Grid>                  
-                    </Grid>   
-                  </TabPanel>     
-                }
-                {tabsValue === 1 && 
-                  <TabPanel value={tabsValue} index={1}>
-                    <Grid container spacing={2} >
-                    {/* Первая строка */}
-                      <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={4.8}>
-                            <TextField                          
-                              multiline
-                              fullWidth
-                              rows={8}
-                              name='operationDescription12'
-                              id="operation-description-12"
-                              label="Описание операции"
-                              size="small"
-                            >
-                            </TextField>
-                          </Grid>
-                        </Grid>                    
-                      </Grid>             
                     </Grid>
-                  </TabPanel>
-                }
-                {tabsValue === 2 && 
-                  <Grid container spacing={2} sx={{ padding: '24px 24px'}}>
-                  {/* Первая строка */}
+                    {/* Третья строка */}
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
-                        <Grid item xs={4.8}>
-                          <MeasuringToolsSearch id="measuringTools13" 
-                            onOptionSelect={handleOptionSelect} selectedValue={formValues['measuringTools13'] ? formValues['measuringTools13'] : []}
-                            errorValue={formErrors['measuringTools13']} />
+                        <Grid item xs={2.4}>
+                          <TextField
+                            required
+                            name='workshopNumber3'
+                            id="workshop-number-3"
+                            label="Номер цеха"
+                            type="text"
+                            size="small"
+                            onChange={handleInputChange}
+                            error={formErrors.workshopNumber3}
+                            helperText={formErrors.workshopNumber3 ? formErrors.workshopNumber3 : ''}
+                            value={formValues.workshopNumber3}
+                            slotProps={{
+                              formHelperText: {
+                                sx: { whiteSpace: 'nowrap' },
+                              },
+                            }}
+                          >
+                          </TextField>
                         </Grid>
+                        <Grid item xs={2.4}>
+                          <TextField
+                            name='workshopAreaNumber4'
+                            id="workshop-area-number-4"
+                            label="Номер участка"
+                            type="text"
+                            size="small"
+                            onChange={handleInputChange}
+                            value={formValues.workshopAreaNumber4}
+                          >
+                          </TextField>
+                        </Grid>                      
                       </Grid>                    
-                    </Grid>             
-                  </Grid>
-                }
-                {tabsValue === 3 &&
-                  <Grid container spacing={2} sx={{ padding: '24px 24px'}}>
-                  {/* Первая строка */}
+                    </Grid>
+                    {/* Четвертая строка */}
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
-                          <ToolingSearch id="tooling14" onOptionSelect={handleOptionSelect}
-                            selectedValue={formValues['tooling14'] ? formValues['tooling14'] : []} errorValue={formErrors['tooling14']} />
+                          <TextField
+                            required
+                            fullWidth
+                            name='documentName5'
+                            id="document-name-5"
+                            label="Обозначение документа"
+                            size="small"
+                            onChange={handleInputChange}
+                            error={formErrors.documentName5}
+                            helperText={formErrors.documentName5 ? formErrors.documentName5 : ''}
+                            value={formValues.documentName5}
+                            slotProps={{
+                              formHelperText: {
+                                sx: { whiteSpace: 'nowrap' },
+                              },
+                            }}
+                          >
+                          </TextField>
                         </Grid>
-                      </Grid>                    
-                    </Grid>             
-                  </Grid>
-                }
-                {tabsValue === 4 &&
-                  <Grid container spacing={2} sx={{ padding: '24px 24px'}}>
-                  {/* Первая строка */}
+                      </Grid>
+                    </Grid>
+                    {/* Пятая строка */}
                     <Grid item xs={12}>
                       <Grid container spacing={2}>
                         <Grid item xs={4.8}>
-                          <ComponentsSearch id="components15" onOptionSelect={handleOptionSelect}
-                            selectedValue={formValues['components15'] ? formValues['components15'] : []} errorValue={formErrors['components15']} />
+                          <ProfessionsSearch id="professionCode6" onOptionSelect={handleOptionSelect} 
+                            selectedValue={formValues['professionCode6'] ? formValues['professionCode6'] : null} errorValue={formErrors['professionCode6']} />
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    {/* Шестая строка */}
+                    <Grid item xs={12}>
+                          <Grid container spacing={2}>
+                            <Grid item xs={2.4}>
+                              <TextField
+                                required
+                                name='workerCategory7'
+                                id="worker-category-7"
+                                label="Разряд"
+                                type="text"
+                                size="small"
+                                onChange={handleInputChange}
+                                error={formErrors.workerCategory7}
+                                helperText={formErrors.workerCategory7 ? formErrors.workerCategory7 : ''}
+                                value={formValues.workerCategory7}
+                                slotProps={{
+                                  formHelperText: {
+                                    sx: { whiteSpace: 'nowrap' },
+                                  },
+                                }}
+                              >
+                              </TextField>
+                            </Grid>
+                            <Grid item xs={2.4}>
+                              <TextField
+                                required
+                                name='workerConditions8'
+                                id="worker-conditions-8"
+                                label="Условия труда"
+                                type="text"
+                                size="small"
+                                onChange={handleInputChange}
+                                error={formErrors.workerConditions8}
+                                helperText={formErrors.workerConditions8 ? formErrors.workerConditions8 : ''}
+                                value={formValues.workerConditions8}
+                                slotProps={{
+                                  formHelperText: {
+                                    sx: { whiteSpace: 'nowrap' },
+                                  },
+                                }}
+                              >
+                              </TextField>
+                            </Grid>
+                            <Grid item xs={2.4}>
+                              <TextField
+                                required
+                                name='numberEmployees9'
+                                id="number-employees-9"
+                                label="Кол-во работающих"
+                                type="text"
+                                size="small"
+                                onChange={handleInputChange}
+                                error={formErrors.numberEmployees9}
+                                helperText={formErrors.numberEmployees9 ? formErrors.numberEmployees9 : ''}
+                                value={formValues.numberEmployees9}
+                                slotProps={{
+                                  formHelperText: {
+                                    sx: { whiteSpace: 'nowrap' },
+                                  },
+                                }}
+                              >
+                              </TextField>
+                            </Grid>
+                            <Grid item xs={4.8}>
+                              <TextField
+                                required
+                                fullWidth
+                                name='numberProcessedParts10'
+                                id="number-processed-parts-10"
+                                label="Кол-во одновременно обрабатываемых деталей"
+                                type="text"
+                                size="small"
+                                onChange={handleInputChange}
+                                error={formErrors.numberProcessedParts10}
+                                helperText={formErrors.numberProcessedParts10 ? formErrors.numberProcessedParts10 : ''}
+                                value={formValues.numberProcessedParts10}
+                                slotProps={{
+                                  formHelperText: {
+                                    sx: { whiteSpace: 'nowrap' },
+                                  },
+                                }}
+                              >
+                              </TextField>
+                            </Grid>
+                          </Grid>
+                    </Grid>
+                    {/* Седьмая строка */}
+                    <Grid item xs={12}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={2.4}>
+                          <TextField
+                            required
+                            name='toilsomeness11'
+                            id="toilsomeness-11"
+                            label="Трудоемкость"
+                            type="text"
+                            size="small"
+                            onChange={handleInputChange}
+                            error={formErrors.toilsomeness11}
+                            helperText={formErrors.toilsomeness11 ? formErrors.toilsomeness11 : ''}
+                            value={formValues.toilsomeness11}
+                            slotProps={{
+                              formHelperText: {
+                                sx: { whiteSpace: 'nowrap' },
+                              },
+                            }}
+                          >
+                          </TextField>
                         </Grid>
                       </Grid>
                     </Grid>                  
+                      
                   </Grid>
-                }
-                {tabsValue === 5 &&
-                  <Grid container spacing={2} sx={{ padding: '24px 24px'}}>
-                  {/* Первая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={4.8}>
-                          <MaterialsSearch id="materials16" onOptionSelect={handleOptionSelect}
-                            selectedValue={formValues['materials16'] ? formValues['materials16'] : []} errorValue={formErrors['materials16']} />
-                        </Grid>
-                      </Grid>
-                    </Grid>                  
-                  </Grid>
-                }
-              </form>
+                
+                
+                </form>
+              </Stack>
+              
               
               {/* уведомления */}
               <Snackbar
