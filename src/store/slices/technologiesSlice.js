@@ -4,7 +4,6 @@ import { selectDrawingExternalCode } from './drawingsSlice';
 const LOADING_DEFAULT = false;
 const initialState = {
   items: [], /* основные элементы дерева */
-  additionalItems: [], /* элементы технологий и операций (не являются дочерними элементами дерева) */
   loading: LOADING_DEFAULT,
   error: null
 };
@@ -22,6 +21,9 @@ export const fetchData = createAsyncThunk(
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
       }
+
+      //для пустого значения
+      if (!externalCode.trim()) return rejectWithValue('Пустое значение поиска (реквизит drawing)');
 
       //приведем к нужному виду
       const processItem = (item) => ({
@@ -43,22 +45,11 @@ const technologiesSlice = createSlice({
   initialState,
   reducers: {
     setItems: (state) => {
-      state.items = [];
-      state.loading = LOADING_DEFAULT;
-    },
-    setAdditionalItems: (state, action) => {
-      const newItems = Array.isArray(action.payload) ? action.payload : [action.payload];
       return {
         ...state,
-        additionalItems: [...state.additionalItems, ...newItems]
-      };
-      /*return {
-        ...state,
-        additionalItems: [...state.additionalItems, ...action.payload]
-      };*/
-    },
-    setClearAdditionalItems: (state) => {
-      state.additionalItems = [];
+        items: [],
+        loading: LOADING_DEFAULT
+      }
     }
   },
   extraReducers: (builder) => {
@@ -82,7 +73,6 @@ const technologiesSlice = createSlice({
   },
 });
 
-export const { setItems, setAdditionalItems, setClearAdditionalItems } = technologiesSlice.actions;
+export const { setItems } = technologiesSlice.actions;
 export const selectItems = (state) => state.technologies.items || [];
-export const selectAdditionalItems = (state) => state.technologies.additionalItems || [];
 export default technologiesSlice.reducer;

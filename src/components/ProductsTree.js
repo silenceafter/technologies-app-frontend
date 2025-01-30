@@ -31,7 +31,7 @@ import { current } from '@reduxjs/toolkit';
 import InfiniteLoader from 'react-window-infinite-loader';
 import AddIcon from '@mui/icons-material/Add';
 
-export default function DrawingsAllTree() {
+export default function ProductsTree() {
   //const [expandedItems, setExpandedItems] = useState([]);
   const [loadedItems, setLoadedItems] = useState([]);
   const [download, setDownload] = useState(false);
