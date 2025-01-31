@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
+import { Divider, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -34,8 +34,11 @@ import AccordionActions from '@mui/material/AccordionActions';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
+import { OperationCard } from './OperationCard';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -43,10 +46,29 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 export default function Content() {
   const dispatch = useDispatch();
+
+  //стейты  
+  const [operationCards, setOperationCards] = useState([{ id: 1, number: 1}]);//карточки операций, операции
+
+  //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
 
+  //добавить карточку операции в стейт
+  const addOperationCard = () => {
+    setOperationCards(prevCards => {
+      const nextNumber = prevCards.length + 1; // Определяем следующий номер
+      return [...prevCards, { id: nextNumber, number: nextNumber }];
+    });
+  };
+
+  //найти номер следующей карточки
+  const findNextNumber = () => {
+    let findMaxNumber = Math.max(...operationCards);
+    return ++findMaxNumber;
+  }
+
   //список числовых полей (для последующей валидации вместо type="number")
-  const numericFields = [
+/*  const numericFields = [
     'operationNumber1', 
     'workshopNumber3', 
     'workshopAreaNumber4',
@@ -95,16 +117,23 @@ export default function Content() {
     tooling14: '',
     components15: '',
     materials16: ''
-  });
+  });*/
 
   //вкладки
-  const [tabsValue, setTabsValue] = useState(0);
-  const handleTabsChange = (event, newValue) => {
-    setTabsValue(newValue);
+  const [tabs, setTabs] = useState([{ id: 1, label: 'Новая операция'}]);
+  const [tabValue, setTabValue] = useState(0);
+
+  const addTab = () => {
+    const newTab = {
+      id: tabs.length + 1,
+      label: `Новая операция ${tabs.length + 1}`,
+    };
+    setTabs([...tabs, newTab]);
+    setTabValue(tabs.length);
   };
 
   //проверка формы
-  const validateForm = () => {
+  /*const validateForm = () => {
     const errors = {};
     const textFieldMessage = 'Поле обязательно для заполнения';
     const autocompleteTextFieldMessage = 'Выберите значение из списка';
@@ -181,7 +210,7 @@ export default function Content() {
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
-  };
+  };*/
 
   //отправка
   const handleSuccess = () => {
@@ -206,7 +235,7 @@ export default function Content() {
   };
 
   //autocomplete
-  const handleOptionSelect = (id, option) => {
+  /*const handleOptionSelect = (id, option) => {
     //задать значение в formValues
     const value = option ? option : null;
     setFormValues((prevFormValues) => ({
@@ -219,7 +248,7 @@ export default function Content() {
       ...prevErrors,
       [id]: '',
     }));
-  };
+  };*/
 
   //buttonGroup
   const [loading, setLoading] = useState({ save: false });
@@ -227,14 +256,14 @@ export default function Content() {
     setLoading((prev) => ({ ...prev, save: true }));  
     await new Promise((resolve) => setTimeout(() => {
       setOpen(true);
-      validateForm();
+      //validateForm();
       setLoading((prev) => ({ ...prev, save: false }));
       dispatch(setUnsavedChanges(false));
     }, 2000));
   }
 
   //textField
-  const handleInputChange = (e) => {
+  /*const handleInputChange = (e) => {
     //значения формы
     const { name, value } = e.target;    
     const errorMessage = numericFields.includes(name) && (value && !/^\d*$/.test(value))
@@ -244,7 +273,7 @@ export default function Content() {
     setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
     setFormErrors((prevErrors) => ({ ...prevErrors, [name]: errorMessage }));
     dispatch(setUnsavedChanges(true));
-  };
+  };*/
   //
   return (
     <>
@@ -256,7 +285,7 @@ export default function Content() {
         padding: 2,
         backgroundColor: 'background.paper',
         borderRadius: 1,          
-        boxShadow: 1,
+        boxShadow: 3,
         height: '700px',
         overflow: 'hidden'
       }}>
@@ -264,10 +293,10 @@ export default function Content() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
-          width: '40%',
+          width: '24rem',
           height: '100%'
         }}>
-          <Accordion sx={{ bgcolor: 'white', color: 'white', width: '100%', height: 'auto', overflow: 'hidden' }}>
+          <Accordion elevation={3} sx={{ bgcolor: 'white', color: 'white', width: '100%', height: 'auto', overflow: 'hidden' }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1-content"
@@ -280,7 +309,7 @@ export default function Content() {
               <TechnologiesTree />              
             </AccordionDetails>
           </Accordion>
-          <Accordion defaultExpanded sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden' }}>
+          <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden' }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel2-content"
@@ -293,14 +322,6 @@ export default function Content() {
                 <ProductsTree />
             </AccordionDetails>          
           </Accordion>
-
-          {/*<Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '45%', flexGrow: 0, flexShrink: 0 }}>
-            <TechnologiesTree />
-          </Paper>
-          <Paper elevation={3} sx={{ width: '100%', height: 'auto', margin: '0', padding: '0', overflow: 'hidden', flexBasis: '55%', flexGrow: 0, flexShrink: 0 }}>
-            <ProductsTree />
-          </Paper>*/}
-
         </Box>   
         <Box sx={{
           display: 'flex',
@@ -313,7 +334,7 @@ export default function Content() {
           backgroundColor: 'background.paper',
           borderRadius: 1,          
           boxShadow: 0,
-          width: '100%',
+          width: '90.5rem',
           height: '100%',
         }}>
           <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
@@ -322,13 +343,8 @@ export default function Content() {
                 position="static"
                 color="primary"
                 elevation={0}
-                sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
+                sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}
               >
-                <Toolbar>
-                  <Typography color="inherit">
-                      Операции
-                  </Typography>
-                </Toolbar>
                 {/*<Tabs value={tabsValue} onChange={handleTabsChange} textColor="inherit">
                   <Tab label="Параметры" />
                   <Tab label="Описание операции" />
@@ -337,247 +353,51 @@ export default function Content() {
                   <Tab label="Комплектующие" />
                   <Tab label="Материалы" />
                 </Tabs>*/}
+                <Tabs 
+                  value={tabValue} 
+                  onChange={(e, newValue) => setTabValue(newValue)} 
+                  variant='scrollable' 
+                  scrollButtons='auto' 
+                  textColor="inherit"
+                  sx={{ maxWidth: '100%', overflow: 'hidden'}}
+                >
+                  {tabs.map((tab, index) => (
+                    <Tab key={tab.id} label={tab.label} />
+                  ))}                
+                </Tabs>
+                <IconButton 
+                  onClick={addTab}
+                  size="small" 
+                  sx={{ 
+                    ml: 1, 
+                    '&:hover': { background: 'transparent'} 
+                  }}
+                >
+                  <AddIcon sx={{ color: 'white' }} />
+                </IconButton>
               </AppBar>
             </Box>            
             <Box sx={{           
               height: '91%',
-              overflowY: 'auto',
-              padding: 2,          
+              overflowY: 'auto'              
             }}>
-              <Stack direction="row" spacing={0} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
-                <Typography variant="h6">
-                  Параметры
-                </Typography>
-                <form>
-                  <Grid container spacing={2} columns={{xs:5}}>
-                    {/* Первая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            required
-                            name='operationNumber1'
-                            id="operation-number-1"
-                            label="Номер операции"
-                            type="text"
-                            size="small"
-                            onChange={handleInputChange}
-                            error={formErrors.operationNumber1}
-                            helperText={formErrors.operationNumber1 ? formErrors.operationNumber1 : ''}
-                            value={formValues.operationNumber1}
-                            slotProps={{
-                              formHelperText: {
-                                sx: { whiteSpace: 'nowrap' },
-                              },
-                            }}
-                          >
-                          </TextField>
-                        </Grid>
-                      </Grid>                    
-                    </Grid>
-                    {/* Вторая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={4.8}>
-                          <OperationsSearch props={
-                            {
-                              id: "operation-code-2",
-                              placeholder: "Код операции"
-                            }
-                          }
-                          id="operationCode2" onOptionSelect={handleOptionSelect}
-                            selectedValue={ formValues['operationCode2'] ? formValues['operationCode2'] : null} errorValue={formErrors['operationCode2']} />
-                        </Grid>
-                      </Grid>                  
-                    </Grid>
-                    {/* Третья строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            required
-                            name='workshopNumber3'
-                            id="workshop-number-3"
-                            label="Номер цеха"
-                            type="text"
-                            size="small"
-                            onChange={handleInputChange}
-                            error={formErrors.workshopNumber3}
-                            helperText={formErrors.workshopNumber3 ? formErrors.workshopNumber3 : ''}
-                            value={formValues.workshopNumber3}
-                            slotProps={{
-                              formHelperText: {
-                                sx: { whiteSpace: 'nowrap' },
-                              },
-                            }}
-                          >
-                          </TextField>
-                        </Grid>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            name='workshopAreaNumber4'
-                            id="workshop-area-number-4"
-                            label="Номер участка"
-                            type="text"
-                            size="small"
-                            onChange={handleInputChange}
-                            value={formValues.workshopAreaNumber4}
-                          >
-                          </TextField>
-                        </Grid>                      
-                      </Grid>                    
-                    </Grid>
-                    {/* Четвертая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={4.8}>
-                          <TextField
-                            required
-                            fullWidth
-                            name='documentName5'
-                            id="document-name-5"
-                            label="Обозначение документа"
-                            size="small"
-                            onChange={handleInputChange}
-                            error={formErrors.documentName5}
-                            helperText={formErrors.documentName5 ? formErrors.documentName5 : ''}
-                            value={formValues.documentName5}
-                            slotProps={{
-                              formHelperText: {
-                                sx: { whiteSpace: 'nowrap' },
-                              },
-                            }}
-                          >
-                          </TextField>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                    {/* Пятая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={4.8}>
-                          <ProfessionsSearch id="professionCode6" onOptionSelect={handleOptionSelect} 
-                            selectedValue={formValues['professionCode6'] ? formValues['professionCode6'] : null} errorValue={formErrors['professionCode6']} />
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                    {/* Шестая строка */}
-                    <Grid item xs={12}>
-                          <Grid container spacing={2}>
-                            <Grid item xs={2.4}>
-                              <TextField
-                                required
-                                name='workerCategory7'
-                                id="worker-category-7"
-                                label="Разряд"
-                                type="text"
-                                size="small"
-                                onChange={handleInputChange}
-                                error={formErrors.workerCategory7}
-                                helperText={formErrors.workerCategory7 ? formErrors.workerCategory7 : ''}
-                                value={formValues.workerCategory7}
-                                slotProps={{
-                                  formHelperText: {
-                                    sx: { whiteSpace: 'nowrap' },
-                                  },
-                                }}
-                              >
-                              </TextField>
-                            </Grid>
-                            <Grid item xs={2.4}>
-                              <TextField
-                                required
-                                name='workerConditions8'
-                                id="worker-conditions-8"
-                                label="Условия труда"
-                                type="text"
-                                size="small"
-                                onChange={handleInputChange}
-                                error={formErrors.workerConditions8}
-                                helperText={formErrors.workerConditions8 ? formErrors.workerConditions8 : ''}
-                                value={formValues.workerConditions8}
-                                slotProps={{
-                                  formHelperText: {
-                                    sx: { whiteSpace: 'nowrap' },
-                                  },
-                                }}
-                              >
-                              </TextField>
-                            </Grid>
-                            <Grid item xs={2.4}>
-                              <TextField
-                                required
-                                name='numberEmployees9'
-                                id="number-employees-9"
-                                label="Кол-во работающих"
-                                type="text"
-                                size="small"
-                                onChange={handleInputChange}
-                                error={formErrors.numberEmployees9}
-                                helperText={formErrors.numberEmployees9 ? formErrors.numberEmployees9 : ''}
-                                value={formValues.numberEmployees9}
-                                slotProps={{
-                                  formHelperText: {
-                                    sx: { whiteSpace: 'nowrap' },
-                                  },
-                                }}
-                              >
-                              </TextField>
-                            </Grid>
-                            <Grid item xs={4.8}>
-                              <TextField
-                                required
-                                fullWidth
-                                name='numberProcessedParts10'
-                                id="number-processed-parts-10"
-                                label="Кол-во одновременно обрабатываемых деталей"
-                                type="text"
-                                size="small"
-                                onChange={handleInputChange}
-                                error={formErrors.numberProcessedParts10}
-                                helperText={formErrors.numberProcessedParts10 ? formErrors.numberProcessedParts10 : ''}
-                                value={formValues.numberProcessedParts10}
-                                slotProps={{
-                                  formHelperText: {
-                                    sx: { whiteSpace: 'nowrap' },
-                                  },
-                                }}
-                              >
-                              </TextField>
-                            </Grid>
-                          </Grid>
-                    </Grid>
-                    {/* Седьмая строка */}
-                    <Grid item xs={12}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={2.4}>
-                          <TextField
-                            required
-                            name='toilsomeness11'
-                            id="toilsomeness-11"
-                            label="Трудоемкость"
-                            type="text"
-                            size="small"
-                            onChange={handleInputChange}
-                            error={formErrors.toilsomeness11}
-                            helperText={formErrors.toilsomeness11 ? formErrors.toilsomeness11 : ''}
-                            value={formValues.toilsomeness11}
-                            slotProps={{
-                              formHelperText: {
-                                sx: { whiteSpace: 'nowrap' },
-                              },
-                            }}
-                          >
-                          </TextField>
-                        </Grid>
-                      </Grid>
-                    </Grid>                  
-                      
-                  </Grid>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+                {/*tabValue === 0 && 
+                  <TabPanel key={tab.id} value={tabValue} index={0}>
+                    <OperationCard operationNumber={index + 1} />
+                  </TabPanel>*/
+                }
+                {tabs.map((tab, index) => (
+                  <TabPanel key={tab.id} value={tabValue} index={index}>
+                    <OperationCard operationNumber={index + 1} />
+                  </TabPanel>
+                ))}
+                
+
+
                 
                 
-                </form>
-              </Stack>
+              </Box>
               
               
               {/* уведомления */}
