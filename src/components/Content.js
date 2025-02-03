@@ -274,56 +274,68 @@ export default function Content() {
     setFormErrors((prevErrors) => ({ ...prevErrors, [name]: errorMessage }));
     dispatch(setUnsavedChanges(true));
   };*/
+
+  const [expanded, setExpanded] = useState('panel1');
+  const handleAccordeonChange = (panel) => (event, newExpanded) => {
+    setExpanded(newExpanded ? panel : false);
+  }
   //
   return (
     <>
       <Box sx={{
         display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'flex-start',     
-        gap: 2,                   
-        padding: 2,
-        backgroundColor: 'background.paper',
-        borderRadius: 1,          
-        boxShadow: 3,
-        height: '700px',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        width: '24rem',
+        height: '705px',
         overflow: 'hidden'
+        
       }}>
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          width: '24rem',
-          height: '100%'
-        }}>
-          <Accordion elevation={3} sx={{ bgcolor: 'white', color: 'white', width: '100%', height: 'auto', overflow: 'hidden' }}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1-content"
-              id="panel1-header"
-              sx={{ backgroundColor: 'primary.main' }}
-            >
-              <Typography component="span">Технологии и операции</Typography>
-            </AccordionSummary>
-            <AccordionDetails sx={{ padding: 0, overflow: 'auto', minHeight: '16.5rem', maxHeight: '35rem'}}>           
-              <TechnologiesTree />              
-            </AccordionDetails>
-          </Accordion>
-          <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden' }}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel2-content"
-              id="panel2-header"
-              sx={{ backgroundColor: 'primary.main' }}
-            >
-              <Typography component="span">Изделия</Typography>
-            </AccordionSummary>
-            <AccordionDetails sx={{ padding: 0, overflow: 'auto', minHeight: '16.5rem', maxHeight: '35rem' }}>             
-                <ProductsTree />
-            </AccordionDetails>          
-          </Accordion>
-        </Box>   
-        <Box sx={{
+        <Accordion 
+          /*expanded={expanded === 'panel1'} 
+          onChange={handleAccordeonChange('panel1')}*/
+          elevation={3} 
+          sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+            sx={{ backgroundColor: 'primary.main' }}
+          >
+            <Typography component="span">Технологии и операции</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px' }}>
+            <Box sx={{ height: '100%' }}>
+              <TechnologiesTree />
+            </Box>              
+          </AccordionDetails>
+          <AccordionActions>
+            <Button sx={{ backgroundColor: 'primary.main', color: 'white' }}>Добавить технологию</Button>
+          </AccordionActions>
+        </Accordion>
+        <Accordion defaultExpanded
+          /*expanded={expanded === 'panel2'} 
+          onChange={handleAccordeonChange('panel2')}*/
+          elevation={3} 
+          sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel2-content"
+            id="panel2-header"
+            sx={{ backgroundColor: 'primary.main' }}
+          >
+            <Typography component="span">Изделия</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px' }}>
+            <Box sx={{ height: 'auto' }}>
+              <ProductsTree />
+            </Box>
+          </AccordionDetails>          
+        </Accordion>
+      </Box>
+      <Box sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',     
@@ -428,7 +440,6 @@ export default function Content() {
             </ButtonGroup>
           </Box>             
         </Box>
-      </Box>      
     </>
   );
 }

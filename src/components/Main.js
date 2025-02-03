@@ -191,7 +191,20 @@ function Main() {
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Header onDrawerToggle={handleDrawerToggle} />
           <Box component="main" sx={{ flex: 1, py: 2, px: 2, bgcolor: '#eaeff1' }}>
-            <Content />
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'flex-start',     
+              gap: 2,                   
+              padding: 2,
+              backgroundColor: 'background.paper',
+              borderRadius: 1,          
+              boxShadow: 3,
+              height: '735px',
+              overflow: 'hidden'
+            }}>
+              <Content />
+            </Box>            
           </Box>
           <Box component="footer" sx={{ p: 1, bgcolor: '#eaeff1' }}>
             <Copyright />

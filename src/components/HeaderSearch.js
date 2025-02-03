@@ -83,11 +83,11 @@ function HeaderSearch(props) {
             <Grid item xs>
               <Autocomplete
                 options={items || []}
-                getOptionLabel={(option) => option.ex_code || option.label}
+                getOptionLabel={(option) => option.external_code || option.label}
                 filterOptions={(options, state) => {
                   const { inputValue } = state;
                   return options.filter(option =>
-                    option.ex_code.toLowerCase().includes(inputValue.toLowerCase()) ||
+                    option.external_code.toLowerCase().includes(inputValue.toLowerCase()) ||
                     option.name.toLowerCase().includes(inputValue.toLowerCase())
                   );
                 }}
@@ -101,8 +101,8 @@ function HeaderSearch(props) {
                   if (newValue) {
                     dispatch(setDrawing(
                       {
-                        externalCode: newValue.ex_code, 
-                        internalCode: newValue.in_code, 
+                        externalCode: newValue.external_code, 
+                        internalCode: newValue.internal_code, 
                         name: newValue.name
                       }
                     ));
@@ -147,11 +147,11 @@ function HeaderSearch(props) {
                 renderOption={(props, option) => (
                   <ListItem 
                     {...props} 
-                    key={`${option.ex_code}-${option.in_code}-${option.name}`} 
+                    key={`${option.external_code}-${option.internal_code}-${option.name}`} 
                     style={{ padding: '8px 16px' }}
                   >
                     <ListItemText
-                      primary={option.ex_code}
+                      primary={option.external_code}
                       secondary={option.name}
                       primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
                       secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
