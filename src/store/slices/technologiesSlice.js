@@ -74,5 +74,10 @@ const technologiesSlice = createSlice({
 });
 
 export const { setItems } = technologiesSlice.actions;
+
+//селекторы
 export const selectItems = (state) => state.technologies.items || [];
+export const selectLoading = (state) => state.technologies.loading;
+export const selectError = (state) => state.header.error;
+
 export default technologiesSlice.reducer;

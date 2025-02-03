@@ -28,6 +28,8 @@ import MuiAlert from '@mui/material/Alert';
 import { TabPanel } from './TabPanel';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
+import { selectItems as technologiesSelectItems, selectLoading as technologiesSelectLoading, selectError as technologiesSelectError} from '../store/slices/technologiesSlice';
+import { selectDrawingExternalCode } from '../store/slices/drawingsSlice';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
@@ -52,6 +54,14 @@ export default function Content() {
 
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
+  const technologiesItems = useSelector(technologiesSelectItems);
+  const technologiesLoading = useSelector(technologiesSelectLoading);
+  const technologiesErrors = useSelector(technologiesSelectError);
+  const drawingExternalCode = useSelector(selectDrawingExternalCode);
+
+  //вкладки
+  const [tabs, setTabs] = useState([]); //useState([{ id: 1, label: 'Новая операция'}]);
+  const [tabValue, setTabValue] = useState(0);
 
   //добавить карточку операции в стейт
   const addOperationCard = () => {
@@ -66,6 +76,38 @@ export default function Content() {
     let findMaxNumber = Math.max(...operationCards);
     return ++findMaxNumber;
   }
+  
+  //стейт вкладок/карточек
+  useEffect(() => { 
+    try {
+      if (!technologiesLoading && technologiesItems.length> 0) {
+        let cnt = 1;                 
+        for(const operation of technologiesItems[0].children) {
+          //вкладки
+          setTabs((prevOperation) => {
+            return [...prevOperation, { id: operation.orderNumber, label: `Операция ${operation.orderNumber}`}];
+          });
+          cnt = operation.orderNumber + 1;
+        }
+
+        //добавить новую вкладку
+        setTabs((prevOperation) => {
+          return [...prevOperation, { id: cnt, label: `Новая операция ${cnt}`}];
+        });
+      }
+    } catch(error) {
+    }
+  }, [technologiesLoading, technologiesItems]);
+
+  //очистить стейт вкладок/карточек
+  useEffect(() => {
+    if (!drawingExternalCode) {
+      setTabs([]);
+    }
+  }, [drawingExternalCode]);
+ 
+    
+
 
   //список числовых полей (для последующей валидации вместо type="number")
 /*  const numericFields = [
@@ -119,9 +161,7 @@ export default function Content() {
     materials16: ''
   });*/
 
-  //вкладки
-  const [tabs, setTabs] = useState([{ id: 1, label: 'Новая операция'}]);
-  const [tabValue, setTabValue] = useState(0);
+  
 
   const addTab = () => {
     const newTab = {
@@ -282,6 +322,7 @@ export default function Content() {
   //
   return (
     <>
+    {console.log(tabs)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -394,16 +435,18 @@ export default function Content() {
               overflowY: 'auto'              
             }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-                {/*tabValue === 0 && 
-                  <TabPanel key={tab.id} value={tabValue} index={0}>
-                    <OperationCard operationNumber={index + 1} />
-                  </TabPanel>*/
-                }
-                {tabs.map((tab, index) => (
+                {/*tabs.map((tab, index) => (
                   <TabPanel key={tab.id} value={tabValue} index={index}>
-                    <OperationCard operationNumber={index + 1} />
+                    <OperationCard operationNumber={tab.id} />
                   </TabPanel>
-                ))}
+                ))*/} {/* index + 1 */}
+                {
+                  tabs.map((tab, index) => (
+                    <TabPanel key={tab.id} value={tabValue} index={index}>
+                      <OperationCard operationNumber={tab.id} />
+                    </TabPanel>
+                  ))
+                }
                 
 
 

@@ -29,6 +29,7 @@ const useStyles = makeStyles({
 
 export default function TechnologiesTree() {
   const [loadedItems, setLoadedItems] = useState([]);
+  const [expandedItems, setExpandedItems] = useState([]);
   const [download, setDownload] = useState(false);  
   const MIN_LOADING_TIME = 500;
   const itemRef = useRef(null);
@@ -125,6 +126,17 @@ export default function TechnologiesTree() {
     //стейты
     const [isProcessing, setIsProcessing] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
+    const [expanded, setExpanded] = useState(false);
+
+    useEffect(() => {
+      setExpanded(expandedItems.includes(props.itemId));
+    }, [expandedItems, props.itemId]);
+    
+    //expanded
+    const handleToggle = () => {
+      setExpanded((prev) => !prev);
+      handleItemExpansionToggle(null, props.itemId, !expanded);
+    };
 
     //нажатие на элемент списка
     const handleRootClick = (e) => {
@@ -139,8 +151,8 @@ export default function TechnologiesTree() {
       //добавить новую технологию
       console.log(type);
     };
+
     const classes = useStyles({ itemType: item.type});
-    
     //дополнительный код
     const additionalItem = (
       <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -169,8 +181,9 @@ export default function TechnologiesTree() {
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
-        onClick={item.type === 'root' ? handleRootClick : handleChildClick}
+        onClick={item.type === 'root' ? handleToggle : handleChildClick}
         label={additionalItem}
+        expanded={expanded}
       >
         { isProcessing && !dataLoaded ? (
           <Box
@@ -207,32 +220,31 @@ export default function TechnologiesTree() {
     ),
     [itemRef]  
   );
+
+  const handleItemExpansionToggle = (event, nodeId, expanded) => {
+    setExpandedItems((prevExpanded) => {
+      if (expanded) {
+        return [...prevExpanded, nodeId];
+      } else {
+        return prevExpanded.filter((id) => id !== nodeId)
+      }
+    });
+  };
+
+  useEffect(() => {
+    //для expandedItems
+    const allItemIds = items.map(item => item.id);
+    setExpandedItems(allItemIds);
+  }, [items]);
   //
   return (
-    <>    
-      {/*<AppBar
-          position="static"
-          color="primary"
-          elevation={0}
-          sx={{ borderBottom: '0px solid rgba(0, 0, 0, 0.12)' }}
-      >
-          <Toolbar>
-              <Typography color="inherit">
-                  Технологии и операции
-              </Typography>
-          </Toolbar>
-      </AppBar>*/}
-      {drawingExternalCode ? (
-        <RichTreeView
-          slots={{ item: renderCustomTreeItem }}          
-          items={items}            
-        />
-      ) : (<>
-        <RichTreeView
-          slots={{ item: renderCustomTreeItem }}
-          items={items}
-      /></>
-      )}
+    <>
+      <RichTreeView
+        slots={{ item: renderCustomTreeItem }}          
+        items={items}
+        expandedItems={expandedItems}
+        onItemExpansionToggle={handleItemExpansionToggle}
+      />
     </>
   );
 
