@@ -1,9 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+//данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {
-  externalCode: '',
-  internalCode: '',
-  name: ''
+  drawing: {
+    externalCode: '',
+    internalCode: '',
+    name: '',
+  },
+  technology: { name: '', code: '' },
+  operation: { name: '', code: '' }
 };
 
 const drawingsSlice = createSlice({
@@ -11,13 +16,24 @@ const drawingsSlice = createSlice({
   initialState,
   reducers: {
     setDrawing: (state, action) => {
-      state.externalCode = action.payload.externalCode;
-      state.internalCode = action.payload.internalCode;
-      state.name = action.payload.name;
+      state.drawing.externalCode = action.payload.externalCode;
+      state.drawing.internalCode = action.payload.internalCode;
+      state.drawing.name = action.payload.name;
+    },
+    setTechnology: (state, action) => {
+      state.technology.name = action.payload.name;
+      state.technology.code = action.payload.code;
+    },
+    setOperation: (state, action) => {
+      state.operation.name = action.payload.name;
+      state.operation.code = action.payload.code;
     }
   },
 });
 
-export const selectDrawingExternalCode = (state) => state.drawings.externalCode;
-export const { setDrawing } = drawingsSlice.actions;
+export const selectDrawingExternalCode = (state) => state?.drawings?.drawing?.externalCode || '';
+export const selectTechnology = (state) => state?.drawings?.technology || {};
+export const selectOperation = (state) => state?.drawings?.operation || {};
+
+export const { setDrawing, setTechnology, setOperation } = drawingsSlice.actions;
 export default drawingsSlice.reducer;

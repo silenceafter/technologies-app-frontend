@@ -8,7 +8,7 @@ const initialState = {
   error: null,
 };
 
-//загрузка списка изделий (корневые элементы)
+//загрузка технологий и операций по коду ДСЕ
 export const fetchData = createAsyncThunk(
   'technologiesTree/fetchData',
   async ({}, { getState, rejectWithValue }) => {

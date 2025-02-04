@@ -17,7 +17,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
-import { selectDrawingExternalCode } from '../store/slices/drawingsSlice';
+import { selectDrawingExternalCode, setTechnology, selectOperation } from '../store/slices/drawingsSlice';
 import { makeStyles } from '@mui/styles';
 
 //добавить кастомный класс и кастомное свойство элементу Box
@@ -133,18 +133,18 @@ export default function TechnologiesTree() {
     }, [expandedItems, props.itemId]);
     
     //expanded
-    const handleToggle = () => {
-      setExpanded((prev) => !prev);
-      handleItemExpansionToggle(null, props.itemId, !expanded);
-    };
-
-    //нажатие на элемент списка
     const handleRootClick = (e) => {
-      e.stopPropagation();
+      //записать выбранную технологию
+      dispatch(setTechnology({ name: item.label, code: item.secondaryLabel }));
+
+      setExpanded((prev) => !prev);
+      handleItemExpansionToggle(null, props.itemId, !expanded);            
     };
   
-    const handleChildClick = async () => {
+    const handleChildClick = (e) => {
       if (dataLoaded) return;
+      e.stopPropagation();
+      console.log('child-item');
     };
 
     const handleAddIconClick = async (type) => {
@@ -181,7 +181,7 @@ export default function TechnologiesTree() {
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
-        onClick={item.type === 'root' ? handleToggle : handleChildClick}
+        onClick={item.type === 'technology' ? handleRootClick : handleChildClick}
         label={additionalItem}
         expanded={expanded}
       >
