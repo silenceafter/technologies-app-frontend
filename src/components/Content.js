@@ -29,7 +29,7 @@ import { TabPanel } from './TabPanel';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 import { selectItems as technologiesSelectItems, selectLoading as technologiesSelectLoading, selectError as technologiesSelectError} from '../store/slices/technologiesSlice';
-import { selectDrawingExternalCode } from '../store/slices/drawingsSlice';
+import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../store/slices/drawingsSlice';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
@@ -58,6 +58,7 @@ export default function Content() {
   const technologiesLoading = useSelector(technologiesSelectLoading);
   const technologiesErrors = useSelector(technologiesSelectError);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
+  const currentTechnology = useSelector(selectTechnology);
 
   //вкладки
   const [tabs, setTabs] = useState([]); //useState([{ id: 1, label: 'Новая операция'}]);
@@ -88,6 +89,9 @@ export default function Content() {
             return [...prevOperation, { id: operation.orderNumber, label: `Операция ${operation.orderNumber}`}];
           });
           cnt = operation.orderNumber + 1;
+
+          //текущая выбранная технология по умолчанию
+          dispatch(setTechnology({ name: technologiesItems[0].label, code: technologiesItems[0].secondaryLabel}));
         }
 
         //добавить новую вкладку
@@ -322,7 +326,7 @@ export default function Content() {
   //
   return (
     <>
-    {console.log(tabs)}
+    {console.log(currentTechnology)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -408,7 +412,7 @@ export default function Content() {
                 </Tabs>*/}
                 <Tabs 
                   value={tabValue} 
-                  onChange={(e, newValue) => setTabValue(newValue)} 
+                  onChange={(e, newValue) => setTabValue(newValue)}
                   variant='scrollable' 
                   scrollButtons='auto' 
                   textColor="inherit"

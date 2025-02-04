@@ -20,14 +20,23 @@ const drawingsSlice = createSlice({
       state.drawing.internalCode = action.payload.internalCode;
       state.drawing.name = action.payload.name;
     },
+    clearDrawing: (state) => {
+      state.drawing.externalCode = '';
+      state.drawing.internalCode = '';
+      state.drawing.name = '';
+    },
     setTechnology: (state, action) => {
       state.technology.name = action.payload.name;
       state.technology.code = action.payload.code;
     },
+    clearTechnology: (state) => {
+      state.technology.name = '';
+      state.technology.code = '';
+    },
     setOperation: (state, action) => {
       state.operation.name = action.payload.name;
       state.operation.code = action.payload.code;
-    }
+    },
   },
 });
 
@@ -35,5 +44,5 @@ export const selectDrawingExternalCode = (state) => state?.drawings?.drawing?.ex
 export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 
-export const { setDrawing, setTechnology, setOperation } = drawingsSlice.actions;
+export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation } = drawingsSlice.actions;
 export default drawingsSlice.reducer;

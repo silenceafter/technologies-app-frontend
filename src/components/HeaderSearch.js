@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/headerSlice';
-import { setDrawing } from '../store/slices/drawingsSlice';
+import { setDrawing, clearDrawing, setTechnology, clearTechnology } from '../store/slices/drawingsSlice';
 import { fetchData as productsFetchData, setItems as productsSetItems } from '../store/slices/productsSlice';
 import { fetchData as technologiesFetchData, setItems as technologiesSetItems } from '../store/slices/technologiesSlice';
 import { debounce } from 'lodash';
@@ -28,11 +28,11 @@ function HeaderSearch(props) {
   //TextField
   const [inputValue, setInputValue] = useState('');
   
-  //запросы
+  //селекторы
   const userDataRequest = useSelector((state) => state.getRequest.userDataRequest);
   const search = useSelector(selectSearch);
   const limit = useSelector(selectLimit);
-  const page = useSelector(selectPage);
+  const page = useSelector(selectPage); 
 
   //запросы для прокрутки списка
   const { items, loading, error, hasMore } = useSelector((state) => state.header);
@@ -105,17 +105,16 @@ function HeaderSearch(props) {
                         internalCode: newValue.internal_code, 
                         name: newValue.name
                       }
-                    ));
-                    /*dispatch(productsSetItems());
-                    dispatch(technologiesSetItems());*/
+                    ));                
                   } else {
-                    dispatch(setDrawing({externalCode: '', internalCode: '', name: ''}));                  
+                    dispatch(clearDrawing());
+                    dispatch(clearTechnology());
                   }
                   //
                   dispatch(productsSetItems());
                   dispatch(technologiesSetItems());                
                   dispatch(productsFetchData({limit: 50, page: 1}));
-                  dispatch(technologiesFetchData({}));            
+                  dispatch(technologiesFetchData({}));
                 }}
                 onClose={console.log('clear')}
                 inputValue={inputValue}

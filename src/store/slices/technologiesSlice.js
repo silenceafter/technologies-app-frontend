@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { selectDrawingExternalCode } from './drawingsSlice';
+import { selectDrawingExternalCode, setTechnology } from './drawingsSlice';
 
 const LOADING_DEFAULT = false;
 const initialState = {
@@ -63,7 +63,6 @@ const technologiesSlice = createSlice({
         const newItems = action.payload.filter(newItem => 
           !state.items.some(existingItem => existingItem.id === newItem.id)
         );
-        //
         state.items = [...state.items, ...newItems];
       })
       .addCase(fetchData.rejected, (state, action) => {
