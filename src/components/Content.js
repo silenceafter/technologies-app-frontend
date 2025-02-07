@@ -51,7 +51,9 @@ export default function Content() {
 
   //стейты  
   const [operationCards, setOperationCards] = useState([{ id: 1, number: 1}]);//карточки операций, операции
-
+  const [tabs, setTabs] = useState([]); //useState([{ id: 1, label: 'Новая операция'}]);
+  const [tabValue, setTabValue] = useState(0);
+  
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
   const technologiesItems = useSelector(technologiesSelectItems);
@@ -59,10 +61,6 @@ export default function Content() {
   const technologiesErrors = useSelector(technologiesSelectError);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const currentTechnology = useSelector(selectTechnology);
-
-  //вкладки
-  const [tabs, setTabs] = useState([]); //useState([{ id: 1, label: 'Новая операция'}]);
-  const [tabValue, setTabValue] = useState(0);
 
   //добавить карточку операции в стейт
   const addOperationCard = () => {
@@ -72,6 +70,14 @@ export default function Content() {
     });
   };
 
+  const updateTabContent = (tabId, newContent) => {
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) =>
+        tab.id === tabId ? { ...tab, content: newContent } : tab
+      )
+    );
+  };
+
   //найти номер следующей карточки
   const findNextNumber = () => {
     let findMaxNumber = Math.max(...operationCards);
@@ -79,24 +85,38 @@ export default function Content() {
   }
   
   //стейт вкладок/карточек
-  useEffect(() => { 
+  useEffect(() => {
     try {
       if (!technologiesLoading && technologiesItems.length> 0) {
         let cnt = 1;                 
         for(const operation of technologiesItems[0].children) {
-          //вкладки
-          setTabs((prevOperation) => {
-            return [...prevOperation, { id: operation.orderNumber, label: `Операция ${operation.orderNumber}`}];
-          });
-          cnt = operation.orderNumber + 1;
+          if (operation.orderNumber) {
+            //вкладки
+            setTabs((prevOperation) => {
+              return [...prevOperation, 
+                { 
+                  id: operation.orderNumber, 
+                  label: `Операция ${operation.orderNumber}`, 
+                  content: {
+                    formValues: {
+                      orderNumber: operation.orderNumber,
+                    },
+                    formErrors: {},
+                  }
+                }
+              ];
+            });
+            cnt = operation.orderNumber + 1;
 
-          //текущая выбранная технология по умолчанию
-          dispatch(setTechnology({ name: technologiesItems[0].label, code: technologiesItems[0].secondaryLabel}));
+            //текущая выбранная технология по умолчанию
+            dispatch(setTechnology({ name: technologiesItems[0].label, code: technologiesItems[0].secondaryLabel}));
+          }
+          
         }
 
         //добавить новую вкладку
         setTabs((prevOperation) => {
-          return [...prevOperation, { id: cnt, label: `Новая операция ${cnt}`}];
+          return [...prevOperation, { id: cnt, label: `Новая операция ${cnt}`, content: { formValues: { orderNumber: cnt}, formErrors: {}}}];
         });
       }
     } catch(error) {
@@ -171,6 +191,7 @@ export default function Content() {
     const newTab = {
       id: tabs.length + 1,
       label: `Новая операция ${tabs.length + 1}`,
+      content: { formValues: { orderNumber: tabs.length + 1 }, formErrors: {}}
     };
     setTabs([...tabs, newTab]);
     setTabValue(tabs.length);
@@ -326,7 +347,7 @@ export default function Content() {
   //
   return (
     <>
-    {console.log(currentTechnology)}
+    {console.log(tabs)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -336,7 +357,7 @@ export default function Content() {
         overflow: 'hidden'
         
       }}>
-        <Accordion 
+        <Accordion defaultExpanded
           /*expanded={expanded === 'panel1'} 
           onChange={handleAccordeonChange('panel1')}*/
           elevation={3} 
@@ -447,7 +468,11 @@ export default function Content() {
                 {
                   tabs.map((tab, index) => (
                     <TabPanel key={tab.id} value={tabValue} index={index}>
-                      <OperationCard operationNumber={tab.id} />
+                      <OperationCard
+                        orderNumber={tab.id}
+                        content={tabs[tabValue].content} 
+                        onUpdate={(newData) => updateTabContent(tabs[tabValue].id, newData)} 
+                      />
                     </TabPanel>
                   ))
                 }

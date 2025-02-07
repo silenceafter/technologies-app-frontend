@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
-import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
+import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import { fetchData, selectItems, setAdditionalItems, selectAdditionalItems, setClearAdditionalItems } from '../store/slices/technologiesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 import AddIcon from '@mui/icons-material/Add';
@@ -28,18 +28,23 @@ const useStyles = makeStyles({
 });
 
 export default function TechnologiesTree() {
+  const MIN_LOADING_TIME = 500;
+
+  //стейты
   const [loadedItems, setLoadedItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState([]);
   const [download, setDownload] = useState(false);  
-  const MIN_LOADING_TIME = 500;
-  const itemRef = useRef(null);
-  const downloadRef = useRef(null);  
   
+    
   //селекторы
   const dispatch = useDispatch();
   const items = useSelector((state) => state.technologies.items);
   const loading = useSelector((state) => state.technologies.loading);
   const error = useSelector((state) => state.technologies.error);
+
+  //refs
+  const itemRef = useRef(null);
+  const downloadRef = useRef(null);
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -121,12 +126,14 @@ export default function TechnologiesTree() {
       children: props.children,
     });
     const item = publicAPI.getItem(props.itemId);
-    const timerRef = useRef(null);
-
+    
     //стейты
     const [isProcessing, setIsProcessing] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [expanded, setExpanded] = useState(false);
+
+    //рефы
+    const timerRef = useRef(null);
 
     useEffect(() => {
       setExpanded(expandedItems.includes(props.itemId));
@@ -136,7 +143,6 @@ export default function TechnologiesTree() {
     const handleRootClick = (e) => {
       //записать выбранную технологию
       dispatch(setTechnology({ name: item.label, code: item.secondaryLabel }));
-
       setExpanded((prev) => !prev);
       handleItemExpansionToggle(null, props.itemId, !expanded);            
     };

@@ -39,70 +39,92 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
-export function OperationCard(props) {
+export function OperationCard({orderNumber, content, onUpdate}) {
   //стейты
-  const [operationNumber, setOperationNumber] = useState(
-    props.operationNumber ? Number(props.operationNumber) : 1
-  );
-  
-  //задать номер операции
-  useEffect(() => {
-    if (props.hasOwnProperty("operationNumber")) {
-      setOperationNumber(Number(props.operationNumber));
-    }
-  }, [props.operationNumber]);
+  const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {} });
 
   //список числовых полей (для последующей валидации вместо type="number")
   const numericFields = [
-    'operationNumber1', 
-    'workshopNumber3', 
-    'workshopAreaNumber4',
-    'workerCategory7',
-    'workerConditions8',
-    'numberEmployees9',
-    'numberProcessedParts10',
-    'toilsomeness11'
+    'orderNumber', 
+    'shopNumber', 
+    'areaNumber',
+    'grade',
+    'workingConditions',
+    'numberOfWorkers',
+    'numberOfProcessedParts',
+    'laborEffort'
   ];
 
-  //значения полей формы
-  const [formValues, setFormValues] = useState({
-    operationNumber1: '',
-    operationCode2: '',
-    workshopNumber3: '',
-    workshopAreaNumber4: '',
-    documentName5: '',
-    professionCode6: '',
-    workerCategory7: '',
-    workerConditions8: '',
-    numberEmployees9: '',
-    numberProcessedParts10: '',
-    toilsomeness11: '',
-    operationDescription12: '',
-    measuringTools13: '',
-    tooling14: '',
-    components15: '',
-    materials16: ''
-  });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
 
-  //значения ошибок (валидация)
-  const [formErrors, setFormErrors] = useState({
-    operationNumber1: '',
-    operationCode2: '',
-    workshopNumber3: '',
-    workshopAreaNumber4: '',
-    documentName5: '',
-    professionCode6: '',
-    workerCategory7: '',
-    workerConditions8: '',
-    numberEmployees9: '',
-    numberProcessedParts10: '',
-    toilsomeness11: '',
-    operationDescription12: '',
-    measuringTools13: '',
-    tooling14: '',
-    components15: '',
-    materials16: ''
-  });
+    //formValues
+    setLocalData((prev) => ({
+      ...prev,
+      formValues: {
+        ...prev.formValues,
+        [name]: value,
+      },      
+    }));
+
+    //formErrors
+    const errorMessage = numericFields.includes(name) && (value && !/^\d*$/.test(value))
+      ? 'Это поле должно содержать только цифры'
+      : undefined;
+
+    //обновляем ошибки
+    setLocalData((prev) => ({
+      ...prev,
+      formErrors: {
+        ...prev.formErrors,
+        [name]: errorMessage,
+      },
+    }));
+
+    //передать изменения в родительский компонент
+    if (onUpdate) {
+      onUpdate(
+        { 
+          ...localData, 
+          formValues: 
+          { 
+            ...localData.formValues, 
+            [name]: value 
+          }, 
+          formErrors: 
+          { 
+            ...localData.formErrors, 
+            [name]: errorMessage 
+          } 
+        }
+      );
+    }
+  };
+
+  const handleOptionSelect = (id, option) => {
+    // Обновляем значение поля
+    setLocalData((prev) => ({
+      ...prev,
+      formValues: {
+        ...prev.formValues,
+        [id]: option || null,
+      },
+    }));
+  
+    // Убираем ошибку для этого поля
+    setLocalData((prev) => ({
+      ...prev,
+      formErrors: {
+        ...prev.formErrors,
+        [id]: '',
+      },
+    }));
+  
+    // Передаем изменения в родительский компонент
+    if (onUpdate) {
+      onUpdate({ ...localData, formValues: { ...localData.formValues, [id]: option || null }, formErrors: { ...localData.formErrors, [id]: '' } });
+    }
+  };
 
   //проверка формы
   const validateForm = () => {
@@ -110,111 +132,71 @@ export function OperationCard(props) {
     const textFieldMessage = 'Поле обязательно для заполнения';
     const autocompleteTextFieldMessage = 'Выберите значение из списка';
 
-    //operationNumber1
-    if (!formValues.operationNumber1) {
-      errors.operationNumber1 = textFieldMessage;
+    //orderNumber
+    if (!localData.formValues.orderNumber) {
+      errors.orderNumber = textFieldMessage;
     }
 
-    //operationCode2
-    if (!formValues.operationCode2) {
-      errors.operationCode2 = autocompleteTextFieldMessage;
+    //operationCode
+    if (!localData.formValues.operationCode) {
+      errors.operationCode = autocompleteTextFieldMessage;
     }
     
-    //workshopNumber3
-    if (!formValues.workshopNumber3) {
-      errors.workshopNumber3 = textFieldMessage;
+    //shopNumber
+    if (!localData.formValues.shopNumber) {
+      errors.shopNumber = textFieldMessage;
     }
 
-    //documentName5
-    if (!formValues.documentName5) {
-      errors.documentName5 = textFieldMessage;
+    //document
+    if (!localData.formValues.document) {
+      errors.document = textFieldMessage;
     }
 
-    //professionCode6
-    if (!formValues.professionCode6) {
-      errors.professionCode6 = autocompleteTextFieldMessage;
+    //jobCode
+    if (!localData.formValues.jobCode) {
+      errors.jobCode = autocompleteTextFieldMessage;
     }
 
-    //workerCategory7
-    if (!formValues.workerCategory7) {
-      errors.workerCategory7 = textFieldMessage;
+    //grade
+    if (!localData.formValues.grade) {
+      errors.grade = textFieldMessage;
     }
 
-    //workerConditions8
-    if (!formValues.workerConditions8) {
-      errors.workerConditions8 = textFieldMessage;
+    //workingConditions
+    if (!localData.formValues.workingConditions) {
+      errors.workingConditions = textFieldMessage;
     }
 
-    //numberEmployees9
-    if (!formValues.numberEmployees9) {
-      errors.numberEmployees9 = textFieldMessage;
+    //numberOfWorkers
+    if (!localData.formValues.numberOfWorkers) {
+      errors.numberOfWorkers = textFieldMessage;
     }
 
-    //numberProcessedParts10
-    if (!formValues.numberProcessedParts10) {
-      errors.numberProcessedParts10 = textFieldMessage;
+    //numberOfProcessedParts
+    if (!localData.formValues.numberOfProcessedParts) {
+      errors.numberOfProcessedParts = textFieldMessage;
     }
 
-    //toilsomeness11
-    if (!formValues.toilsomeness11) {
-      errors.toilsomeness11 = textFieldMessage;
+    //laborEffort
+    if (!localData.formValues.laborEffort) {
+      errors.laborEffort = textFieldMessage;
     }
 
-    //measuringTools13
-    if (formValues.measuringTools13.length == 0) {
-      errors.measuringTools13 = autocompleteTextFieldMessage;
-    }
-
-    //tooling14
-    if (formValues.tooling14.length == 0) {
-      errors.tooling14 = autocompleteTextFieldMessage;
-    }
-
-    //components15
-    if (formValues.components15.length == 0) {
-      errors.components15 = autocompleteTextFieldMessage;
-    }
-
-    //materials16
-    if (formValues.materials16.length == 0) {
-      errors.materials16 = autocompleteTextFieldMessage;
-    }
-
-    setFormErrors(errors);
+    // Обновляем ошибки
+    setLocalData((prev) => ({
+      ...prev,
+      formErrors: errors,
+    }));
     return Object.keys(errors).length === 0;
   };
 
   //textField
-  const handleInputChange = (e) => {
-    //значения формы
-    const { name, value } = e.target;    
-    const errorMessage = numericFields.includes(name) && (value && !/^\d*$/.test(value))
-      ? 'Это поле должно содержать только цифры'
-      : undefined;
-    //
-    setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
-    setFormErrors((prevErrors) => ({ ...prevErrors, [name]: errorMessage }));
+  /* handleInputChange = (e) => {
     //dispatch(setUnsavedChanges(true));
-  };
-
-  //autocomplete
-  const handleOptionSelect = (id, option) => {
-    //задать значение в formValues
-    const value = option ? option : null;
-    setFormValues((prevFormValues) => ({
-      ...prevFormValues,
-      [id]: value,
-    }));
-
-    //убрать ошибку в formErrors    
-    setFormErrors((prevErrors) => ({
-      ...prevErrors,
-      [id]: '',
-    }));
-  };
-
+  };*/
   return (
     <>
+      {console.log(localData)}
       {/* Параметры */}
       <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
         <AccordionSummary
@@ -234,20 +216,20 @@ export function OperationCard(props) {
                   <Grid item xs={2.4}>
                     <TextField                          
                       fullWidth                          
-                      name='operationNumber1'
-                      id="operation-number-1"
+                      name='orderNumber'
+                      id="order-number-1"
                       label="Номер операции"
                       type="text"
                       size="small"
                       onChange={handleInputChange}
-                      error={formErrors.operationNumber1}
-                      helperText={formErrors.operationNumber1 ? formErrors.operationNumber1 : ''}
-                      value={operationNumber}
+                      error={!!localData.formErrors.orderNumber}
+                      helperText={localData.formErrors.orderNumber}
+                      value={localData.formValues.orderNumber || ''}
                       slotProps={{
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
                         },
-                        input: { readOnly: true }
+                        input: { readOnly: false }
                       }}
                     >
                     </TextField>
@@ -258,14 +240,14 @@ export function OperationCard(props) {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <OperationsSearch props={
+                    {/*<OperationsSearch props={
                       {
                         id: "operation-code-2",
                         placeholder: "Код операции"
                       }
                     }
-                    id="operationCode2" onOptionSelect={handleOptionSelect}
-                      selectedValue={ formValues['operationCode2'] ? formValues['operationCode2'] : null} errorValue={formErrors['operationCode2']} />
+                    id="operationCode" onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
+                      selectedValue={ formValues['operationCode'] ? formValues['operationCode'] : null} errorValue={formErrors['operationCode']} />*/}
                   </Grid>
                 </Grid>                  
               </Grid>
@@ -276,15 +258,15 @@ export function OperationCard(props) {
                     <TextField
                       required
                       fullWidth
-                      name='workshopNumber3'
-                      id="workshop-number-3"
+                      name='shopNumber'
+                      id="shop-number-3"
                       label="Номер цеха"
                       type="text"
                       size="small"
                       onChange={handleInputChange}
-                      error={formErrors.workshopNumber3}
-                      helperText={formErrors.workshopNumber3 ? formErrors.workshopNumber3 : ''}
-                      value={formValues.workshopNumber3}
+                      error={!!localData.formErrors.shopNumber}
+                      helperText={localData.formErrors.shopNumber}
+                      value={localData.formValues.shopNumber || ''}
                       slotProps={{
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
@@ -296,13 +278,13 @@ export function OperationCard(props) {
                   <Grid item xs={2.4}>
                     <TextField
                       fullWidth
-                      name='workshopAreaNumber4'
-                      id="workshop-area-number-4"
+                      name='areaNumber'
+                      id="area-number-4"
                       label="Номер участка"
                       type="text"
                       size="small"
                       onChange={handleInputChange}
-                      value={formValues.workshopAreaNumber4}
+                      value={localData.formValues.areaNumber || ''}
                     >
                     </TextField>
                   </Grid>                      
@@ -315,14 +297,14 @@ export function OperationCard(props) {
                     <TextField
                       required
                       fullWidth
-                      name='documentName5'
-                      id="document-name-5"
+                      name='document'
+                      id="document-5"
                       label="Обозначение документа"
                       size="small"
                       onChange={handleInputChange}
-                      error={formErrors.documentName5}
-                      helperText={formErrors.documentName5 ? formErrors.documentName5 : ''}
-                      value={formValues.documentName5}
+                      error={!!localData.formErrors.document}
+                      helperText={localData.formErrors.document}
+                      value={localData.formValues.document || ''}
                       slotProps={{
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
@@ -337,8 +319,8 @@ export function OperationCard(props) {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <ProfessionsSearch id="professionCode6" onOptionSelect={handleOptionSelect} 
-                      selectedValue={formValues['professionCode6'] ? formValues['professionCode6'] : null} errorValue={formErrors['professionCode6']} />
+                    {/*<ProfessionsSearch id="job-code-6" onOptionSelect={handleSOptionSelect} 
+                      selectedValue={formValues['jobCode'] ? formValues['jobCode'] : null} errorValue={formErrors['jobCode']} />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -349,15 +331,15 @@ export function OperationCard(props) {
                         <TextField
                           required
                           fullWidth
-                          name='workerCategory7'
-                          id="worker-category-7"
+                          name='grade'
+                          id="grade-7"
                           label="Разряд"
                           type="text"
                           size="small"
                           onChange={handleInputChange}
-                          error={formErrors.workerCategory7}
-                          helperText={formErrors.workerCategory7 ? formErrors.workerCategory7 : ''}
-                          value={formValues.workerCategory7}
+                          error={!!localData.formErrors.grade}
+                          helperText={localData.formErrors.grade}
+                          value={localData.formValues.grade || ''}
                           slotProps={{
                             formHelperText: {
                               sx: { whiteSpace: 'nowrap' },
@@ -370,15 +352,15 @@ export function OperationCard(props) {
                         <TextField
                           required
                           fullWidth
-                          name='workerConditions8'
-                          id="worker-conditions-8"
+                          name='workingConditions'
+                          id="working-conditions-8"
                           label="Условия труда"
                           type="text"
                           size="small"
                           onChange={handleInputChange}
-                          error={formErrors.workerConditions8}
-                          helperText={formErrors.workerConditions8 ? formErrors.workerConditions8 : ''}
-                          value={formValues.workerConditions8}
+                          error={!!localData.formErrors.workingConditions}
+                          helperText={localData.formErrors.workingConditions}
+                          value={localData.formValues.workingConditions || ''}
                           slotProps={{
                             formHelperText: {
                               sx: { whiteSpace: 'nowrap' },
@@ -391,15 +373,15 @@ export function OperationCard(props) {
                         <TextField
                           required
                           fullWidth
-                          name='numberEmployees9'
-                          id="number-employees-9"
+                          name='numberOfWorkers'
+                          id="number-of-workers-9"
                           label="Кол-во работающих"
                           type="text"
                           size="small"
                           onChange={handleInputChange}
-                          error={formErrors.numberEmployees9}
-                          helperText={formErrors.numberEmployees9 ? formErrors.numberEmployees9 : ''}
-                          value={formValues.numberEmployees9}
+                          error={!!localData.formErrors.numberOfWorkers}
+                          helperText={localData.formErrors.numberOfWorkers}
+                          value={localData.formValues.numberOfWorkers || ''}
                           slotProps={{
                             formHelperText: {
                               sx: { whiteSpace: 'nowrap' },
@@ -412,15 +394,15 @@ export function OperationCard(props) {
                         <TextField
                           required
                           fullWidth
-                          name='numberProcessedParts10'
-                          id="number-processed-parts-10"
+                          name='numberOfProcessedParts'
+                          id="number-of-processed-parts-10"
                           label="Кол-во одновременно обрабатываемых деталей"
                           type="text"
                           size="small"
                           onChange={handleInputChange}
-                          error={formErrors.numberProcessedParts10}
-                          helperText={formErrors.numberProcessedParts10 ? formErrors.numberProcessedParts10 : ''}
-                          value={formValues.numberProcessedParts10}
+                          error={!!localData.formErrors.numberOfProcessedParts}
+                          helperText={localData.formErrors.numberOfProcessedParts}
+                          value={localData.formValues.numberOfProcessedParts || ''}
                           slotProps={{
                             formHelperText: {
                               sx: { whiteSpace: 'nowrap' },
@@ -438,15 +420,15 @@ export function OperationCard(props) {
                     <TextField
                       required
                       fullWidth
-                      name='toilsomeness11'
-                      id="toilsomeness-11"
+                      name='laborEffort'
+                      id="labor-effort-11"
                       label="Трудоемкость"
                       type="text"
                       size="small"
                       onChange={handleInputChange}
-                      error={formErrors.toilsomeness11}
-                      helperText={formErrors.toilsomeness11 ? formErrors.toilsomeness11 : ''}
-                      value={formValues.toilsomeness11}
+                      error={!!localData.formErrors.laborEffort}
+                      helperText={localData.formErrors.laborEffort}
+                      value={localData.formValues.laborEffort || ''}
                       slotProps={{
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
@@ -532,7 +514,7 @@ export function OperationCard(props) {
                         fullWidth
                         minRows={8}
                         maxRows={16}
-                        name='operationDescription12'
+                        name='operationDescription'
                         id="operation-description-12"
                         label="Описание операции"
                         size="small"
@@ -580,9 +562,9 @@ export function OperationCard(props) {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <MeasuringToolsSearch id="measuringTools13" 
+                    {/*<MeasuringToolsSearch id="measuringTools13" 
                       onOptionSelect={handleOptionSelect} selectedValue={formValues['measuringTools13'] ? formValues['measuringTools13'] : []}
-                      errorValue={formErrors['measuringTools13']} />
+                      errorValue={formErrors['measuringTools13']} />*/}
                   </Grid>
                 </Grid>                    
               </Grid>             
