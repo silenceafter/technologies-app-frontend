@@ -53,6 +53,8 @@ export default function Content() {
   const [operationCards, setOperationCards] = useState([{ id: 1, number: 1}]);//карточки операций, операции
   const [tabs, setTabs] = useState([]); //useState([{ id: 1, label: 'Новая операция'}]);
   const [tabValue, setTabValue] = useState(0);
+  const [validateForm, setValidateForm] = useState(() => () => true);
+  //const [tabErrors, setTabErrors] = useState(loca)
   
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
@@ -70,10 +72,10 @@ export default function Content() {
     });
   };
 
-  const updateTabContent = (tabId, newContent) => {
+  const updateTabContent = (tabId, newContent, newValidateForm) => {
     setTabs((prevTabs) =>
       prevTabs.map((tab) =>
-        tab.id === tabId ? { ...tab, content: newContent } : tab
+        tab.id === tabId ? { ...tab, content: newContent, validateForm: newValidateForm } : tab
       )
     );
   };
@@ -317,15 +319,24 @@ export default function Content() {
 
   //buttonGroup
   const [loading, setLoading] = useState({ save: false });
-  const handleSave = async () => {
+  /*const handleSave = async () => {
     setLoading((prev) => ({ ...prev, save: true }));  
     await new Promise((resolve) => setTimeout(() => {
       setOpen(true);
       //validateForm();
       setLoading((prev) => ({ ...prev, save: false }));
-      dispatch(setUnsavedChanges(false));
+      //dispatch(setUnsavedChanges(false));
     }, 2000));
-  }
+  }*/
+
+  const handleSave = () => {
+    if (validateForm()) {
+      // Выполняем сохранение
+      console.log("Форма прошла валидацию");
+    } else {
+      console.log("Ошибка валидации");
+    }
+  };    
 
   //textField
   /*const handleInputChange = (e) => {
@@ -470,8 +481,10 @@ export default function Content() {
                     <TabPanel key={tab.id} value={tabValue} index={index}>
                       <OperationCard
                         orderNumber={tab.id}
-                        content={tabs[tabValue].content} 
-                        onUpdate={(newData) => updateTabContent(tabs[tabValue].id, newData)} 
+                        content={tabs[tabValue].content}
+                        formErrors={tab.content.formErrors}
+                        onUpdate={(newData) => updateTabContent(tabs[tabValue].id, newData)}
+                        setValidateForm={setValidateForm}                        
                       />
                     </TabPanel>
                   ))

@@ -39,7 +39,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
-export function OperationCard({orderNumber, content, onUpdate}) {
+const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErrors}) => {
   //стейты
   const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {} });
 
@@ -95,7 +95,8 @@ export function OperationCard({orderNumber, content, onUpdate}) {
           { 
             ...localData.formErrors, 
             [name]: errorMessage 
-          } 
+          },
+          validateForm
         }
       );
     }
@@ -194,6 +195,11 @@ export function OperationCard({orderNumber, content, onUpdate}) {
   /* handleInputChange = (e) => {
     //dispatch(setUnsavedChanges(true));
   };*/
+
+  useEffect(() => {
+    setValidateForm(() => validateForm);
+  }, [setValidateForm]);
+
   return (
     <>
       {console.log(localData)}
@@ -574,4 +580,6 @@ export function OperationCard({orderNumber, content, onUpdate}) {
       </Accordion>                                                          
     </>
   );
-}
+};
+
+export {OperationCard};
