@@ -49,12 +49,20 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 export default function Content() {
   const dispatch = useDispatch();
 
+  //объекты
+  const expandedPanelsDefault = { 
+    parameters: true,
+    equipment: true,
+    components: true,
+    materials: true,
+    tooling: true,
+    measuringTools: true
+  };
+
   //стейты  
-  const [operationCards, setOperationCards] = useState([{ id: 1, number: 1}]);//карточки операций, операции
   const [tabs, setTabs] = useState([]); //useState([{ id: 1, label: 'Новая операция'}]);
   const [tabValue, setTabValue] = useState(0);
   const [validateForm, setValidateForm] = useState(() => () => true);
-  //const [tabErrors, setTabErrors] = useState(loca)
   
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
@@ -64,220 +72,79 @@ export default function Content() {
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const currentTechnology = useSelector(selectTechnology);
 
-  //добавить карточку операции в стейт
-  const addOperationCard = () => {
-    setOperationCards(prevCards => {
-      const nextNumber = prevCards.length + 1; // Определяем следующий номер
-      return [...prevCards, { id: nextNumber, number: nextNumber }];
-    });
-  };
-
   const updateTabContent = (tabId, newContent, newValidateForm) => {
     setTabs((prevTabs) =>
       prevTabs.map((tab) =>
-        tab.id === tabId ? { ...tab, content: newContent, validateForm: newValidateForm } : tab
+        tab.id === tabId 
+          ? { 
+              ...tab, 
+              content: /*newContent*/
+              {
+                ...tab.content,
+                formValues: newContent.formValues,
+                formErrors: newContent.formErrors || tab.content.formErrors,
+                expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
+              }, 
+              validateForm: newValidateForm 
+            } 
+          : tab
       )
     );
   };
-
-  //найти номер следующей карточки
-  const findNextNumber = () => {
-    let findMaxNumber = Math.max(...operationCards);
-    return ++findMaxNumber;
-  }
   
   //стейт вкладок/карточек
   useEffect(() => {
     try {
-      if (!technologiesLoading && technologiesItems.length> 0) {
-        let cnt = 1;                 
-        for(const operation of technologiesItems[0].children) {
-          if (operation.orderNumber) {
-            //вкладки
-            setTabs((prevOperation) => {
-              return [...prevOperation, 
-                { 
-                  id: operation.orderNumber, 
-                  label: `Операция ${operation.orderNumber}`, 
-                  content: {
-                    formValues: {
-                      orderNumber: operation.orderNumber,
-                    },
-                    formErrors: {},
-                  }
+      if (!technologiesLoading && technologiesItems.length > 0) {
+        setTabs((prevTabs) => {
+          // Создаем новые вкладки
+          const newTabs = technologiesItems[0].children
+            .filter(operation => operation.orderNumber)
+            .map(operation => {
+              const existingTab = prevTabs.find(tab => tab.id === operation.orderNumber);
+              return {
+                id: operation.orderNumber,
+                label: `Операция ${operation.orderNumber}`,
+                content: {
+                  formValues: {
+                    orderNumber: operation.orderNumber,
+                  },
+                  formErrors: existingTab?.content?.formErrors || {},
+                  expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault,
                 }
-              ];
+              };
             });
-            cnt = operation.orderNumber + 1;
-
-            //текущая выбранная технология по умолчанию
-            dispatch(setTechnology({ name: technologiesItems[0].label, code: technologiesItems[0].secondaryLabel}));
-          }
-          
-        }
-
-        //добавить новую вкладку
-        setTabs((prevOperation) => {
-          return [...prevOperation, { id: cnt, label: `Новая операция ${cnt}`, content: { formValues: { orderNumber: cnt}, formErrors: {}}}];
+  
+          // Если tabs уже загружены, не обновляем их
+          return prevTabs.length === 0 ? newTabs : prevTabs;
         });
+  
+        // Устанавливаем текущую выбранную технологию
+        dispatch(setTechnology({ name: technologiesItems[0].label, code: technologiesItems[0].secondaryLabel }));
       }
-    } catch(error) {
+    } catch (error) {
+      console.error("Ошибка при обработке технологий:", error);
     }
   }, [technologiesLoading, technologiesItems]);
+  
 
   //очистить стейт вкладок/карточек
   useEffect(() => {
     if (!drawingExternalCode) {
+      setTabValue(0);
       setTabs([]);
     }
   }, [drawingExternalCode]);
  
-    
-
-
-  //список числовых полей (для последующей валидации вместо type="number")
-/*  const numericFields = [
-    'operationNumber1', 
-    'workshopNumber3', 
-    'workshopAreaNumber4',
-    'workerCategory7',
-    'workerConditions8',
-    'numberEmployees9',
-    'numberProcessedParts10',
-    'toilsomeness11'
-  ];
-
-  //значения полей формы
-  const [formValues, setFormValues] = useState({
-    operationNumber1: '',
-    operationCode2: '',
-    workshopNumber3: '',
-    workshopAreaNumber4: '',
-    documentName5: '',
-    professionCode6: '',
-    workerCategory7: '',
-    workerConditions8: '',
-    numberEmployees9: '',
-    numberProcessedParts10: '',
-    toilsomeness11: '',
-    operationDescription12: '',
-    measuringTools13: '',
-    tooling14: '',
-    components15: '',
-    materials16: ''
-  });
-
-  //значения ошибок (валидация)
-  const [formErrors, setFormErrors] = useState({
-    operationNumber1: '',
-    operationCode2: '',
-    workshopNumber3: '',
-    workshopAreaNumber4: '',
-    documentName5: '',
-    professionCode6: '',
-    workerCategory7: '',
-    workerConditions8: '',
-    numberEmployees9: '',
-    numberProcessedParts10: '',
-    toilsomeness11: '',
-    operationDescription12: '',
-    measuringTools13: '',
-    tooling14: '',
-    components15: '',
-    materials16: ''
-  });*/
-
-  
-
   const addTab = () => {
     const newTab = {
       id: tabs.length + 1,
       label: `Новая операция ${tabs.length + 1}`,
-      content: { formValues: { orderNumber: tabs.length + 1 }, formErrors: {}}
+      content: { formValues: { orderNumber: tabs.length + 1 }, formErrors: {}, expandedPanels: expandedPanelsDefault }
     };
     setTabs([...tabs, newTab]);
     setTabValue(tabs.length);
   };
-
-  //проверка формы
-  /*const validateForm = () => {
-    const errors = {};
-    const textFieldMessage = 'Поле обязательно для заполнения';
-    const autocompleteTextFieldMessage = 'Выберите значение из списка';
-
-    //operationNumber1
-    if (!formValues.operationNumber1) {
-      errors.operationNumber1 = textFieldMessage;
-    }
-
-    //operationCode2
-    if (!formValues.operationCode2) {
-      errors.operationCode2 = autocompleteTextFieldMessage;
-    }
-    
-    //workshopNumber3
-    if (!formValues.workshopNumber3) {
-      errors.workshopNumber3 = textFieldMessage;
-    }
-
-    //documentName5
-    if (!formValues.documentName5) {
-      errors.documentName5 = textFieldMessage;
-    }
-
-    //professionCode6
-    if (!formValues.professionCode6) {
-      errors.professionCode6 = autocompleteTextFieldMessage;
-    }
-
-    //workerCategory7
-    if (!formValues.workerCategory7) {
-      errors.workerCategory7 = textFieldMessage;
-    }
-
-    //workerConditions8
-    if (!formValues.workerConditions8) {
-      errors.workerConditions8 = textFieldMessage;
-    }
-
-    //numberEmployees9
-    if (!formValues.numberEmployees9) {
-      errors.numberEmployees9 = textFieldMessage;
-    }
-
-    //numberProcessedParts10
-    if (!formValues.numberProcessedParts10) {
-      errors.numberProcessedParts10 = textFieldMessage;
-    }
-
-    //toilsomeness11
-    if (!formValues.toilsomeness11) {
-      errors.toilsomeness11 = textFieldMessage;
-    }
-
-    //measuringTools13
-    if (formValues.measuringTools13.length == 0) {
-      errors.measuringTools13 = autocompleteTextFieldMessage;
-    }
-
-    //tooling14
-    if (formValues.tooling14.length == 0) {
-      errors.tooling14 = autocompleteTextFieldMessage;
-    }
-
-    //components15
-    if (formValues.components15.length == 0) {
-      errors.components15 = autocompleteTextFieldMessage;
-    }
-
-    //materials16
-    if (formValues.materials16.length == 0) {
-      errors.materials16 = autocompleteTextFieldMessage;
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };*/
 
   //отправка
   const handleSuccess = () => {
@@ -301,22 +168,6 @@ export default function Content() {
     setOpen(false);
   };
 
-  //autocomplete
-  /*const handleOptionSelect = (id, option) => {
-    //задать значение в formValues
-    const value = option ? option : null;
-    setFormValues((prevFormValues) => ({
-      ...prevFormValues,
-      [id]: value,
-    }));
-
-    //убрать ошибку в formErrors    
-    setFormErrors((prevErrors) => ({
-      ...prevErrors,
-      [id]: '',
-    }));
-  };*/
-
   //buttonGroup
   const [loading, setLoading] = useState({ save: false });
   /*const handleSave = async () => {
@@ -338,19 +189,6 @@ export default function Content() {
     }
   };    
 
-  //textField
-  /*const handleInputChange = (e) => {
-    //значения формы
-    const { name, value } = e.target;    
-    const errorMessage = numericFields.includes(name) && (value && !/^\d*$/.test(value))
-      ? 'Это поле должно содержать только цифры'
-      : undefined;
-    //
-    setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
-    setFormErrors((prevErrors) => ({ ...prevErrors, [name]: errorMessage }));
-    dispatch(setUnsavedChanges(true));
-  };*/
-
   const [expanded, setExpanded] = useState('panel1');
   const handleAccordeonChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
@@ -369,8 +207,8 @@ export default function Content() {
         
       }}>
         <Accordion defaultExpanded
-          /*expanded={expanded === 'panel1'} 
-          onChange={handleAccordeonChange('panel1')}*/
+          expanded={expanded === 'panel1'} 
+          onChange={handleAccordeonChange('panel1')}
           elevation={3} 
           sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
         >
@@ -480,9 +318,8 @@ export default function Content() {
                   tabs.map((tab, index) => (
                     <TabPanel key={tab.id} value={tabValue} index={index}>
                       <OperationCard
-                        orderNumber={tab.id}
+                        /*orderNumber={tab.id}*/
                         content={tabs[tabValue].content}
-                        formErrors={tab.content.formErrors}
                         onUpdate={(newData) => updateTabContent(tabs[tabValue].id, newData)}
                         setValidateForm={setValidateForm}                        
                       />

@@ -9,8 +9,8 @@ const initialState = {
 };
 
 //загрузка технологий и операций по коду ДСЕ
-export const fetchData = createAsyncThunk(
-  'technologiesTree/fetchData',
+export const getSavedData = createAsyncThunk(
+  'technologiesTree/getSavedData',
   async ({}, { getState, rejectWithValue }) => {
     try {
       const state = getState();
@@ -54,18 +54,18 @@ const technologiesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchData.pending, (state) => {
+      .addCase(getSavedData.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchData.fulfilled, (state, action) => {
+      .addCase(getSavedData.fulfilled, (state, action) => {
         state.loading = false;
         const newItems = action.payload.filter(newItem => 
           !state.items.some(existingItem => existingItem.id === newItem.id)
         );
         state.items = [...state.items, ...newItems];
       })
-      .addCase(fetchData.rejected, (state, action) => {
+      .addCase(getSavedData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });                    

@@ -39,7 +39,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
-const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErrors}) => {
+const OperationCard = ({content, onUpdate, setValidateForm}) => {
   //стейты
   const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {} });
 
@@ -64,7 +64,7 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
       formValues: {
         ...prev.formValues,
         [name]: value,
-      },      
+      },
     }));
 
     //formErrors
@@ -92,9 +92,9 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
             [name]: value 
           }, 
           formErrors: 
-          { 
-            ...localData.formErrors, 
-            [name]: errorMessage 
+          {
+            ...localData.formErrors,
+            [name]: errorMessage
           },
           validateForm
         }
@@ -127,8 +127,29 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
     }
   };
 
+  const handleAccordionChange = (panel) => (event, isExpanded) => {
+    setLocalData((prev) => ({
+      ...prev,
+      expandedPanels: {
+        ...prev.expandedPanels,
+        [panel]: isExpanded
+      },
+    }));
+    //
+    onUpdate(
+      { 
+        ...localData, 
+        expandedPanels: 
+        { 
+          ...localData.expandedPanels,
+          [panel]: isExpanded 
+        },
+      }
+    );
+  };
+
   //проверка формы
-  const validateForm = () => {
+  const validateForm = (e) => {
     const errors = {};
     const textFieldMessage = 'Поле обязательно для заполнения';
     const autocompleteTextFieldMessage = 'Выберите значение из списка';
@@ -183,11 +204,15 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
       errors.laborEffort = textFieldMessage;
     }
 
-    // Обновляем ошибки
+    //обновляем ошибки
     setLocalData((prev) => ({
       ...prev,
       formErrors: errors,
     }));
+    //
+    if (Object.keys(errors).length > 0) {
+      onUpdate({ ...localData, formValues: {...localData.formValues}, formErrors: errors });
+    }
     return Object.keys(errors).length === 0;
   };
 
@@ -204,7 +229,7 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
     <>
       {console.log(localData)}
       {/* Параметры */}
-      <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
+      <Accordion defaultExpanded expanded={localData.expandedPanels['parameters'] || false} onChange={handleAccordionChange('parameters')} elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
           aria-controls="panel1-content"
@@ -213,7 +238,7 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
         >
           <Typography component="span">Параметры</Typography>
         </AccordionSummary>
-        <AccordionDetails sx={{ padding: 2, overflow: 'auto', minHeight: '16.5rem', maxHeight: '35rem'}}>           
+        <AccordionDetails sx={{ padding: 2, overflow: 'auto', minHeight: '16.5rem', maxHeight: '35rem' }}>
           <form>
             <Grid container spacing={2} columns={{xs:5}}>
               {/* Первая строка */}
@@ -441,17 +466,35 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
                         },
                       }}
                     >
-                    </TextField>
+                    </TextField>                       
                   </Grid>
                 </Grid>
-              </Grid>                                        
+              </Grid>
+              {/* Восьмая строка */}
+              <Grid item xs={12}>
+                <Grid container spacing={2}>
+                  <Grid item xs={4.8}>
+                    <TextField                          
+                      multiline
+                      fullWidth
+                      minRows={8}
+                      maxRows={100}
+                      name='operationDescription'
+                      id="operation-description-12"
+                      label="Описание операции"
+                      size='small'                      
+                      /*sx={{ resize: 'both', overflow: 'auto' }}*/
+                    />                  
+                  </Grid>
+                </Grid>
+              </Grid>                                                    
             </Grid>
           </form>              
         </AccordionDetails>
       </Accordion>        
       
       {/* Оборудование */}
-      <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
+      <Accordion defaultExpanded expanded={localData.expandedPanels['equipment'] || false} onChange={handleAccordionChange('equipment')} elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
           aria-controls="panel1-content"
@@ -467,7 +510,7 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
       </Accordion>
 
       {/* Комплектующие */}
-      <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
+      <Accordion defaultExpanded expanded={localData.expandedPanels['components'] || false} onChange={handleAccordionChange('components')} elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
           aria-controls="panel1-content"
@@ -483,7 +526,7 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
       </Accordion>
 
       {/* Материалы */}
-      <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
+      <Accordion defaultExpanded expanded={localData.expandedPanels['materials'] || false} onChange={handleAccordionChange('materials')} elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
           aria-controls="panel1-content"
@@ -498,45 +541,8 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
         </AccordionDetails>
       </Accordion>
       
-      {/* Описание операции */}
-      <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-          aria-controls="panel1-content"
-          id="panel1-header"
-          sx={{ backgroundColor: '#101F33', color: 'white' }}
-        >
-          <Typography component="span">Описание операции</Typography>
-        </AccordionSummary>
-        <AccordionDetails sx={{ padding: 2, overflow: 'auto'}}>
-          <form>
-            <Grid container spacing={2} columns={{xs:5}} >
-              {/* Первая строка */}
-                <Grid item xs={12}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={4.8}>
-                      <TextField                          
-                        multiline
-                        fullWidth
-                        minRows={8}
-                        maxRows={16}
-                        name='operationDescription'
-                        id="operation-description-12"
-                        label="Описание операции"
-                        size="small"
-                        sx={{ resize: 'both', overflow: 'auto' }}
-                      >
-                      </TextField>
-                    </Grid>
-                  </Grid>                    
-                </Grid>             
-            </Grid>
-          </form>              
-        </AccordionDetails>
-      </Accordion>
-      
       {/* Оснастка */}
-      <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
+      <Accordion defaultExpanded expanded={localData.expandedPanels['tooling'] || false} onChange={handleAccordionChange('tooling')} elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
           aria-controls="panel1-content"
@@ -552,7 +558,7 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
       </Accordion>
 
       {/* Измерительный инструмент */}
-      <Accordion defaultExpanded elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
+      <Accordion defaultExpanded expanded={localData.expandedPanels['measuringTools'] || false} onChange={handleAccordionChange('measuringTools')} elevation={3} sx={{ bgcolor: 'white', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
           aria-controls="panel1-content"
@@ -572,12 +578,12 @@ const OperationCard = ({orderNumber, content, onUpdate, setValidateForm, formErr
                       onOptionSelect={handleOptionSelect} selectedValue={formValues['measuringTools13'] ? formValues['measuringTools13'] : []}
                       errorValue={formErrors['measuringTools13']} />*/}
                   </Grid>
-                </Grid>                    
-              </Grid>             
+                </Grid>
+              </Grid>
           </Grid>
-          </form>              
+          </form>
         </AccordionDetails>
-      </Accordion>                                                          
+      </Accordion>
     </>
   );
 };
