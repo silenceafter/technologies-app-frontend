@@ -11,10 +11,10 @@ const initialState = {
 };
 
 export const fetchData = createAsyncThunk(
-  'professions/fetchData',
+  'equipment/fetchData',
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getprofessions.v0.php?search=${search}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getEquipment.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -26,8 +26,8 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-const professionsSlice = createSlice({
-  name: 'professions',
+const equipmentSlice = createSlice({
+  name: 'equipment',
   initialState,
   reducers: {
     setSearch: (state, action) => {
@@ -53,8 +53,8 @@ const professionsSlice = createSlice({
         state.loading = false;
         const newItems = action.payload.data.filter(newItem => 
           !state.items.some(existingItem => {
-            return `${existingItem.code}-${existingItem.name}` === 
-                `${newItem.code}-${newItem.name}`;
+            return `${existingItem.name}-${existingItem.type}` === 
+                `${newItem.name}-${newItem.type}`;
             })
         );
         //
@@ -72,9 +72,9 @@ const professionsSlice = createSlice({
 });
 
 //селекторы
-export const selectSearch = (state) => state.professions.search;
-export const selectLimit = (state) => state.professions.limit;
-export const selectPage = (state) => state.professions.page;
+export const selectSearch = (state) => state.equipment.search;
+export const selectLimit = (state) => state.equipment.limit;
+export const selectPage = (state) => state.equipment.page;
 
-export const { setSearch, setLimit, setPage } = professionsSlice.actions;
-export default professionsSlice.reducer;
+export const { setSearch, setLimit, setPage } = equipmentSlice.actions;
+export default equipmentSlice.reducer;

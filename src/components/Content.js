@@ -18,7 +18,7 @@ import ProductsTree from './ProductsTree';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { OperationsSearch } from './OperationsSearch';
-import { ProfessionsSearch } from './ProfessionsSearch';
+import { ProfessionsSearch } from './JobsSearch';
 import { MeasuringToolsSearch } from './MeasuringToolsSearch';
 import { ToolingSearch } from './ToolingSearch';
 import { ComponentsSearch } from './ComponentsSearch';
@@ -226,7 +226,11 @@ export default function Content() {
             </Box>              
           </AccordionDetails>
           <AccordionActions>
-            <Button sx={{ backgroundColor: 'primary.main', color: 'white' }}>Добавить технологию</Button>
+            <Button
+              /*onClick={}*/
+              sx={{ backgroundColor: 'primary.main', color: 'white' }}>
+                Добавить технологию
+            </Button>
           </AccordionActions>
         </Accordion>
         <Accordion defaultExpanded

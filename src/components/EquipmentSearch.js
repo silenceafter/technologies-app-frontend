@@ -1,22 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
 import { 
-    AppBar,
     Autocomplete, 
-    Box, 
+    Box,
+    Chip,
     CircularProgress, 
-    Grid,
-    Link,
     ListItem, 
     ListItemText,
-    TextField,
-    Toolbar
+    TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/professionsSlice';
+import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/equipmentSlice';
 import { debounce } from 'lodash';
 
-function ProfessionsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
+function EquipmentSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const dispatch = useDispatch();
 
   //TextField
@@ -28,7 +24,7 @@ function ProfessionsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const page = useSelector(selectPage);
 
   //запросы для прокрутки списка
-  const { items, loading, error, hasMore } = useSelector((state) => state.professions);
+  const { items, loading, error, hasMore } = useSelector((state) => state.equipment);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
@@ -67,20 +63,21 @@ function ProfessionsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   return (
     <>
       <Autocomplete
+        multiple
         options={items || []}
-        getOptionLabel={(option) => `${option.code} ${option.name}`}
+        getOptionLabel={(option) => `${option.name} ${option.type}`}
         filterOptions={(options, state) => {
-          const { inputValue } = state;
-          return options.filter(option =>
-            option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
-            option.name.toLowerCase().includes(inputValue.toLowerCase())
-          );
+            const { inputValue } = state;
+            return options.filter(option =>
+            option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+            option.type.toLowerCase().includes(inputValue.toLowerCase())
+            );
         }}
         onInputChange={(event, newInputValue) => {
             setInputValue(newInputValue);
         }}
-        onChange={(event, newValue) => {                           
-            onOptionSelect(id, newValue);//setValue(newValue);
+        onChange={(event, newValue) => {
+            onOptionSelect(id, newValue);
         }}
         inputValue={inputValue}
         loadingText="поиск данных"
@@ -90,7 +87,7 @@ function ProfessionsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
             onScroll: handleScroll,
             ref: listRef,
             sx: {
-            maxHeight: '25vh',
+            maxHeight: '48vh',
             overflowY: 'auto'
             }
         }}
@@ -103,16 +100,16 @@ function ProfessionsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
                 justifyContent: 'center',
                 padding: '10px'}}
                 >
-                  <CircularProgress size={24} />
+                <CircularProgress size={24} />
                 </Box>
             )}
             </div>
         )}
         renderOption={(props, option) => (
-            <ListItem {...props} key={`${option.code}-${option.name}`} style={{ padding: '8px 16px' }}>
+            <ListItem {...props} key={`${option.name}-${option.type}`} style={{ padding: '8px 16px' }}>
             <ListItemText
-                primary={option.code}
-                secondary={option.name}
+                primary={option.name}
+                secondary={option.type}
                 primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
                 secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
             />
@@ -123,15 +120,24 @@ function ProfessionsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
               {...params}
               required
               fullWidth
-              id="profession-code-6"
+              id="equipment-14"
               error={!!errorValue}
               helperText={errorValue}
-              placeholder="Код профессии"
+              placeholder="Оборудование"
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}
               size='small'
             />
         )}
+        renderTags={(tagValue, getTagProps) =>
+          tagValue.map((option, index) => (
+            <Chip
+              key={index}
+              label={option.name || option.label}
+              {...getTagProps({ index })}         
+            />
+          ))
+        }
         sx={{
             '& .MuiAutocomplete-listbox': {
             backgroundColor: '#fff',
@@ -147,4 +153,4 @@ function ProfessionsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   );
 }
 
-export { ProfessionsSearch };
+export { EquipmentSearch };

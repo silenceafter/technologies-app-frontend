@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/operationsSlice';
 import { debounce } from 'lodash';
 
-function OperationsSearch({props, id, selectedValue, onOptionSelect, errorValue }) {
+const OperationsSearch = ({props, id, selectedValue, onOptionSelect, errorValue }) => {
   const dispatch = useDispatch();
 
   //TextField
@@ -80,7 +80,9 @@ function OperationsSearch({props, id, selectedValue, onOptionSelect, errorValue 
               setInputValue(newInputValue);
           }}
           onChange={(event, newValue) => {
+            if (onOptionSelect) {
               onOptionSelect(id, newValue);
+            }              
           }}
           inputValue={inputValue}
           loadingText="поиск данных"
@@ -146,6 +148,6 @@ function OperationsSearch({props, id, selectedValue, onOptionSelect, errorValue 
             />
     </>
   );
-}
+};
 
 export { OperationsSearch };
