@@ -310,9 +310,9 @@ export default function Content() {
             </Box>            
             <Box sx={{           
               height: '91%',
-              overflowY: 'auto'              
+              overflowY: 'auto'
             }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 {/*tabs.map((tab, index) => (
                   <TabPanel key={tab.id} value={tabValue} index={index}>
                     <OperationCard operationNumber={tab.id} />
