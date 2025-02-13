@@ -7,7 +7,17 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
-import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
+import { 
+  TreeItem2, 
+  TreeItem2Content,
+  TreeItem2Root,
+  TreeItem2GroupTransition,
+  TreeItem2IconContainer,
+  TreeItem2Label 
+} from '@mui/x-tree-view/TreeItem2';
+import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
+import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
+import { TreeItem2LabelInput } from '@mui/x-tree-view/TreeItem2LabelInput';
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import { fetchData, selectItems, setAdditionalItems, selectAdditionalItems, setClearAdditionalItems } from '../store/slices/technologiesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -23,6 +33,8 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Fab from '@mui/material/Fab';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import AdjustIcon from '@mui/icons-material/Adjust';
 
 //добавить кастомный класс и кастомное свойство элементу Box
 const useStyles = makeStyles({
@@ -37,6 +49,7 @@ export default function TechnologiesTree() {
   //стейты
   const [loadedItems, setLoadedItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState([]);
+  const [disabledItems, setDisabledItems] = useState([]);
   const [download, setDownload] = useState(false);  
   const [technologyChip, setTechnologyChip] = useState(null);
     
@@ -110,15 +123,24 @@ export default function TechnologiesTree() {
     },
   }));
   
-  function CustomLabel({ children, className, secondaryLabel }) {
+  function CustomLabel({ children, className, secondaryLabel, disabled }) {
     return (
-      <div className={className}>
-        <Typography>{children}</Typography>
-        {secondaryLabel && (
-          <Typography variant="caption" color="secondary">
-            {secondaryLabel}
-          </Typography>
-        )}
+      <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        <div>
+          <Typography>{children}</Typography>
+          {secondaryLabel && (
+            <Typography variant="caption" color="secondary">
+              {secondaryLabel}
+            </Typography>
+          )}
+        </div>
+        {
+          disabled && (
+            <TreeItem2IconContainer sx={{ marginLeft: '8px', color: 'grey' }}>
+              <CancelOutlinedIcon color="action" fontSize="small" />
+            </TreeItem2IconContainer>
+          )
+        }
       </div>
     );
   }
@@ -137,26 +159,37 @@ export default function TechnologiesTree() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [expanded, setExpanded] = useState(false);
+    const [disabled, setDisabled] = useState(false);
 
     //рефы
     const timerRef = useRef(null);
 
+    //эффекты
     useEffect(() => {
       setExpanded(expandedItems.includes(props.itemId));
     }, [expandedItems, props.itemId]);
+
+    useEffect(() => {
+      setDisabled(disabledItems.includes(props.itemId));
+    }, [disabledItems, props.itemId]);
     
     //expanded
     const handleRootClick = (e) => {
       //записать выбранную технологию
       dispatch(setTechnology({ name: item.label, code: item.secondaryLabel }));
       setExpanded((prev) => !prev);
-      handleItemExpansionToggle(null, props.itemId, !expanded);            
+      setDisabled((prev) => !prev);
+      handleItemExpansionToggle(null, props.itemId, !expanded);
+      /*handleItemDisabledToggle(null, props.itemId, item.type, item.children, !disabled);*/
     };
   
     const handleChildClick = (e) => {
       if (dataLoaded) return;
       e.stopPropagation();
       console.log('child-item');
+
+      setDisabled((prev) => !prev);
+      handleItemDisabledToggle(null, props.itemId, item.type, item.children, !disabled);
     };
 
     const handleAddIconClick = async (type) => {
@@ -167,17 +200,15 @@ export default function TechnologiesTree() {
     const classes = useStyles({ itemType: item.type});
     //дополнительный код
     const additionalItem = (
-      <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center'}}>
           <span>{props.label}</span>
-          { item.type == "add-technology" || item.type == "add-operation" ? (
+          {/* item.type == "add-technology" || item.type == "add-operation" ? (
             <IconButton onClick={() => handleAddIconClick(item.type)} sx={{ marginLeft: '8px' }}>
             </IconButton>
-          ) : null
+          ) : null*/
           }
-      </Box>);
-      /*<StyledIconButton onClick={() => handleAddIconClick(item.type)} sx={{ marginLeft: '8px' }}>
-          <StyledAddIcon />
-        </StyledIconButton> */
+      </Box>
+    );
     //
     return (
       <>
@@ -190,12 +221,14 @@ export default function TechnologiesTree() {
         slotProps={{
           label: { 
             secondaryLabel: item?.secondaryLabel || '',
+            disabled: disabled,
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
         onClick={item.type === 'technology' ? handleRootClick : handleChildClick}
         label={additionalItem}
         expanded={expanded}
+        disabled={disabled}
       >
         { isProcessing && !dataLoaded ? (
           <Box
@@ -210,8 +243,8 @@ export default function TechnologiesTree() {
           >
             <CircularProgress size={40} />
           </Box>
-        ) : (
-          props.children
+        ) : (          
+          props.children                             
         )}
       </StyledTreeItem2>
       </>
@@ -224,7 +257,7 @@ export default function TechnologiesTree() {
       <CustomTreeItem
         {...props}
         key={props.itemId}
-        ref={itemRef}
+        ref={itemRef}        
       />
     ),
     [itemRef]  
@@ -236,6 +269,30 @@ export default function TechnologiesTree() {
         return [...prevExpanded, nodeId];
       } else {
         return prevExpanded.filter((id) => id !== nodeId)
+      }
+    });
+  };
+
+  const handleItemDisabledToggle = (event, nodeId, type, children, disabled) => {
+    /*if (type == 'technology') {
+      //дочерние элементы
+      for(let child of children) {
+        setDisabledItems((prevDisabled) => {
+          if (disabled) {
+            return [...prevDisabled, child.id];
+          } else {
+            return prevDisabled.filter((id) => id !== child.id)
+          }
+        });
+      }
+    }*/
+
+    //родительский элемент
+    setDisabledItems((prevDisabled) => {
+      if (disabled) {
+        return [...prevDisabled, nodeId];
+      } else {
+        return prevDisabled.filter((id) => id !== nodeId)
       }
     });
   };
@@ -257,11 +314,14 @@ export default function TechnologiesTree() {
   //
   return (
     <>
+    {console.log(disabledItems)}
       <RichTreeView
         slots={{ item: renderCustomTreeItem }}          
         items={items}
         expandedItems={expandedItems}
         onItemExpansionToggle={handleItemExpansionToggle}
+        disabledItems={disabledItems}
+        isItemDisabled={(item) => disabledItems.includes(item.id)}
       />                        
       <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.5, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
         {
@@ -271,24 +331,16 @@ export default function TechnologiesTree() {
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
                 {
                   technologySelector.code.trim() != ''
-                    ? (
-                      <>
-                      
-                        {technologyChip && <Chip label={technologyChip} variant="outlined" onDelete={handleDelete} />}
-                      
-                      </>
+                    ? (                                            
+                      technologyChip && <Chip label={technologyChip} variant="outlined" onDelete={handleDelete} />
                     )
                     : ('')
                 }
-                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
-                  <Fab size='small' color="primary" aria-label="add">
-                    <AddIcon />
-                  </Fab>                
-                </Box>
-                {/*<Button
-                  sx={{ backgroundColor: 'primary.main', color: 'white', width: '100%'}}>
-                    Добавить технологию
-                </Button>*/}
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
+                    <Fab size='small' color="primary" aria-label="add">
+                      <AddIcon />
+                    </Fab>
+                  </Box>
                 </Box>
               </>
             )
@@ -298,7 +350,7 @@ export default function TechnologiesTree() {
               </>
             )
         }
-      </Stack>                        
+      </Stack>
     </>
   );
 }

@@ -180,13 +180,19 @@ export default function Content() {
     }, 2000));
   }*/
 
-  const handleSave = () => {
-    if (validateForm()) {
-      // Выполняем сохранение
-      console.log("Форма прошла валидацию");
-    } else {
-      console.log("Ошибка валидации");
-    }
+  const handleSave = async () => {
+    //сохранение
+    setLoading((prev) => ({ ...prev, save: true }));  
+    await new Promise((resolve) => setTimeout(() => {
+      setOpen(true);
+      if (validateForm()) {
+        setRequestStatus('success');
+      } else {
+        setRequestStatus('error');
+      }  
+      setLoading((prev) => ({ ...prev, save: false }));
+      //dispatch(setUnsavedChanges(false));
+    }, 2000));
   };    
 
   const [expanded, setExpanded] = useState('panel1');

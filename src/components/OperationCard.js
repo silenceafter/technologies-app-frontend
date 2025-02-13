@@ -690,8 +690,8 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <MeasuringToolsSearch 
-                      id="measuringTools13" 
+                    <MeasuringToolsSearch
+                      id="measuringTools"
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.measuringTools}
                       errorValue={localData.formErrors.measuringTools}

@@ -31,7 +31,7 @@ export const getSavedData = createAsyncThunk(
         id: item.id || item.ItemId,
         label: item.label || 'Unnamed Item',
         secondaryLabel: item.secondaryLabel || null,
-        children: item.children.map(processItem) || []
+        children: item.children.map(processItem) || [],
       });
       return data.map(processItem);
     } catch (error) {
