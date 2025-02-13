@@ -17,8 +17,12 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
-import { selectDrawingExternalCode, setTechnology, selectOperation } from '../store/slices/drawingsSlice';
+import { selectDrawingExternalCode, setTechnology, selectTechnology, selectOperation } from '../store/slices/drawingsSlice';
 import { makeStyles } from '@mui/styles';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Fab from '@mui/material/Fab';
 
 //добавить кастомный класс и кастомное свойство элементу Box
 const useStyles = makeStyles({
@@ -34,13 +38,15 @@ export default function TechnologiesTree() {
   const [loadedItems, setLoadedItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState([]);
   const [download, setDownload] = useState(false);  
-  
+  const [technologyChip, setTechnologyChip] = useState(null);
     
   //селекторы
   const dispatch = useDispatch();
   const items = useSelector((state) => state.technologies.items);
   const loading = useSelector((state) => state.technologies.loading);
   const error = useSelector((state) => state.technologies.error);
+  const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
+  const technologySelector = useSelector(selectTechnology);
 
   //refs
   const itemRef = useRef(null);
@@ -212,9 +218,6 @@ export default function TechnologiesTree() {
     );
   });
 
-  //запросы
-  const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
-
   //мемоизированная функция для slots.item (избегаем перерисовки)
   const renderCustomTreeItem = useCallback(
     (props) => (
@@ -242,6 +245,15 @@ export default function TechnologiesTree() {
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
   }, [items]);
+
+  //chip для выбранной технологии
+  const handleDelete = () => {
+    setTechnologyChip(null);
+  };
+
+  useEffect(() => {
+    setTechnologyChip(`${technologySelector.name}: ${technologySelector.code}`);
+  }, [technologySelector]);
   //
   return (
     <>
@@ -250,34 +262,43 @@ export default function TechnologiesTree() {
         items={items}
         expandedItems={expandedItems}
         onItemExpansionToggle={handleItemExpansionToggle}
-      />
+      />                        
+      <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.5, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
+        {
+          drawingExternalCode.trim() != ''
+            ? (
+              <>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
+                {
+                  technologySelector.code.trim() != ''
+                    ? (
+                      <>
+                      
+                        {technologyChip && <Chip label={technologyChip} variant="outlined" onDelete={handleDelete} />}
+                      
+                      </>
+                    )
+                    : ('')
+                }
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
+                  <Fab size='small' color="primary" aria-label="add">
+                    <AddIcon />
+                  </Fab>                
+                </Box>
+                {/*<Button
+                  sx={{ backgroundColor: 'primary.main', color: 'white', width: '100%'}}>
+                    Добавить технологию
+                </Button>*/}
+                </Box>
+              </>
+            )
+            : (
+              <>
+                {/*заглушка*/}
+              </>
+            )
+        }
+      </Stack>                        
     </>
   );
-
-  /*return (
-    <>
-        <AppBar
-            position="static"
-            color="primary"
-            elevation={0}
-            sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
-        >
-            <Toolbar>
-                <Typography color="inherit">
-                    Технологии
-                </Typography>
-            </Toolbar>
-        </AppBar>
-        <Box>
-          {MUI_X_PRODUCTS.length > 0 ? (
-            <RichTreeView items={MUI_X_PRODUCTS} />
-          ) : (
-            <Typography sx={{ padding: 2 }}>
-              Список технологий и операций
-            </Typography>
-          )}
-            
-        </Box>             
-    </>
-  );*/
 }

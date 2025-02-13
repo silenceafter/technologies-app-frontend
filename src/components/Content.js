@@ -226,11 +226,10 @@ export default function Content() {
             </Box>              
           </AccordionDetails>
           <AccordionActions>
-            <Button
-              /*onClick={}*/
+            {/*<Button
               sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                 Добавить технологию
-            </Button>
+            </Button>*/}
           </AccordionActions>
         </Accordion>
         <Accordion defaultExpanded
