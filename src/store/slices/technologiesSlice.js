@@ -1,9 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { selectDrawingExternalCode, setTechnology } from './drawingsSlice';
+import { act } from 'react';
 
 const LOADING_DEFAULT = false;
 const initialState = {
   items: [], /* основные элементы дерева */
+  selectedItems: [],
   loading: LOADING_DEFAULT,
   error: null,
 };
@@ -44,12 +46,51 @@ const technologiesSlice = createSlice({
   name: 'technologies',
   initialState,
   reducers: {
-    setItems: (state) => {
+    clearItems: (state) => {
       return {
         ...state,
         items: [],
         loading: LOADING_DEFAULT
       }
+    },
+    setItems: (state, action) => {
+      switch(action.payload.type) {
+        case 'delete':
+          return {
+            ...state,
+            items: state.items
+              .filter(item => !action.payload.selectedItems.includes(item.id))
+              .map(item => ({
+                ...item,
+                children: item.children
+                  ? item.children.filter(child => !action.payload.selectedItems.includes(child.id))
+                  : item.children
+              }))
+          };
+
+        default:
+          return state;
+      }
+      /*return {
+        ...state,
+        items: state.items.map(item => ({
+          ...item,
+          children: item.children
+            ? item.children.filter(child => !action.payload.includes(child.id))
+            : []
+        }))
+      };*/           
+    },
+    setSelectedItems: (state, action) => {
+      state.selectedItems = action.payload;
+    },
+    addSelectedItems: (state, action) => {
+      if (!state.selectedItems.includes(action.payload)) {
+        state.selectedItems.push(action.payload);
+      }
+    },
+    removeSelectedItems: (state, action) => {
+      state.selectedItems = state.selectedItems.filter(id => id !== action.payload);
     }
   },
   extraReducers: (builder) => {
@@ -72,10 +113,14 @@ const technologiesSlice = createSlice({
   },
 });
 
-export const { setItems } = technologiesSlice.actions;
+export const { 
+  clearItems, setItems, 
+  setSelectedItems, addSelectedItems, removeSelectedItems
+} = technologiesSlice.actions;
 
 //селекторы
 export const selectItems = (state) => state.technologies.items || [];
+export const selectSelectedItems = (state) => state.technologies.selectedItems || [];
 export const selectLoading = (state) => state.technologies.loading;
 export const selectError = (state) => state.header.error;
 
