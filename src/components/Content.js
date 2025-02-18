@@ -202,7 +202,6 @@ export default function Content() {
   //
   return (
     <>
-    {console.log(tabs)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

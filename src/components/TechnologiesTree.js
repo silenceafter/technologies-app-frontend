@@ -19,7 +19,7 @@ import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
 import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { TreeItem2LabelInput } from '@mui/x-tree-view/TreeItem2LabelInput';
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
-import { fetchData, setItems, setSelectedItems, addSelectedItems, removeSelectedItems } from '../store/slices/technologiesSlice';
+import { fetchData, setItems, setSelectedItems, addSelectedItems, deleteSelectedItems, setDisabledItems, deleteSavedData} from '../store/slices/technologiesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import Card from '@mui/material/Card';
@@ -39,11 +39,13 @@ import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 
 //действия для SpeedDial
 const actions = [
   { icon: <AddIcon />, name: 'add-technology', title: 'Добавить технологию' },
   { icon: <DeleteIcon />, name: 'delete', title: 'Удалить' },
+  { icon: <RestoreFromTrashIcon />, name: 'restore', title: 'Отменить удаление' }
 ];
 
 //добавить кастомный класс и кастомное свойство элементу Box
@@ -68,7 +70,7 @@ export default function TechnologiesTree() {
   //стейты
   const [loadedItems, setLoadedItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState([]);
-  const [disabledItems, setDisabledItems] = useState([]);
+  //const [disabledItems, setDisabledItems] = useState([]);
   //const [selectedItems, setSelectedItems] = useState([]);
   const [download, setDownload] = useState(false);  
   const [technologyChip, setTechnologyChip] = useState(null);
@@ -81,6 +83,7 @@ export default function TechnologiesTree() {
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const technologySelector = useSelector(selectTechnology);
   const selectedItems = useSelector((state) => state.technologies.selectedItems);
+  const disabledItems = useSelector((state) => state.technologies.disabledItems);
 
   //refs
   const itemRef = useRef(null);
@@ -146,12 +149,7 @@ export default function TechnologiesTree() {
     },
   }));
   
-  function CustomLabel({ children, className, secondaryLabel, disabled }) {    
-    const [isDisabled, setIsDisabled] = useState(disabled);
-    useEffect(() => {
-      setIsDisabled(disabled);
-    }, [disabled]);
-    //
+  function CustomLabel({ children, className, secondaryLabel }) {    
     return (
       <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
         <div>
@@ -162,19 +160,6 @@ export default function TechnologiesTree() {
             </Typography>
           )}
         </div>
-        {
-          /*disabled && (
-            <TreeItem2IconContainer
-              sx={{ marginLeft: '8px', color: 'grey', cursor: 'pointer' }}
-              onClick={(event) => {
-                event.stopPropagation(); // предотвращает срабатывание клика на родительском TreeItem
-                console.log("Иконка нажата!");
-              }}
-            >
-              <CancelOutlinedIcon color="action" fontSize="small" />
-            </TreeItem2IconContainer>
-          )*/
-        }
       </div>
     );
   }
@@ -190,9 +175,9 @@ export default function TechnologiesTree() {
     const item = publicAPI.getItem(props.itemId);
     const parent = item.parentId != null ? publicAPI.getItem(item.parentId) : null;
 
-    if (disabledItems.includes(parent?.itemId)) {
+    /*if (disabledItems.includes(parent?.itemId)) {
       console.log(`my parent ${parent.itemId} is disabled`);
-    }
+    }*/
 
     //стейты
     const [isProcessing, setIsProcessing] = useState(false);
@@ -229,18 +214,11 @@ export default function TechnologiesTree() {
         handleItemExpansionToggle(null, props.itemId, !expanded);
         return; 
       }
-      //
-      /*setDisabled((prev) => !prev);
-      handleItemDisabledToggle(null, props.itemId, item.type, item.children, !disabled);*/
     };
   
     const handleChildClick = (e) => {
       if (dataLoaded) return;
       e.stopPropagation();
-      console.log('child-item');
-
-      /*setDisabled((prev) => !prev);
-      handleItemDisabledToggle(null, props.itemId, item.type, item.children, !disabled);*/
     };
 
     const handleAddIconClick = async (type) => {
@@ -271,8 +249,7 @@ export default function TechnologiesTree() {
         }}
         slotProps={{
           label: { 
-            secondaryLabel: item?.secondaryLabel || '',
-            /*disabled: disabled,*/ /*disabledItems.includes(props.itemId),*/
+            secondaryLabel: item?.secondaryLabel || ''
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
@@ -324,37 +301,12 @@ export default function TechnologiesTree() {
     });
   };
 
-  const handleItemDisabledToggle = (event, nodeId, type, children, disabled) => {
-    if (type == 'technology') {
-      //дочерние элементы
-      for(let child of children) {
-        handleItemDisabledToggle(null, child.id, child.type, child.children, true);
-        /*setDisabledItems((prevDisabled) => {
-          if (disabled) {
-            return [...prevDisabled, child.id];
-          } else {
-            return prevDisabled.filter((id) => id !== child.id)
-          }
-        });*/
-      }
-    }
-
-    //родительский элемент
-    setDisabledItems((prevDisabled) => {
-      if (disabled) {
-        return [...prevDisabled, nodeId];
-      } else {
-        return prevDisabled.filter((id) => id !== nodeId)
-      }
-    });
-  };
-
   const handleItemSelectionToggle = (event, itemId, isSelected) => {
     toggledItemRef.current[itemId] = isSelected;
   };
 
   const handleSelectedItemsChange = (event, newSelectedItems) => {
-    setSelectedItems(newSelectedItems);
+    dispatch(setSelectedItems(newSelectedItems));//setSelectedItems(newSelectedItems);
     const itemsToSelect = [];
     const itemsToUnSelect = {};
     Object.entries(toggledItemRef.current).forEach(([itemId, isSelected]) => {
@@ -367,7 +319,7 @@ export default function TechnologiesTree() {
         });
       }
     });
-
+    //
     const newSelectedItemsWithChildren = Array.from(
       new Set(
         [...newSelectedItems, ...itemsToSelect].filter(
@@ -375,7 +327,7 @@ export default function TechnologiesTree() {
         ),
       ),
     );
-    setSelectedItems(newSelectedItemsWithChildren);
+    dispatch(setSelectedItems(newSelectedItemsWithChildren));//setSelectedItems(newSelectedItemsWithChildren);
     toggledItemRef.current = {};
   };
 
@@ -394,11 +346,11 @@ export default function TechnologiesTree() {
     setTechnologyChip(`${technologySelector.name}: ${technologySelector.code}`);
   }, [technologySelector]);
 
-  const handleSDActionClick = (action) => {
+  const handleSpeedDialActionClick = (action) => {
     switch(action.name) {
       case 'delete':
        
-        for(const itemId of selectedItems) {
+        /*for(const itemId of selectedItems) {
           const itemById = apiRef.current?.getItem(itemId);
           if (itemById.type == 'operation') {
             //операция
@@ -411,7 +363,10 @@ export default function TechnologiesTree() {
             //технология
             dispatch(setItems({ type: action.name, selectedItems: selectedItems }));
           }
-        }
+          
+        }*/
+        //dispatch(deleteSavedData(selectedItems));
+        dispatch(deleteSelectedItems(selectedItems));
         break;
     }
 
@@ -422,7 +377,7 @@ export default function TechnologiesTree() {
     <>
     {console.log(selectedItems)}
       <RichTreeView
-        slots={{ item: renderCustomTreeItem }}          
+        slots={{ item: renderCustomTreeItem }}
         items={items}
         expandedItems={expandedItems}
         onItemExpansionToggle={handleItemExpansionToggle}
@@ -463,7 +418,7 @@ export default function TechnologiesTree() {
                           key={action.name}
                           icon={action.icon}
                           tooltipTitle={action.title}
-                          onClick={() => handleSDActionClick(action)}
+                          onClick={() => handleSpeedDialActionClick(action)}
                         />
                       ))}
                     </SpeedDial>
