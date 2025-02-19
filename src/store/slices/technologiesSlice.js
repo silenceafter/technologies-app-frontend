@@ -34,7 +34,8 @@ export const getSavedData = createAsyncThunk(
         id: item.id || item.ItemId,
         label: item.label || 'Unnamed Item',
         secondaryLabel: item.secondaryLabel || null,
-        children: item.children.map(processItem) || []
+        children: item.children.map(processItem) || [],
+        type: item.type,
       });
       return data.map(processItem);
     } catch (error) {
@@ -176,7 +177,44 @@ const technologiesSlice = createSlice({
         ...state,
         disabledItems: action.payload
       };
-    }
+    },
+    deleteDisabledItems: (state, action) => {
+      const targetItemId = action.payload.itemId; // Получаем id из action.payload
+      const childrenItemIds = Array.isArray(action.payload.children)
+        ? action.payload.children.map(child => child.itemId) 
+        : []; // Проверяем, является ли children массивом и извлекаем id из каждого ребенка
+    
+      const itemsToRemove = [targetItemId, ...childrenItemIds]; // Собираем все id, которые нужно удалить
+    
+      return {
+        ...state,
+        disabledItems: state.disabledItems.filter(itemId => !itemsToRemove.includes(itemId)), // Убираем все найденные id
+        items: state.items.map(item => {
+          if (item.id === targetItemId) {
+            // Если найден основной элемент, снимаем selected у него и у всех детей
+            return {
+              ...item,
+              selected: false,
+              children: item.children
+                ? item.children.map(child => ({ ...child, selected: false })) // Снимаем selected у детей
+                : item.children
+            };
+          }
+    
+          // Для всех других элементов проверяем детей
+          return {
+            ...item,
+            children: item.children
+              ? item.children.map(child =>
+                  child.id === targetItemId
+                    ? { ...child, selected: false } // Если это выбранный дочерний элемент, снимаем selected
+                    : child
+                )
+              : item.children
+          };
+        })
+      };
+    }        
   },
   extraReducers: (builder) => {
     builder
@@ -201,7 +239,7 @@ const technologiesSlice = createSlice({
 export const { 
   clearItems, setItems, 
   setSelectedItems, addSelectedItems, deleteSelectedItems,
-  setDisabledItems
+  setDisabledItems, deleteDisabledItems
 } = technologiesSlice.actions;
 
 //селекторы

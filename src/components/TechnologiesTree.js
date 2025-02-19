@@ -19,7 +19,7 @@ import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
 import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { TreeItem2LabelInput } from '@mui/x-tree-view/TreeItem2LabelInput';
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
-import { fetchData, setItems, setSelectedItems, addSelectedItems, deleteSelectedItems, setDisabledItems, deleteSavedData} from '../store/slices/technologiesSlice';
+import { fetchData, setItems, setSelectedItems, addSelectedItems, deleteSelectedItems, setDisabledItems, deleteDisabledItems, deleteSavedData} from '../store/slices/technologiesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import Card from '@mui/material/Card';
@@ -40,12 +40,14 @@ import SpeedDialAction from '@mui/material/SpeedDialAction';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 //действия для SpeedDial
 const actions = [
   { icon: <AddIcon />, name: 'add-technology', title: 'Добавить технологию' },
   { icon: <DeleteIcon />, name: 'delete', title: 'Удалить' },
-  { icon: <RestoreFromTrashIcon />, name: 'restore', title: 'Отменить удаление' }
+  { icon: <RestoreFromTrashIcon />, name: 'restore', title: 'Отменить удаление всех элементов' }
 ];
 
 //добавить кастомный класс и кастомное свойство элементу Box
@@ -72,8 +74,9 @@ export default function TechnologiesTree() {
   const [expandedItems, setExpandedItems] = useState([]);
   //const [disabledItems, setDisabledItems] = useState([]);
   //const [selectedItems, setSelectedItems] = useState([]);
-  const [download, setDownload] = useState(false);  
   const [technologyChip, setTechnologyChip] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null);
+  const [selectedNode, setSelectedNode] = useState(null);
     
   //селекторы
   const dispatch = useDispatch();
@@ -87,7 +90,6 @@ export default function TechnologiesTree() {
 
   //refs
   const itemRef = useRef(null);
-  const downloadRef = useRef(null);
   const toggledItemRef = React.useRef({});
   const apiRef = useTreeViewApiRef();
 
@@ -129,25 +131,6 @@ export default function TechnologiesTree() {
       },
     })
   }));
-
-  const StyledIconButton = styled(IconButton)(({ theme }) => ({
-    backgroundColor: theme.palette.primary.main,
-    color: 'white',
-    padding: theme.spacing(1),
-    '&:hover': {
-      backgroundColor: theme.palette.primary.dark,
-      transform: 'scale(1.1)',
-      transition: 'transform 0.3s ease-in-out, background-color 0.3s',
-    },
-  }));
-  
-  const StyledAddIcon = styled(AddIcon)(({ theme }) => ({
-    fontSize: '0.65rem',
-    transition: 'transform 0.3s ease-in-out',
-    '&:hover': {
-      transform: 'rotate(45deg)',
-    },
-  }));
   
   function CustomLabel({ children, className, secondaryLabel }) {    
     return (
@@ -166,18 +149,11 @@ export default function TechnologiesTree() {
   
   const CustomTreeItem = React.forwardRef(function CustomTreeItem({ ...props }, ref) {
     const dispatch = useDispatch();
-    const items = useSelector((state) => state.technologies.items);
-    //
     const { publicAPI } = useTreeItem2Utils({
       itemId: props.itemId,
       children: props.children,
     });
     const item = publicAPI.getItem(props.itemId);
-    const parent = item.parentId != null ? publicAPI.getItem(item.parentId) : null;
-
-    /*if (disabledItems.includes(parent?.itemId)) {
-      console.log(`my parent ${parent.itemId} is disabled`);
-    }*/
 
     //стейты
     const [isProcessing, setIsProcessing] = useState(false);
@@ -221,21 +197,11 @@ export default function TechnologiesTree() {
       e.stopPropagation();
     };
 
-    const handleAddIconClick = async (type) => {
-      //добавить новую технологию
-      console.log(type);
-    };
-
     const classes = useStyles({ itemType: item.type});
     //дополнительный код
     const additionalItem = (
       <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center'}}>
           <span>{props.label}</span>
-          {/* item.type == "add-technology" || item.type == "add-operation" ? (
-            <IconButton onClick={() => handleAddIconClick(item.type)} sx={{ marginLeft: '8px' }}>
-            </IconButton>
-          ) : null*/
-          }
       </Box>
     );
     //
@@ -256,7 +222,6 @@ export default function TechnologiesTree() {
         onClick={item.type === 'technology' ? handleRootClick : handleChildClick}
         label={additionalItem}
         expanded={expanded}
-        /*disabled={disabled}*/
       >
         { isProcessing && !dataLoaded ? (
           <Box
@@ -281,15 +246,31 @@ export default function TechnologiesTree() {
 
   //мемоизированная функция для slots.item (избегаем перерисовки)
   const renderCustomTreeItem = useCallback(
+    (props) => {
+      return (
+        <CustomTreeItem
+          {...props}
+          key={props.itemId}
+          ref={itemRef}
+          onContextMenu={(event) => handleContextMenu(event, props)}
+        />
+      );
+    },
+    [itemRef]  
+  );
+  /*const renderCustomTreeItem = useCallback(
     (props) => (
       <CustomTreeItem
         {...props}
+        type={props.type}
         key={props.itemId}
-        ref={itemRef}        
+        ref={itemRef}
+        onContextMenu={(event) => handleContextMenu(event, props)}
       />
     ),
     [itemRef]  
-  );
+  );*/
+  
 
   const handleItemExpansionToggle = (event, nodeId, expanded) => {
     setExpandedItems((prevExpanded) => {
@@ -349,47 +330,53 @@ export default function TechnologiesTree() {
   const handleSpeedDialActionClick = (action) => {
     switch(action.name) {
       case 'delete':
-       
-        /*for(const itemId of selectedItems) {
-          const itemById = apiRef.current?.getItem(itemId);
-          if (itemById.type == 'operation') {
-            //операция
-            const parent = selectedItems.includes(itemById.parentId);
-            if (!parent) {
-              //удаляем только операцию, не трогаем технологию
-              dispatch(setItems({ type: action.name, selectedItems: selectedItems }));
-            }
-          } else if (itemById.type == 'technology') {
-            //технология
-            dispatch(setItems({ type: action.name, selectedItems: selectedItems }));
-          }
-          
-        }*/
-        //dispatch(deleteSavedData(selectedItems));
         dispatch(deleteSelectedItems(selectedItems));
         break;
     }
+  };
 
-    
+  //контекстное меню
+  const handleContextMenu = (event, nodeId) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setSelectedNode(nodeId);
+    setContextMenu(
+      contextMenu === null
+        ? {
+            mouseX: event.clientX + 2,
+            mouseY: event.clientY - 6,
+          }
+        : null,
+    );
+  };
+
+  const handleContextMenuClose = () => {
+    setContextMenu(null);
+  };
+
+  const handleContextMenuItemRestore = (nodes) => {
+    dispatch(deleteDisabledItems(nodes));
+    handleContextMenuClose();
   };
   //
   return (
     <>
-    {console.log(selectedItems)}
+    {console.log(items)}
       <RichTreeView
+        checkboxSelection
+        multiSelect
         slots={{ item: renderCustomTreeItem }}
         items={items}
         expandedItems={expandedItems}
         onItemExpansionToggle={handleItemExpansionToggle}
         disabledItems={disabledItems}
         isItemDisabled={(item) => disabledItems.includes(item.id)}
-        expansionTrigger='iconContainer'
-        multiSelect
-        checkboxSelection
+        expansionTrigger='iconContainer'                
         apiRef={apiRef}
         selectedItems={selectedItems}
         onSelectedItemsChange={handleSelectedItemsChange}
         onItemSelectionToggle={handleItemSelectionToggle}
+        disabledItemsFocusable={true}        
       />                        
       <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.5, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
         {
@@ -433,6 +420,18 @@ export default function TechnologiesTree() {
             )
         }
       </Stack>
+      <Menu
+        open={contextMenu !== null}
+        onClose={handleContextMenuClose}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
+      >
+        <MenuItem onClick={() => handleContextMenuItemRestore(selectedNode)}>Отменить удаление</MenuItem>
+      </Menu>
     </>
   );
 }
