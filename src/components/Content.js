@@ -226,7 +226,7 @@ export default function Content() {
             <Typography component="span">Технологии и операции</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px' }}>
-            <Box sx={{ height: '100%' }}>
+            <Box sx={{ height: '100%'/*, display: 'flex', flexDirection: 'column', gap: 2*/ }}>
               <TechnologiesTree />
             </Box>              
           </AccordionDetails>

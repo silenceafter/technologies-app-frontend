@@ -9,7 +9,23 @@ const initialState = {
   disabledItems: [], /* помеченные на удаление */
   loading: LOADING_DEFAULT,
   error: null,
+  newItemCnt: 1,
+  //
+  searchedItems: [],
+  searchedLoading: false,
+  searchedError: null,
+  searchedHasMore: true,
+  search: '',
+  limit: 100,
+  page: 1,
 };
+
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 //загрузка технологий и операций по коду ДСЕ
 export const getSavedData = createAsyncThunk(
@@ -91,6 +107,23 @@ export const deleteSavedData = createAsyncThunk(
   }
 );
 
+//поиск технологии
+export const fetchData = createAsyncThunk(
+  'technologiesTree/fetchData',
+  async ({ search, limit, page }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`http://localhost/ivc/ogt/executescripts/gettechnologies.v2.php?search=${search}&&limit=${limit}&page=${page}`);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Network response was not ok');
+      }
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const technologiesSlice = createSlice({
   name: 'technologies',
   initialState,
@@ -119,21 +152,19 @@ const technologiesSlice = createSlice({
 
         default:
           return state;
-      }
-      /*return {
-        ...state,
-        items: state.items.map(item => ({
-          ...item,
-          children: item.children
-            ? item.children.filter(child => !action.payload.includes(child.id))
-            : []
-        }))
-      };*/           
+      }        
     },
     setSelectedItems: (state, action) => {
       return {
         ...state,
         selectedItems: action.payload
+      };
+    },
+    addItems: (state) => {
+      return {
+        ...state,
+        newItemCnt: state.newItemCnt + 1,
+        items: [...state.items, { id: generateUUID(), label: `Новая технология ${state.newItemCnt}`, secondaryLabel: 'Описание', children: [], parentId: null, type: 'technology' }]
       };
     },
     addSelectedItems: (state, action) => {
@@ -145,7 +176,80 @@ const technologiesSlice = createSlice({
       };
     },
     deleteSelectedItems: (state, action) => {
-      const selectedItemsData = state.items
+      const targetItemIds = Array.isArray(action.payload) ? action.payload : [action.payload];
+
+      // Функция для поиска всех потомков для заданного itemId
+      const findDescendants = (items, itemId, result = []) => {
+        for (const item of items) {
+          if (item.id === itemId) {
+            result.push(item.id); // Добавляем текущий элемент
+            if (item.children) {
+              item.children.forEach(child => result.push(child.id)); // Добавляем всех детей
+            }
+          } else if (item.children) {
+            // Рекурсивно ищем среди детей
+            findDescendants(item.children, itemId, result);
+          }
+        }
+        return result;
+      };
+    
+      // Функция для проверки, остались ли дети у родительского элемента
+      const hasRemainingChildren = (parentId, disabledItems) => {
+        const parent = state.items.find(item => item.id === parentId);
+        if (parent && parent.children) {
+          // Проверяем, есть ли у родителя хотя бы один ребенок, который не в disabledItems
+          return parent.children.some(child => !disabledItems.includes(child.id));
+        }
+        return false; // Если детей нет, или все они уже в disabledItems
+      };
+    
+      // Находим все id, которые нужно исключить (потомки и их родитель)
+      const itemsToDisable = targetItemIds.reduce((acc, itemId) => {
+        const descendants = findDescendants(state.items, itemId); // Находим потомков
+        return [...acc, ...descendants]; // Добавляем найденные id в аккумулятор
+      }, []);
+    
+      // Также проверяем, все ли дети родителя удалены
+      const parentsToDisable = targetItemIds.reduce((acc, itemId) => {
+        const parentId = state.items.find(item => item.children?.some(child => child.id === itemId))?.id;
+        if (parentId && !hasRemainingChildren(parentId, state.disabledItems)) {
+          // Если у родителя нет других детей, добавляем его в список на удаление
+          acc.push(parentId);
+        }
+        return acc;
+      }, []);
+    
+      // Объединяем ids для удаления: дочерние элементы + родительские элементы, если все дети удалены
+      const allItemsToDisable = [...itemsToDisable, ...parentsToDisable];
+    
+      // Важно: убираем их из selectedItems и добавляем в disabledItems
+      return {
+        ...state,
+        // Добавляем все элементы и их потомков в disabledItems
+        disabledItems: [...new Set([...state.disabledItems, ...allItemsToDisable])],
+    
+        // Очищаем selectedItems для указанных элементов и их потомков
+        selectedItems: state.selectedItems.filter(id => !allItemsToDisable.includes(id)),
+    
+        // Обновляем состояние selected для элементов и их детей
+        items: state.items.map(item => {
+          const isDisabled = allItemsToDisable.includes(item.id);
+          return {
+            ...item,
+            selected: isDisabled ? false : item.selected, // Снимаем selected
+            children: item.children
+              ? item.children.map(child => ({
+                  ...child,
+                  selected: isDisabled ? false : child.selected // Снимаем selected у детей
+                }))
+              : item.children
+          };
+        })
+      };
+    
+
+      /*const selectedItemsData = state.items
         .filter(item => action.payload.includes(item.id) || item.children?.some(child => action.payload.includes(child.id)))
         .map(item => ({
           ...item,
@@ -170,7 +274,7 @@ const technologiesSlice = createSlice({
               }))
             : item.children
         }))
-      };
+      };*/
     },
     setDisabledItems: (state, action) => {
       return {
@@ -178,15 +282,15 @@ const technologiesSlice = createSlice({
         disabledItems: action.payload
       };
     },
-    deleteDisabledItems: (state, action) => {
-      const targetItemId = action.payload;
+    restoreItems: (state, action) => {
+      const targetItemIds = Array.isArray(action.payload) ? action.payload : [action.payload]; //если передан один itemId, преобразуем его в массив
       let parentId = null;
       let foundItem = null;
 
       //поиск элемента и его родителя
       const findItemAndParent = (items, parent = null) => {
         for (const item of items) {
-          if (item.id === targetItemId) {
+          if (targetItemIds.includes(item.id)) {  //проверяем, что itemId есть в targetItemIds
             foundItem = item;
             parentId = parent ? parent.id : null;
             return;
@@ -198,7 +302,11 @@ const technologiesSlice = createSlice({
       };
 
       //запускаем поиск по всей структуре items
-      findItemAndParent(state.items);
+      targetItemIds.forEach(itemId => {
+        if (!foundItem) {
+          findItemAndParent(state.items); //ищем каждый itemId из payload
+        }
+      });
 
       //если элемент не найден — ничего не делаем
       if (!foundItem) return state;
@@ -207,17 +315,29 @@ const technologiesSlice = createSlice({
       const childrenIds = foundItem.children?.map(child => child.id) || [];
 
       //собираем все id, которые нужно восстановить (элемент + его дети + родитель, если есть)
-      const itemsToRestore = [targetItemId, ...childrenIds];
+      const itemsToRestore = [...targetItemIds, ...childrenIds];
       if (parentId) {
         itemsToRestore.push(parentId);
       }
-      //
+
       return {
         ...state,
         //убираем эти id из disabledItems
-        disabledItems: state.disabledItems.filter(itemId => !itemsToRestore.includes(itemId))
+        disabledItems: state.disabledItems.filter(itemId => !itemsToRestore.includes(itemId)),
       };
-    }            
+    },
+    setSearch: (state, action) => {
+      state.search = action.payload;
+      state.page = 1;
+      state.searchedItems = [];
+      state.searchedHasMore = true;
+    },
+    setLimit: (state, action) => {
+      state.limit = action.payload;      
+    },
+    setPage: (state, action) => {
+       state.page = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -235,19 +355,44 @@ const technologiesSlice = createSlice({
       .addCase(getSavedData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchData.pending, (state) => {
+        state.searchedLoading = true;
+        state.searchedError = null;
+      })
+      .addCase(fetchData.fulfilled, (state, action) => {
+        state.searchedLoading = false;
+        const newItems = action.payload.data.filter(newItem => 
+          !state.searchedItems.some(existingItem => {
+            return `${existingItem.code}-${existingItem.name}` === 
+                `${newItem.code}-${newItem.name}`;
+            })
+        );
+        //
+        state.searchedItems = [...state.searchedItems, ...newItems];//добавляем только новые данные к существующему списку
+        if (newItems.length < state.limit) {
+          state.searchedHasMore = false;//если меньше лимита, прекращаем подгрузку
+        }
+      })
+      .addCase(fetchData.rejected, (state, action) => {
+        state.searchedLoading = false;
+        state.searchedHasMore = false;
+        state.searchedError = action.payload;
       });                    
   },
 });
 
 export const { 
-  clearItems, setItems, 
+  clearItems, setItems, addItems,
   setSelectedItems, addSelectedItems, deleteSelectedItems,
-  setDisabledItems, deleteDisabledItems
+  setDisabledItems, restoreItems,
+  setSearch, setLimit, setPage
 } = technologiesSlice.actions;
 
 //селекторы
 export const selectItems = (state) => state.technologies.items || [];
 export const selectSelectedItems = (state) => state.technologies.selectedItems || [];
+export const selectSearchedItems = (state) => state.technologies.searchedItems || [];
 export const selectLoading = (state) => state.technologies.loading;
 export const selectError = (state) => state.header.error;
 

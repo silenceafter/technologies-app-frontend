@@ -19,7 +19,7 @@ import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
 import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { TreeItem2LabelInput } from '@mui/x-tree-view/TreeItem2LabelInput';
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
-import { fetchData, setItems, setSelectedItems, addSelectedItems, deleteSelectedItems, setDisabledItems, deleteDisabledItems, deleteSavedData} from '../store/slices/technologiesSlice';
+import { fetchData, setItems, addItems, setSelectedItems, addSelectedItems, deleteSelectedItems, setDisabledItems, restoreItems, deleteSavedData} from '../store/slices/technologiesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import Card from '@mui/material/Card';
@@ -39,15 +39,26 @@ import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
+import RestoreIcon from '@mui/icons-material/Restore';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Autocomplete from '@mui/material/Autocomplete';
+import { TechnologySearch } from './TechnologySearch';
+import Divider from '@mui/material/Divider';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 //действия для SpeedDial
 const actions = [
   { icon: <AddIcon />, name: 'add-technology', title: 'Добавить технологию' },
   { icon: <DeleteIcon />, name: 'delete', title: 'Удалить' },
-  { icon: <RestoreFromTrashIcon />, name: 'restore', title: 'Отменить удаление всех элементов' }
+  { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление всех элементов' }
 ];
 
 //добавить кастомный класс и кастомное свойство элементу Box
@@ -77,7 +88,8 @@ export default function TechnologiesTree() {
   const [technologyChip, setTechnologyChip] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
-    
+  const [editedItems, setEditedItems] = useState([]);  
+
   //селекторы
   const dispatch = useDispatch();
   const items = useSelector((state) => state.technologies.items);
@@ -157,6 +169,7 @@ export default function TechnologiesTree() {
 
     //стейты
     const [isProcessing, setIsProcessing] = useState(false);
+    const [edited, setEdited] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [disabled, setDisabled] = useState(false);
@@ -177,6 +190,10 @@ export default function TechnologiesTree() {
     useEffect(() => {
       setSelected(selectedItems.includes(props.itemId));
     }, [selectedItems, props.itemId]);
+
+    useEffect(() => {
+      setEdited(editedItems.includes(props.itemId));
+    }, [editedItems, props.itemId]);
     
     //expanded
     const handleRootClick = (e) => {
@@ -200,8 +217,8 @@ export default function TechnologiesTree() {
     const classes = useStyles({ itemType: item.type});
     //дополнительный код
     const additionalItem = (
-      <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center'}}>
-          <span>{props.label}</span>
+      <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center', width: '100%'}} /*onDoubleClick={handleDoubleClick}*/>
+        <span>{props.label}</span>
       </Box>
     );
     //
@@ -215,7 +232,7 @@ export default function TechnologiesTree() {
         }}
         slotProps={{
           label: { 
-            secondaryLabel: item?.secondaryLabel || ''
+            secondaryLabel: item?.secondaryLabel || '',
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
@@ -258,19 +275,6 @@ export default function TechnologiesTree() {
     },
     [itemRef]
   );
-  /*const renderCustomTreeItem = useCallback(
-    (props) => (
-      <CustomTreeItem
-        {...props}
-        type={props.type}
-        key={props.itemId}
-        ref={itemRef}
-        onContextMenu={(event) => handleContextMenu(event, props)}
-      />
-    ),
-    [itemRef]
-  );*/
-  
 
   const handleItemExpansionToggle = (event, nodeId, expanded) => {
     setExpandedItems((prevExpanded) => {
@@ -332,6 +336,18 @@ export default function TechnologiesTree() {
       case 'delete':
         dispatch(deleteSelectedItems(selectedItems));
         break;
+
+      case 'restoreAll':
+        const parentItemIds = items
+          .filter(item => item.children && item.children.length > 0)
+          .map(item => item.id);
+        handleContextMenuItemRestore(disabledItems);
+        break;
+
+      case 'add-technology':
+        //handleClickOpen();
+        dispatch(addItems());
+        break;
     }
   };
 
@@ -355,13 +371,37 @@ export default function TechnologiesTree() {
   };
 
   const handleContextMenuItemRestore = (nodes) => {
-    dispatch(deleteDisabledItems(nodes));
+    dispatch(restoreItems(nodes));
     handleContextMenuClose();
   };
+
+  const handleContextMenuItemDelete = (node) => {
+    dispatch(deleteSelectedItems(node));
+    handleContextMenuClose();
+  };
+
+  const handleContextMenuItemRename = (node) => {
+    setEditedItems(
+      [...editedItems, node]
+    );
+    handleContextMenuClose();
+  }
+
+  //добавить технологию
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   //
   return (
     <>
-    {console.log(selectedItems)}
+    {console.log(editedItems)}
       <RichTreeView
         checkboxSelection
         multiSelect
@@ -378,7 +418,7 @@ export default function TechnologiesTree() {
         onItemSelectionToggle={handleItemSelectionToggle}
         disabledItemsFocusable={true}        
       />                        
-      <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.5, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
+      <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
         {
           drawingExternalCode.trim() != ''
             ? (
@@ -430,10 +470,46 @@ export default function TechnologiesTree() {
             : undefined
         }
       >
-        {disabledItems.includes(selectedNode) && (
-          <MenuItem onClick={() => handleContextMenuItemRestore(selectedNode)}>Отменить удаление</MenuItem>
-        )}        
+        <MenuItem onClick={() => handleContextMenuItemRestore(selectedNode)}>Отменить удаление</MenuItem>
+        <MenuItem onClick={() => handleContextMenuItemDelete(selectedNode)}>Удалить</MenuItem>
+        <MenuItem onClick={() => handleContextMenuItemRename(selectedNode)}>Переименовать</MenuItem>
       </Menu>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        slotProps={{
+          paper: {
+            component: 'form',
+            onSubmit: (event) => {
+              event.preventDefault();
+              const formData = new FormData(event.currentTarget);
+              const formJson = Object.fromEntries(formData.entries());
+              const email = formJson.email;
+              console.log(email);
+              handleClose();
+            },
+          },
+        }}        
+      >
+        <DialogTitle>Новая технология</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Выберите технологию из списка
+          </DialogContentText>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 2, width: '500px' }}>
+            <TechnologySearch
+              props={{id: "operation-code-2", placeholder: "Код операции"}}
+              id="operationCode" /*onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
+              selectedValue={localData.formValues.operationCode} 
+              errorValue={localData.formErrors.operationCode}*/
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Отмена</Button>
+          <Button type="submit">Подтвердить</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
