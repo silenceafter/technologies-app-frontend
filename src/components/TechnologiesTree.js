@@ -252,11 +252,11 @@ export default function TechnologiesTree() {
           {...props}
           key={props.itemId}
           ref={itemRef}
-          onContextMenu={(event) => handleContextMenu(event, props)}
+          onContextMenu={(event) => handleContextMenu(event, props.itemId)}
         />
       );
     },
-    [itemRef]  
+    [itemRef]
   );
   /*const renderCustomTreeItem = useCallback(
     (props) => (
@@ -268,7 +268,7 @@ export default function TechnologiesTree() {
         onContextMenu={(event) => handleContextMenu(event, props)}
       />
     ),
-    [itemRef]  
+    [itemRef]
   );*/
   
 
@@ -361,7 +361,7 @@ export default function TechnologiesTree() {
   //
   return (
     <>
-    {console.log(items)}
+    {console.log(selectedItems)}
       <RichTreeView
         checkboxSelection
         multiSelect
@@ -430,7 +430,9 @@ export default function TechnologiesTree() {
             : undefined
         }
       >
-        <MenuItem onClick={() => handleContextMenuItemRestore(selectedNode)}>Отменить удаление</MenuItem>
+        {disabledItems.includes(selectedNode) && (
+          <MenuItem onClick={() => handleContextMenuItemRestore(selectedNode)}>Отменить удаление</MenuItem>
+        )}        
       </Menu>
     </>
   );

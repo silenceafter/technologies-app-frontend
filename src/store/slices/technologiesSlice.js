@@ -179,42 +179,45 @@ const technologiesSlice = createSlice({
       };
     },
     deleteDisabledItems: (state, action) => {
-      const targetItemId = action.payload.itemId; // Получаем id из action.payload
-      const childrenItemIds = Array.isArray(action.payload.children)
-        ? action.payload.children.map(child => child.itemId) 
-        : []; // Проверяем, является ли children массивом и извлекаем id из каждого ребенка
-    
-      const itemsToRemove = [targetItemId, ...childrenItemIds]; // Собираем все id, которые нужно удалить
-    
+      const targetItemId = action.payload;
+      let parentId = null;
+      let foundItem = null;
+
+      //поиск элемента и его родителя
+      const findItemAndParent = (items, parent = null) => {
+        for (const item of items) {
+          if (item.id === targetItemId) {
+            foundItem = item;
+            parentId = parent ? parent.id : null;
+            return;
+          }
+          if (item.children) {
+            findItemAndParent(item.children, item);
+          }
+        }
+      };
+
+      //запускаем поиск по всей структуре items
+      findItemAndParent(state.items);
+
+      //если элемент не найден — ничего не делаем
+      if (!foundItem) return state;
+
+      //получаем id всех детей, если это родительский элемент
+      const childrenIds = foundItem.children?.map(child => child.id) || [];
+
+      //собираем все id, которые нужно восстановить (элемент + его дети + родитель, если есть)
+      const itemsToRestore = [targetItemId, ...childrenIds];
+      if (parentId) {
+        itemsToRestore.push(parentId);
+      }
+      //
       return {
         ...state,
-        disabledItems: state.disabledItems.filter(itemId => !itemsToRemove.includes(itemId)), // Убираем все найденные id
-        items: state.items.map(item => {
-          if (item.id === targetItemId) {
-            // Если найден основной элемент, снимаем selected у него и у всех детей
-            return {
-              ...item,
-              selected: false,
-              children: item.children
-                ? item.children.map(child => ({ ...child, selected: false })) // Снимаем selected у детей
-                : item.children
-            };
-          }
-    
-          // Для всех других элементов проверяем детей
-          return {
-            ...item,
-            children: item.children
-              ? item.children.map(child =>
-                  child.id === targetItemId
-                    ? { ...child, selected: false } // Если это выбранный дочерний элемент, снимаем selected
-                    : child
-                )
-              : item.children
-          };
-        })
+        //убираем эти id из disabledItems
+        disabledItems: state.disabledItems.filter(itemId => !itemsToRestore.includes(itemId))
       };
-    }        
+    }            
   },
   extraReducers: (builder) => {
     builder
