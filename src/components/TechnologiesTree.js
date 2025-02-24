@@ -105,12 +105,25 @@ export default function TechnologiesTree() {
   const toggledItemRef = React.useRef({});
   const apiRef = useTreeViewApiRef();
 
+  const StyledLabelInput = styled('input')(({ theme }) => ({
+    ...theme.typography.body1,
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: theme.shape.borderRadius,
+    border: 'none',
+    padding: '0 2px',
+    boxSizing: 'border-box',
+    width: 100,
+    '&:focus': {
+      outline: `1px solid ${theme.palette.primary.main}`,
+    },
+  }));
+
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
     [`& .${treeItemClasses.content}`]: {
       borderRadius: theme.spacing(0.5),
       padding: theme.spacing(0.5, 1),
-      margin: theme.spacing(0.2, 0),
+      margin: theme.spacing(0.2, 0),  
       [`& .${treeItemClasses.label}`]: {
         fontSize: '0.8rem',
         fontWeight: 500,
@@ -144,16 +157,90 @@ export default function TechnologiesTree() {
     })
   }));
   
-  function CustomLabel({ children, className, secondaryLabel }) {    
+  /*function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick }) {    
     return (
       <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
         <div>
-          <Typography>{children}</Typography>
+          <Typography onClick={(e) => { e.stopPropagation(); onLabelClick?.(e); }}>{children}</Typography>
           {secondaryLabel && (
-            <Typography variant="caption" color="secondary">
+            <Typography variant="caption" color="secondary" onClick={(e) => { e.stopPropagation(); onSecondaryLabelClick?.(e); }}>
               {secondaryLabel}
             </Typography>
           )}
+        </div>
+      </div>
+    );
+  }*/
+
+  function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel }) {
+    const [isEditing, setIsEditing] = useState(edited);
+    const [value, setValue] = useState(customLabel);
+
+    //обновляем isEditing
+    useEffect(() => {
+      setIsEditing(edited);
+    }, [edited]);
+    //
+    return (
+      <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        <div style={{ width: '100%' }}>
+          {isEditing ? (
+            <>
+              <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                <TechnologySearch 
+                  props={{id: "operation-code-2", placeholder: "Код операции"}}
+                  id="operationCode">
+                </TechnologySearch>
+                <IconButton
+                  color="success"
+                  size="small"
+                  /*onClick={(event) => {
+                    handleSaveItemLabel(event, `${nameValue.firstName} ${nameValue.lastName}`);
+                    save();
+                  }}*/
+                >
+                  <CheckIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={(event) => {
+                    setIsEditing(false);
+                  }}
+                >
+                  <CloseRoundedIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </>
+          ) : (
+            <Typography 
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                /*setIsEditing(true);*/                
+                onLabelClick?.(e); 
+              }}
+            >
+              {value}
+            </Typography>
+          )}                    
+          {secondaryLabel && (
+            <div>
+              {isEditing ? (
+                <Typography />
+              ) : (
+                <Typography 
+                  variant="caption" 
+                  color="secondary" 
+                  onClick={(e) => { 
+                    e.stopPropagation();
+                    onSecondaryLabelClick?.(e); 
+                  }}
+                >
+                  {secondaryLabel}
+                </Typography>
+              )}
+            </div>
+          )}          
         </div>
       </div>
     );
@@ -194,7 +281,7 @@ export default function TechnologiesTree() {
     useEffect(() => {
       setEdited(editedItems.includes(props.itemId));
     }, [editedItems, props.itemId]);
-    
+
     //expanded
     const handleRootClick = (e) => {
       //записать выбранную технологию
@@ -233,6 +320,10 @@ export default function TechnologiesTree() {
         slotProps={{
           label: { 
             secondaryLabel: item?.secondaryLabel || '',
+            edited: edited,
+            onLabelClick: (e) => <TextField>111</TextField>,
+            onSecondaryLabelClick: (e) => console.log(item?.type),
+            customLabel: item?.label || ''
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
@@ -273,7 +364,7 @@ export default function TechnologiesTree() {
         />
       );
     },
-    [itemRef]
+    [itemRef, editedItems]
   );
 
   const handleItemExpansionToggle = (event, nodeId, expanded) => {
@@ -381,9 +472,14 @@ export default function TechnologiesTree() {
   };
 
   const handleContextMenuItemRename = (node) => {
-    setEditedItems(
-      [...editedItems, node]
-    );
+    if (!editedItems.includes(node)) {
+      setEditedItems(prev => {
+        if (!prev.includes(node)) {
+          return [...prev, node];
+        }
+        return prev;
+      });  
+    }
     handleContextMenuClose();
   }
 
@@ -416,7 +512,7 @@ export default function TechnologiesTree() {
         selectedItems={selectedItems}
         onSelectedItemsChange={handleSelectedItemsChange}
         onItemSelectionToggle={handleItemSelectionToggle}
-        disabledItemsFocusable={true}        
+        disabledItemsFocusable={true}
       />                        
       <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
         {

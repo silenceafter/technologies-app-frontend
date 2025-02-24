@@ -41,6 +41,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import { OperationCard } from './OperationCard';
+import CloseIcon from "@mui/icons-material/Close";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -136,14 +137,50 @@ export default function Content() {
     }
   }, [drawingExternalCode]);
  
-  const addTab = () => {
+  const handleAddTab = () => {
+    const maxId = Math.max(...tabs.map((tab) => tab.id), 0);
     const newTab = {
-      id: tabs.length + 1,
-      label: `Новая операция ${tabs.length + 1}`,
-      content: { formValues: { orderNumber: tabs.length + 1 }, formErrors: {}, expandedPanels: expandedPanelsDefault }
+      id: maxId + 1,
+      label: `Новая операция ${maxId + 1}`,
+      content: {
+        formValues: { orderNumber: maxId + 1 },
+        formErrors: {},
+        expandedPanels: expandedPanelsDefault,
+      },
     };
-    setTabs([...tabs, newTab]);
+    //
+    setTabs((prevTabs) => [...prevTabs, newTab]);
     setTabValue(tabs.length);
+  };
+
+  const handleCloseTab = (tabId) => {
+    setTabs((prevTabs) => {
+      const tabIndex = prevTabs.findIndex((tab) => tab.id === tabId);
+      const newTabs = prevTabs.filter((tab) => tab.id !== tabId);
+      //
+      if (tabValue === tabIndex) {
+        //закрытая вкладка была активной
+        const newActiveIndex = tabIndex > 0 ? tabIndex - 1 : 0; //берем предыдущую вкладку, если есть
+        setTabValue(newTabs.length > 0 ? newActiveIndex : null);
+      } else if (tabValue > tabIndex) {
+        //если закрыли вкладку перед активной, уменьшаем tabValue
+        setTabValue((prev) => Math.max(prev - 1, 0));
+      }  
+      return newTabs;
+    });
+  };
+
+  const handleTabMouseUp = (event, tabId) => {
+    if (event.button === 1) {
+      handleCloseTab(tabId);
+    }
+  };
+
+  const handleTabWheelCapture = (event, tabId) => {
+    if (event.button === 1) {
+      event.preventDefault();  // Блокируем стандартное поведение
+      handleCloseTab(tabId);   // Закрываем вкладку
+    }
   };
 
   //отправка
@@ -198,10 +235,12 @@ export default function Content() {
   const [expanded, setExpanded] = useState('panel1');
   const handleAccordeonChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
-  }
+  }  
   //
   return (
     <>
+    {console.log(tabs)}
+    {console.log(`tabsValue: ${tabValue}`)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -297,11 +336,29 @@ export default function Content() {
                   sx={{ maxWidth: '100%', overflow: 'hidden'}}
                 >
                   {tabs.map((tab, index) => (
-                    <Tab key={tab.id} label={tab.label} />
+                    <Tab 
+                      key={tab.id} 
+                      label={
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          {tab.label}
+                          <IconButton
+                            size="small"
+                            sx={{ marginLeft: 1 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCloseTab(tab.id);
+                            }}
+                          >
+                            <CloseIcon fontSize="small" sx={{color: 'white'}}/>
+                          </IconButton>
+                        </Box>                      
+                      }
+                      /*onMouseUp={(e) => handleTabMouseUp(e, tab.id)}*/
+                    />
                   ))}                
                 </Tabs>
                 <IconButton 
-                  onClick={addTab}
+                  onClick={handleAddTab}
                   size="small" 
                   sx={{ 
                     ml: 1, 
@@ -317,23 +374,15 @@ export default function Content() {
               overflowY: 'auto'
             }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                {/*tabs.map((tab, index) => (
-                  <TabPanel key={tab.id} value={tabValue} index={index}>
-                    <OperationCard operationNumber={tab.id} />
+                {tabs.length > 0 && tabs[tabValue] ? (
+                  <TabPanel key={tabs[tabValue].id} value={tabValue} index={tabValue}>
+                    <OperationCard
+                      content={tabs[tabValue]?.content} 
+                      onUpdate={(newData) => updateTabContent(tabs[tabValue]?.id, newData)}
+                      setValidateForm={setValidateForm}                        
+                    />
                   </TabPanel>
-                ))*/} {/* index + 1 */}
-                {
-                  tabs.map((tab, index) => (
-                    <TabPanel key={tab.id} value={tabValue} index={index}>
-                      <OperationCard
-                        /*orderNumber={tab.id}*/
-                        content={tabs[tabValue].content}
-                        onUpdate={(newData) => updateTabContent(tabs[tabValue].id, newData)}
-                        setValidateForm={setValidateForm}                        
-                      />
-                    </TabPanel>
-                  ))
-                }
+                ) : null}
                 
 
 

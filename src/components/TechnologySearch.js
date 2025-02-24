@@ -142,6 +142,7 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
             ))
           }
           sx={{
+              width: '100%',
               '& .MuiAutocomplete-listbox': {
               backgroundColor: '#fff',
               boxShadow: 2
