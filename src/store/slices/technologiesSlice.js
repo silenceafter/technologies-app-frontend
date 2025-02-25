@@ -10,6 +10,7 @@ const initialState = {
   loading: LOADING_DEFAULT,
   error: null,
   newItemCnt: 1,
+  developer: 'Пинаев Александр Алексеевич', /* null */
   //
   searchedItems: [],
   searchedLoading: false,

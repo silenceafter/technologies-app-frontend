@@ -88,7 +88,8 @@ export default function TechnologiesTree() {
   const [technologyChip, setTechnologyChip] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
-  const [editedItems, setEditedItems] = useState([]);  
+  const [editedItems, setEditedItems] = useState([]);
+  const [developedTechnologies, setDevelopedTechnologies] = useState([]);
 
   //селекторы
   const dispatch = useDispatch();
@@ -183,7 +184,7 @@ export default function TechnologiesTree() {
     //
     return (
       <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%' }}>        
           {isEditing ? (
             <>
               <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
@@ -212,7 +213,7 @@ export default function TechnologiesTree() {
                 </IconButton>
               </Box>
             </>
-          ) : (
+          ) : (<><Box sx={{display: 'flex', flexDirection: 'row'}}>
             <Typography 
               onClick={(e) => { 
                 e.stopPropagation(); 
@@ -222,6 +223,9 @@ export default function TechnologiesTree() {
             >
               {value}
             </Typography>
+            <TreeItem2IconContainer sx={{ width: '50%', display: 'flex', justifyContent: 'flex-end', bgcolor: 'yellow' }}>
+            <CheckIcon color="success" />
+          </TreeItem2IconContainer></Box></>
           )}                    
           {secondaryLabel && (
             <div>
@@ -344,7 +348,7 @@ export default function TechnologiesTree() {
           >
             <CircularProgress size={40} />
           </Box>
-        ) : (          
+        ) : (                
           props.children                             
         )}
       </StyledTreeItem2>
@@ -412,6 +416,12 @@ export default function TechnologiesTree() {
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
   }, [items]);
+
+  //на данный момент считаем, что все технологии наши
+  useEffect(() => {
+    const allItemIds = items.map(item => item.id);
+    setDevelopedTechnologies(allItemIds);
+  }, items);
 
   //chip для выбранной технологии
   const handleDelete = () => {
@@ -497,7 +507,7 @@ export default function TechnologiesTree() {
   //
   return (
     <>
-    {console.log(editedItems)}
+    {console.log(developedTechnologies)}
       <RichTreeView
         checkboxSelection
         multiSelect
