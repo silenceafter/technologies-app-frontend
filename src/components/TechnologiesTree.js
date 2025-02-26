@@ -53,6 +53,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
 //действия для SpeedDial
 const actions = [
@@ -173,7 +174,7 @@ export default function TechnologiesTree() {
     );
   }*/
 
-  function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel }) {
+  function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel, type }) {
     const [isEditing, setIsEditing] = useState(edited);
     const [value, setValue] = useState(customLabel);
 
@@ -184,7 +185,7 @@ export default function TechnologiesTree() {
     //
     return (
       <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-        <div style={{ width: '100%' }}>        
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {isEditing ? (
             <>
               <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
@@ -213,7 +214,7 @@ export default function TechnologiesTree() {
                 </IconButton>
               </Box>
             </>
-          ) : (<><Box sx={{display: 'flex', flexDirection: 'row'}}>
+          ) : (
             <Typography 
               onClick={(e) => { 
                 e.stopPropagation(); 
@@ -223,16 +224,13 @@ export default function TechnologiesTree() {
             >
               {value}
             </Typography>
-            <TreeItem2IconContainer sx={{ width: '50%', display: 'flex', justifyContent: 'flex-end', bgcolor: 'yellow' }}>
-            <CheckIcon color="success" />
-          </TreeItem2IconContainer></Box></>
           )}                    
           {secondaryLabel && (
             <div>
               {isEditing ? (
                 <Typography />
               ) : (
-                <Typography 
+                <Typography
                   variant="caption" 
                   color="secondary" 
                   onClick={(e) => { 
@@ -244,6 +242,13 @@ export default function TechnologiesTree() {
                 </Typography>
               )}
             </div>
+          )}          
+        </div>
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
+          {type == 'technology' && (
+            <TreeItem2IconContainer>
+              <EditOutlinedIcon color="success" />
+            </TreeItem2IconContainer>
           )}          
         </div>
       </div>
@@ -327,7 +332,8 @@ export default function TechnologiesTree() {
             edited: edited,
             onLabelClick: (e) => <TextField>111</TextField>,
             onSecondaryLabelClick: (e) => console.log(item?.type),
-            customLabel: item?.label || ''
+            customLabel: item?.label || '',
+            type: item?.type,
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
