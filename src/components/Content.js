@@ -93,8 +93,6 @@ export default function Content() {
       )
     );
   };
-
-  const operationItems = useSelector((state) => state.operations.items);
   
   //стейт вкладок/карточек
   useEffect(() => {
@@ -146,7 +144,7 @@ export default function Content() {
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
-  }, [technologiesLoading, technologiesItems, operationItems]);
+  }, [technologiesLoading, technologiesItems]);
   
 
   //очистить стейт вкладок/карточек
@@ -310,7 +308,7 @@ export default function Content() {
           </AccordionSummary>
           <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px' }}>
             <Box sx={{ height: 'auto' }}>
-              <ProductsTree />
+              {/*<ProductsTree />*/}
             </Box>
           </AccordionDetails>          
         </Accordion>
@@ -394,11 +392,11 @@ export default function Content() {
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 {tabs.length > 0 && tabs[tabValue] ? (
                   <TabPanel key={tabs[tabValue].id} value={tabValue} index={tabValue}>
-                    <OperationCard
+                    {/*<OperationCard
                       content={tabs[tabValue]?.content} 
                       onUpdate={(newData) => updateTabContent(tabs[tabValue]?.id, newData)}
                       setValidateForm={setValidateForm}                        
-                    />
+                    />*/}
                   </TabPanel>
                 ) : null}
                 

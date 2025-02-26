@@ -88,7 +88,7 @@ export default function TechnologiesTree() {
   const [expandedItems, setExpandedItems] = useState([]);
   //const [disabledItems, setDisabledItems] = useState([]);
   //const [selectedItems, setSelectedItems] = useState([]);
-  const [technologyChip, setTechnologyChip] = useState(null);
+  //const [technologyChip, setTechnologyChip] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
   const [editedItems, setEditedItems] = useState([]);
@@ -109,19 +109,6 @@ export default function TechnologiesTree() {
   const itemRef = useRef(null);
   const toggledItemRef = React.useRef({});
   const apiRef = useTreeViewApiRef();
-
-  const StyledLabelInput = styled('input')(({ theme }) => ({
-    ...theme.typography.body1,
-    backgroundColor: theme.palette.background.paper,
-    borderRadius: theme.shape.borderRadius,
-    border: 'none',
-    padding: '0 2px',
-    boxSizing: 'border-box',
-    width: 100,
-    '&:focus': {
-      outline: `1px solid ${theme.palette.primary.main}`,
-    },
-  }));
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -182,9 +169,9 @@ export default function TechnologiesTree() {
     const [value, setValue] = useState(customLabel);
 
     //обновляем isEditing
-    useEffect(() => {
+    /*useEffect(() => {
       setIsEditing(edited);
-    }, [edited]);
+    }, [edited]);*/
     //
     return (
       <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }} ref={labelRef}>
@@ -247,13 +234,13 @@ export default function TechnologiesTree() {
             </div>
           )}          
         </div>
-        <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
+        {<div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
           {type == 'technology' && (
             <TreeItem2IconContainer>
               <EditOutlinedIcon color="success" />
             </TreeItem2IconContainer>
           )}          
-        </div>
+        </div>}
       </div>
     );
   }
@@ -282,19 +269,10 @@ export default function TechnologiesTree() {
     //эффекты
     useEffect(() => {
       setExpanded(expandedItems.includes(props.itemId));
-    }, [expandedItems, props.itemId]);
-
-    useEffect(() => {
       setDisabled(disabledItems.includes(props.itemId));
-    }, [disabledItems, props.itemId]);
-
-    useEffect(() => {
       setSelected(selectedItems.includes(props.itemId));
-    }, [selectedItems, props.itemId]);
-
-    useEffect(() => {
       setEdited(editedItems.includes(props.itemId));
-    }, [editedItems, props.itemId]);
+    }, [expandedItems, disabledItems, selectedItems, editedItems, props.itemId]);
 
     //expanded
     const handleRootClick = (e) => {
@@ -310,9 +288,9 @@ export default function TechnologiesTree() {
       }
 
       //popover
-      if (labelRef.current) {
+      /*if (labelRef.current) {
         setAnchorPopover(labelRef.current);
-      }      
+      }*/     
     };
   
     const handleChildClick = (e) => {
@@ -320,9 +298,9 @@ export default function TechnologiesTree() {
       e.stopPropagation();
       
       //popover
-      if (labelRef.current) {
+      /*if (labelRef.current) {
         setAnchorPopover(labelRef.current);
-      }
+      }*/
     };
 
     const handlePopoverClose = () => {
@@ -378,7 +356,7 @@ export default function TechnologiesTree() {
           props.children                             
         )}
       </StyledTreeItem2>
-      <Popover
+      {/*<Popover
         open={Boolean(anchorPopover)}
         anchorEl={anchorPopover}
         onClose={handlePopoverClose}
@@ -395,7 +373,7 @@ export default function TechnologiesTree() {
           <Typography gutterBottom variant="body1"><strong>Дата создания:</strong> дд.мм.гггг чч:мм:сс</Typography>
           <Typography gutterBottom variant="body1"><strong>Последнее изменение:</strong> дд.мм.гггг чч:мм:сс</Typography>
         </Paper>
-      </Popover>
+      </Popover>*/}
       </>
     );
   });
@@ -415,7 +393,7 @@ export default function TechnologiesTree() {
     [itemRef, editedItems]
   );
 
-  const handleItemExpansionToggle = (event, nodeId, expanded) => {
+  const handleItemExpansionToggle = useCallback((event, nodeId, expanded) => {
     setExpandedItems((prevExpanded) => {
       if (expanded) {
         return [...prevExpanded, nodeId];
@@ -423,13 +401,13 @@ export default function TechnologiesTree() {
         return prevExpanded.filter((id) => id !== nodeId)
       }
     });
-  };
+  }, [setExpandedItems]);
 
-  const handleItemSelectionToggle = (event, itemId, isSelected) => {
+  const handleItemSelectionToggle = useCallback((event, itemId, isSelected) => {
     toggledItemRef.current[itemId] = isSelected;
-  };
+  }, []);
 
-  const handleSelectedItemsChange = (event, newSelectedItems) => {
+  const handleSelectedItemsChange = useCallback((event, newSelectedItems) => {
     dispatch(setSelectedItems(newSelectedItems));//setSelectedItems(newSelectedItems);
     const itemsToSelect = [];
     const itemsToUnSelect = {};
@@ -453,7 +431,7 @@ export default function TechnologiesTree() {
     );
     dispatch(setSelectedItems(newSelectedItemsWithChildren));//setSelectedItems(newSelectedItemsWithChildren);
     toggledItemRef.current = {};
-  };
+  }, [apiRef, dispatch, getItemDescendantsIds]);
 
   useEffect(() => {
     //для expandedItems
@@ -469,14 +447,18 @@ export default function TechnologiesTree() {
 
   //chip для выбранной технологии
   const handleDelete = () => {
-    setTechnologyChip(null);
+    //setTechnologyChip(null);
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     setTechnologyChip(`${technologySelector.name}: ${technologySelector.code}`);
+  }, [technologySelector]);*/
+
+  const technologyChip = useMemo(() => {
+    return `${technologySelector.name}: ${technologySelector.code}`;
   }, [technologySelector]);
 
-  const handleSpeedDialActionClick = (action) => {
+  const handleSpeedDialActionClick = useCallback((action) => {
     switch(action.name) {
       case 'delete':
         dispatch(deleteSelectedItems(selectedItems));
@@ -494,7 +476,7 @@ export default function TechnologiesTree() {
         dispatch(addItems());
         break;
     }
-  };
+  }, [selectedItems, disabledItems]);
 
   //контекстное меню
   const handleContextMenu = (event, nodeId) => {
@@ -547,10 +529,18 @@ export default function TechnologiesTree() {
   const handleClose = () => {
     setOpen(false);
   };
+  
+  //вывод
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
   //
   return (
     <>
-    {console.log(developedTechnologies)}
       <RichTreeView
         checkboxSelection
         multiSelect

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { 
     AppBar,
@@ -36,11 +36,12 @@ function HeaderSearch(props) {
 
   //запросы для прокрутки списка
   const { items, loading, error, hasMore } = useSelector((state) => state.header);
+  const memoizedItems = useMemo(() => items, [items]);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
-  }, 1); //задержка в 500 мс
+  }, 500); //задержка в 500 мс
 
   useEffect(() => {
     //загрузка данных при пустом поисковом запросе
@@ -74,7 +75,7 @@ function HeaderSearch(props) {
   //
   return (
     <>
-        <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0, paddingBottom: '0.5rem' }}>
+      <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0, paddingBottom: '0.5rem' }}>
         <Toolbar>
           <Grid container spacing={2} sx={{ alignItems: 'center' }}>
             <Grid item>
@@ -82,7 +83,11 @@ function HeaderSearch(props) {
             </Grid>
             <Grid item xs>
               <Autocomplete
-                options={items || []}
+                disableListWrap                
+                autoComplete={false}
+                autoHighlight={false}
+                freeSolo={false}
+                options={memoizedItems || []}
                 getOptionLabel={(option) => option.external_code || option.label}
                 filterOptions={(options, state) => {
                   const { inputValue } = state;

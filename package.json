@@ -10,6 +10,7 @@
     "@mui/material": "^6.1.0",
     "@mui/styles": "^6.4.1",
     "@mui/x-tree-view": "^7.17.0",
+    "@react-spring/web": "^9.7.5",
     "@reduxjs/toolkit": "^2.2.7",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
