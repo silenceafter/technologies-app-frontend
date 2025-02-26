@@ -42,6 +42,7 @@ import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import { OperationCard } from './OperationCard';
 import CloseIcon from "@mui/icons-material/Close";
+import { fetchData } from '../store/slices/operationsSlice';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -92,6 +93,8 @@ export default function Content() {
       )
     );
   };
+
+  const operationItems = useSelector((state) => state.operations.items);
   
   //стейт вкладок/карточек
   useEffect(() => {
@@ -109,6 +112,23 @@ export default function Content() {
                 content: {
                   formValues: {
                     orderNumber: operation.orderNumber,
+                    operationDescription: operation.operationDescription,
+                    shopNumber: operation.shopNumber,
+                    areaNumber: operation.areaNumber,
+                    document: operation.document,
+                    grade: operation.grade,
+                    workingConditions: operation.workingConditions,
+                    numberOfWorkers: operation.numberOfWorkers,
+                    numberOfProcessedParts: operation.numberOfProcessedParts,
+                    laborEffort: operation.laborEffort,
+                    jobCode: {code: operation.jobCode, name: operation.jobName},
+                    operationCode: {code: operation.label, name: operation.secondaryLabel}, /*operationItems.find(
+                          (option) => option.code === operation.label && option.name === operation.secondaryLabel)*/
+                    /*equipment: [{}],
+                    components: [{}],
+                    materials: [{}],
+                    tooling: [{}],
+                    measuringTools: [{}]*/
                   },
                   formErrors: existingTab?.content?.formErrors || {},
                   expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault,
@@ -126,7 +146,7 @@ export default function Content() {
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
-  }, [technologiesLoading, technologiesItems]);
+  }, [technologiesLoading, technologiesItems, operationItems]);
   
 
   //очистить стейт вкладок/карточек
@@ -238,9 +258,7 @@ export default function Content() {
   }  
   //
   return (
-    <>
-    {console.log(tabs)}
-    {console.log(`tabsValue: ${tabValue}`)}
+    <>    
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

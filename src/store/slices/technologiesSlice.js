@@ -53,6 +53,18 @@ export const getSavedData = createAsyncThunk(
         secondaryLabel: item.secondaryLabel || null,
         children: item.children.map(processItem) || [],
         type: item.type,
+        description: item.operationDescription != null ? item.operationDescription : '',
+        orderNumber: item.orderNumber,
+        shopNumber: item.shopNumber,
+        areaNumber: item.areaNumber != null ? item.areaNumber : '',
+        document: item.document != null ? item.document : '',
+        grade: item.grade,
+        workingConditions: item.workingConditions,
+        numberOfWorkers: item.numberOfWorkers,
+        numberOfProcessedParts: item.numberOfProcessedParts,
+        laborEffort: item.laborEffort,
+        jobName: item.jobName,
+        jobCode: item.jobCode
       });
       return data.map(processItem);
     } catch (error) {

@@ -19,7 +19,7 @@ import { debounce } from 'lodash';
 const OperationsSearch = ({props, id, selectedValue, onOptionSelect, errorValue }) => {
   const dispatch = useDispatch();
 
-  //TextField
+  //стейты
   const [inputValue, setInputValue] = useState('');
   
   //запросы
@@ -64,11 +64,13 @@ const OperationsSearch = ({props, id, selectedValue, onOptionSelect, errorValue 
       }
     }
   };
+  //
   return (
     <>
         <Autocomplete
           options={items || []}
           getOptionLabel={(option) => `${option.code} ${option.name}`}
+          getOptionSelected={(option, value) => option.code === value.code && option.name === value.name}
           filterOptions={(options, state) => {
               const { inputValue } = state;
               return options.filter(option =>

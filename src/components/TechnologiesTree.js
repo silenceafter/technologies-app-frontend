@@ -3,6 +3,8 @@ import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
+import Popover from '@mui/material/Popover';
+import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
@@ -91,6 +93,7 @@ export default function TechnologiesTree() {
   const [selectedNode, setSelectedNode] = useState(null);
   const [editedItems, setEditedItems] = useState([]);
   const [developedTechnologies, setDevelopedTechnologies] = useState([]);
+  const [anchorPopover, setAnchorPopover] = useState(null);
 
   //селекторы
   const dispatch = useDispatch();
@@ -174,7 +177,7 @@ export default function TechnologiesTree() {
     );
   }*/
 
-  function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel, type }) {
+  function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel, type, labelRef }) {
     const [isEditing, setIsEditing] = useState(edited);
     const [value, setValue] = useState(customLabel);
 
@@ -184,7 +187,7 @@ export default function TechnologiesTree() {
     }, [edited]);
     //
     return (
-      <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+      <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }} ref={labelRef}>
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {isEditing ? (
             <>
@@ -217,9 +220,9 @@ export default function TechnologiesTree() {
           ) : (
             <Typography 
               onClick={(e) => { 
-                e.stopPropagation(); 
+                /*e.stopPropagation();*/ 
                 /*setIsEditing(true);*/                
-                onLabelClick?.(e); 
+                onLabelClick?.(e);                
               }}
             >
               {value}
@@ -234,7 +237,7 @@ export default function TechnologiesTree() {
                   variant="caption" 
                   color="secondary" 
                   onClick={(e) => { 
-                    e.stopPropagation();
+                    /*e.stopPropagation();*/
                     onSecondaryLabelClick?.(e); 
                   }}
                 >
@@ -270,9 +273,11 @@ export default function TechnologiesTree() {
     const [expanded, setExpanded] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const [selected, setSelected] = useState(false);
+    const [anchorPopover, setAnchorPopover] = useState(null);
 
     //рефы
     const timerRef = useRef(null);
+    const labelRef = useRef(null);
 
     //эффекты
     useEffect(() => {
@@ -303,11 +308,25 @@ export default function TechnologiesTree() {
         handleItemExpansionToggle(null, props.itemId, !expanded);
         return; 
       }
+
+      //popover
+      if (labelRef.current) {
+        setAnchorPopover(labelRef.current);
+      }      
     };
   
     const handleChildClick = (e) => {
       if (dataLoaded) return;
       e.stopPropagation();
+      
+      //popover
+      if (labelRef.current) {
+        setAnchorPopover(labelRef.current);
+      }
+    };
+
+    const handlePopoverClose = () => {
+      setAnchorPopover(null);
     };
 
     const classes = useStyles({ itemType: item.type});
@@ -316,7 +335,7 @@ export default function TechnologiesTree() {
       <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center', width: '100%'}} /*onDoubleClick={handleDoubleClick}*/>
         <span>{props.label}</span>
       </Box>
-    );
+    );    
     //
     return (
       <>
@@ -334,6 +353,7 @@ export default function TechnologiesTree() {
             onSecondaryLabelClick: (e) => console.log(item?.type),
             customLabel: item?.label || '',
             type: item?.type,
+            labelRef: labelRef
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
@@ -358,6 +378,24 @@ export default function TechnologiesTree() {
           props.children                             
         )}
       </StyledTreeItem2>
+      <Popover
+        open={Boolean(anchorPopover)}
+        anchorEl={anchorPopover}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Paper sx={{ p: 2, width: 'auto' }}>
+        <Typography gutterBottom variant="h6" component="div">{item?.type == 'technology' ? 'Технология' : 'Операция'}</Typography>
+          <Typography gutterBottom variant="body1"><strong>Наименование:</strong> {item?.secondaryLabel || ''}</Typography>
+          <Typography gutterBottom variant="body1"><strong>Код:</strong> {item?.label || ''}</Typography>
+          <Typography gutterBottom variant="body1"><strong>Автор:</strong> ФИО</Typography>
+          <Typography gutterBottom variant="body1"><strong>Дата создания:</strong> дд.мм.гггг чч:мм:сс</Typography>
+          <Typography gutterBottom variant="body1"><strong>Последнее изменение:</strong> дд.мм.гггг чч:мм:сс</Typography>
+        </Paper>
+      </Popover>
       </>
     );
   });
@@ -509,7 +547,6 @@ export default function TechnologiesTree() {
   const handleClose = () => {
     setOpen(false);
   };
-
   //
   return (
     <>

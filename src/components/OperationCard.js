@@ -523,21 +523,7 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={2.4}>
-                    <TextField   
-                      fullWidth                                                          
-                      name='developer'
-                      id="developer-12"
-                      label="Разработчик"
-                      type="text"
-                      size='small'                      
-                      slotProps={{
-                        formHelperText: {
-                          sx: { whiteSpace: 'nowrap' },
-                        },
-                        input: { readOnly: true }
-                      }}
-                      value={'Пинаев Александр Алексеевич' || ''}                      
-                    />                  
+                    <Button variant='contained'>Удалить операцию</Button>                
                   </Grid>
                 </Grid>
               </Grid>                                                    
