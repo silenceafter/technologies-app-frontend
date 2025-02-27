@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { 
     AppBar,
@@ -15,27 +15,35 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/operationsSlice';
 import { debounce } from 'lodash';
+import Skeleton from '@mui/material/Skeleton';
 
-const OperationsSearch = ({props, id, selectedValue, onOptionSelect, errorValue }) => {
+const OperationsSearch = React.memo(({props, id, selectedValue, options, onOptionSelect, errorValue }) => {
   const dispatch = useDispatch();
 
   //стейты
   const [inputValue, setInputValue] = useState('');
   
   //запросы
-  const search = useSelector(selectSearch);
+  /*const search = useSelector(selectSearch);
   const limit = useSelector(selectLimit);
-  const page = useSelector(selectPage);
+  const page = useSelector(selectPage);*/
+  const { 
+    search = '', 
+    limit = 10, 
+    page = 1, 
+    items = [], 
+    loading = false, 
+    hasMore = false 
+  } = options;
 
   //запросы для прокрутки списка
-  const { items, loading, error, hasMore } = useSelector((state) => state.operations);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
   }, 1);
 
-  useEffect(() => {
+  /*useEffect(() => {
     //загрузка данных при пустом поисковом запросе
     if (!search) {
       dispatch(fetchData({ search: '', limit, page: 1 }));
@@ -53,7 +61,7 @@ const OperationsSearch = ({props, id, selectedValue, onOptionSelect, errorValue 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);//чистим обработчик при размонтировании
-  }, [loading, hasMore]);
+  }, [loading, hasMore]);*/
 
   const handleScroll = (event) => {
     if (listRef.current) {
@@ -64,6 +72,8 @@ const OperationsSearch = ({props, id, selectedValue, onOptionSelect, errorValue 
       }
     }
   };
+
+  const refValue = useRef(selectedValue);
   //
   return (
     <>
@@ -134,7 +144,16 @@ const OperationsSearch = ({props, id, selectedValue, onOptionSelect, errorValue 
                 placeholder={props.placeholder}
                 variant="outlined"
                 sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-                size='small'              
+                size='small'
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {loading ? <Skeleton variant="circular" width={20} height={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  ),
+                }}
               />
           )}
           sx={{
@@ -146,10 +165,10 @@ const OperationsSearch = ({props, id, selectedValue, onOptionSelect, errorValue 
               padding: '8px 16px'
               },
           }}
-          value={selectedValue}
+          value={refValue.current}
             />
     </>
   );
-};
+});
 
 export { OperationsSearch };

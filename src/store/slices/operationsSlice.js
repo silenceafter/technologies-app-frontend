@@ -75,6 +75,7 @@ const operationsSlice = createSlice({
 export const selectSearch = (state) => state.operations.search;
 export const selectLimit = (state) => state.operations.limit;
 export const selectPage = (state) => state.operations.page;
+export const selectOperations = (state) => state.operations;
 
 export const { setSearch, setLimit, setPage } = operationsSlice.actions;
 export default operationsSlice.reducer;

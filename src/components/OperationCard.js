@@ -26,7 +26,6 @@ import { MaterialsSearch } from './MaterialsSearch';
 import { EquipmentSearch } from './EquipmentSearch';
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
-import { TabPanel } from './TabPanel';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 
@@ -39,8 +38,9 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import { property } from 'lodash';
 
-const OperationCard = ({content, onUpdate, setValidateForm}) => {
+const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions}) => {
   //стейты
   const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {} });
 
@@ -302,8 +302,10 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
                     <OperationsSearch props={{id: "operation-code-2", placeholder: "Код операции"}}
-                      id="operationCode" onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
-                      selectedValue={localData.formValues.operationCode} 
+                      id="operationCode"
+                      selectedValue={localData.formValues.operationCode}
+                      options={autocompleteOptions.operations}
+                      onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
                       errorValue={localData.formErrors.operationCode}
                     />
                   </Grid>
@@ -377,12 +379,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <JobsSearch 
+                    {/*<JobsSearch 
                       id="job-code-6" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues['jobCode']} 
                       errorValue={localData.formErrors['jobCode']}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -554,12 +556,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <EquipmentSearch 
+                    {/*<EquipmentSearch 
                       id="equipment" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.equipment}
                       errorValue={localData.formErrors.equipment}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -590,12 +592,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <ComponentsSearch 
+                    {/*<ComponentsSearch 
                       id="components" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.components}
                       errorValue={localData.formErrors.components}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -626,12 +628,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <MaterialsSearch 
+                    {/*<MaterialsSearch 
                       id="materials" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.materials}
                       errorValue={localData.formErrors.materials}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -662,12 +664,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <ToolingSearch
+                    {/*<ToolingSearch
                       id="tooling" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.tooling}
                       errorValue={localData.formErrors.tooling}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -698,12 +700,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <MeasuringToolsSearch
+                    {/*<MeasuringToolsSearch
                       id="measuringTools"
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.measuringTools}
                       errorValue={localData.formErrors.measuringTools}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -713,6 +715,6 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
       </Accordion>
     </>
   );
-};
+});
 
 export {OperationCard};

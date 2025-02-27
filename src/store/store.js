@@ -13,6 +13,7 @@ import drawingsReducer from './slices/drawingsSlice';
 import technologiesReducer from './slices/technologiesSlice';
 import equipmentReducer from './slices/equipmentSlice';
 import usersReducer from './slices/usersSlice';
+import operationsTabsReducer from './slices/operationsTabsSlice';
 /*import postRequestReducer from './reducers/postRequestReducer';
 import routerReducer from './reducers/routerReducer';
 import sidebarReducer from './slices/sidebarSlice';*/
@@ -34,7 +35,8 @@ const rootReducer = combineReducers({
   technologies: technologiesReducer,
   products: productsReducer,
   equipment: equipmentReducer,
-  users: usersReducer
+  users: usersReducer,
+  operationsTabs: operationsTabsReducer,
   /*router: routerReducer,*/
 });
 

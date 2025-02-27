@@ -1,7 +1,14 @@
 import { Box } from '@mui/material';
+import React, { useState, useEffect, useMemo } from 'react';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
+  const optimizedChildren = React.Children.map(children, child => {
+    return React.cloneElement(child, {
+      ...child.props,
+    });
+  });
+  //
   return (
     <div
       role="tabpanel"
@@ -12,11 +19,11 @@ function TabPanel(props) {
     >
       {value === index && (
         <Box sx={{ p: 2 }}>
-          {children}
+          {optimizedChildren}
         </Box>
       )}
     </div>
   );
 }
 
-export { TabPanel };
+export const MemoizedTabPanel = React.memo(TabPanel); //{ TabPanel };
