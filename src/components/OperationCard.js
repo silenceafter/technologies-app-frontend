@@ -43,6 +43,7 @@ import { property } from 'lodash';
 const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions}) => {
   //стейты
   const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {} });
+  const [bb, setBb] = useState(autocompleteOptions.operations || null);
 
   //список числовых полей (для последующей валидации вместо type="number")
   const numericFields = [
@@ -301,13 +302,13 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <OperationsSearch props={{id: "operation-code-2", placeholder: "Код операции"}}
+                    {<OperationsSearch props={{id: "operation-code-2", placeholder: "Код операции"}}
                       id="operationCode"
                       selectedValue={localData.formValues.operationCode}
-                      options={autocompleteOptions.operations}
+                      options={bb}
                       onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
                       errorValue={localData.formErrors.operationCode}
-                    />
+                    />}
                   </Grid>
                 </Grid>
               </Grid>

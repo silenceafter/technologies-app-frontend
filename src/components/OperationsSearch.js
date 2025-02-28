@@ -75,8 +75,9 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onOptio
 
   const refValue = useRef(selectedValue);
   //
-  return (
+  return (    
     <>
+    {console.log(items)}
         <Autocomplete
           options={items || []}
           getOptionLabel={(option) => `${option.code} ${option.name}`}
@@ -144,16 +145,7 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onOptio
                 placeholder={props.placeholder}
                 variant="outlined"
                 sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-                size='small'
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <React.Fragment>
-                      {loading ? <Skeleton variant="circular" width={20} height={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  ),
-                }}
+                size='small'            
               />
           )}
           sx={{

@@ -3,12 +3,26 @@ import { selectOperations } from './operationsSlice';
 
 //данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {
-  tabs: [],
-  tabValue: 0,
-  validateForm: () => true,
-  autocompleteOptions: {},
+  tabs: [
+    /*{ 
+      id: "1", 
+      title: "Вкладка 1", 
+      content: { formValues: {}, formErrors: {}, expandedPanels: {} },
+      validateForm: () => true,
+    }*/
+  ],
+  tabValue: '1',
+  validateForm: false,
   loading: false,
   error: null,
+  expandedPanelsDefault: { 
+    parameters: true,
+    equipment: true,
+    components: true,
+    materials: true,
+    tooling: true,
+    measuringTools: true
+  }
 };
 
 //сохранить введенные данные
@@ -33,19 +47,54 @@ const operationsTabsSlice = createSlice({
   name: 'operationsTabs',
   initialState,
   reducers: {
-    /*setTabs: (state, action) => {
-
+    setTabs: (state, action) => {
+      if (state.tabs.length === 0) {
+        state.tabs = action.payload;
+        state.activeTabId = action.payload.length > 0 ? action.payload[0].id : null;
+      }
+    },
+    addTab: (state, action) => {
+      return {
+        ...state,
+        tabs: [...state.tabs, action.payload],
+        tabValue: action.payload.id,
+      };
+    },
+    removeTab: (state, action) => {
+      const updatedTabs = state.tabs.filter((tab) => tab.id !== action.payload);
+      return {
+        ...state,
+        tabs: updatedTabs,
+        tabValue: updatedTabs.length ? updatedTabs[0].id : null,
+      };
+    },
+    updateTab: (state, action) => {
+      const { id, newContent, newValidateForm } = action.payload;
+      state.tabs = state.tabs.map((tab) =>
+        tab.id === id
+          ? {
+              ...tab,
+              content: {
+                ...tab.content,
+                formValues: newContent.formValues,
+                formErrors: newContent.formErrors || tab.content.formErrors,
+                expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
+              },
+              validateForm: newValidateForm || tab.validateForm,
+            }
+          : tab
+      );
+      state.validateForm = true;
     },
     setTabValue: (state, action) => {
-      
+      return {
+        ...state,
+        tabValue: action.payload,
+      }
     },
-    setValidateForm: (state, action) => {
-      
-    },*/
-    setAutocompleteOptions: (state, action) => {
-      const hh = selectOperations(state);
-      console.log('jj');
-    }
+    toggleValidateFormInSlice: (state) => {
+      state.validateForm = !state.validateForm;
+    },    
   },
   /*extraReducers: (builder) => {
     builder
@@ -68,5 +117,5 @@ export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 
 export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation } = drawingsSlice.actions;*/
-export const { setAutocompleteOptions } = operationsTabsSlice.actions;
+export const { setTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice } = operationsTabsSlice.actions;
 export default operationsTabsSlice.reducer;

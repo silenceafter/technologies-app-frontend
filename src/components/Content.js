@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext, createContext } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Divider, Typography } from '@mui/material';
@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 import { selectItems as technologiesSelectItems, selectLoading as technologiesSelectLoading, selectError as technologiesSelectError} from '../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../store/slices/drawingsSlice';
+import { setTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice } from '../store/slices/operationsTabsSlice';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
@@ -53,18 +54,18 @@ export default function Content() {
   const dispatch = useDispatch();
 
   //объекты
-  const expandedPanelsDefault = { 
+  /*const expandedPanelsDefault = { 
     parameters: true,
     equipment: true,
     components: true,
     materials: true,
     tooling: true,
     measuringTools: true
-  };
+  };*/
 
   //стейты  
-  const [tabs, setTabs] = useState([]); //useState([{ id: 1, label: 'Новая операция'}]);
-  const [tabValue, setTabValue] = useState(0);
+  //const [tabs, setTabs] = useState([]); //useState([{ id: 1, label: 'Новая операция'}]);
+  //const [tabValue, setTabValue] = useState(0);
   const [validateForm, setValidateForm] = useState(() => () => true);
   const [autocompleteOptions, setAutocompleteOptions] = useState({});
   
@@ -75,6 +76,8 @@ export default function Content() {
   const technologiesErrors = useSelector(technologiesSelectError);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const currentTechnology = useSelector(selectTechnology);
+
+  const { tabs, tabValue, expandedPanelsDefault } = useSelector((state) => state.operationsTabs);
 
   const operationsSelectors = useSelector(selectOperations);
   const operationsItems = operationsSelectors?.items;
@@ -88,34 +91,17 @@ export default function Content() {
       }));
     }
   }, [operationsItems, operationsLoading]);
-
-  const updateTabContent = (tabId, newContent, newValidateForm) => {
-    setTabs((prevTabs) =>
-      prevTabs.map((tab) =>
-        tab.id === tabId 
-          ? { 
-              ...tab, 
-              content: /*newContent*/
-              {
-                ...tab.content,
-                formValues: newContent.formValues,
-                formErrors: newContent.formErrors || tab.content.formErrors,
-                expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
-              }, 
-              validateForm: newValidateForm 
-            } 
-          : tab
-      )
-    );
-  };
   
-  if (!technologiesLoading && technologiesItems.length > 0) {
-    setTabs((prevTabs) => {
-      // Создаем новые вкладки
-      const newTabs = technologiesItems[0].children
+  //стейт вкладок/карточек
+  useEffect(() => {
+    try {
+      if (!technologiesLoading && technologiesItems.length > 0) {
+        const newTabs = technologiesItems[0].children
         .filter(operation => operation.orderNumber)
         .map(operation => {
-          const existingTab = prevTabs.find(tab => tab.id === operation.orderNumber);
+          // Ищем существующую вкладку, чтобы сохранить ошибки и состояние панелей
+          const existingTab = tabs.find(tab => tab.id === operation.orderNumber);
+
           return {
             id: operation.orderNumber,
             label: `Операция ${operation.orderNumber}`,
@@ -131,87 +117,58 @@ export default function Content() {
                 numberOfWorkers: operation.numberOfWorkers,
                 numberOfProcessedParts: operation.numberOfProcessedParts,
                 laborEffort: operation.laborEffort,
-                jobCode: {code: operation.jobCode, name: operation.jobName},
-                operationCode: {code: operation.label, name: operation.secondaryLabel} || {code: '111', name: '222'}, /*operationItems.find(
-                      (option) => option.code === operation.label && option.name === operation.secondaryLabel)*/
-                /*equipment: [{}],
-                components: [{}],
-                materials: [{}],
-                tooling: [{}],
-                measuringTools: [{}]*/
-                },
-              formErrors: existingTab?.content?.formErrors || {},
-              expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault,
+                jobCode: { code: operation.jobCode, name: operation.jobName },
+                operationCode: { code: operation.label, name: operation.secondaryLabel } || { code: '111', name: '222' },
+              },
+              formErrors: existingTab?.content?.formErrors || {}, // Сохраняем ошибки
+              expandedPanels: existingTab?.content?.expandedPanels || {}, // Сохраняем раскрытые панели
             }
           };
         });
 
-      // Если tabs уже загружены, не обновляем их
-      return prevTabs.length === 0 ? newTabs : prevTabs;
-    });
-  }
-  //стейт вкладок/карточек
-  /*useEffect(() => {
-    try {
-      if (!technologiesLoading && technologiesItems.length > 0) {
-        setTabs((prevTabs) => {
-          // Создаем новые вкладки
-          const newTabs = technologiesItems[0].children
-            .filter(operation => operation.orderNumber)
-            .map(operation => {
-              const existingTab = prevTabs.find(tab => tab.id === operation.orderNumber);
-              return {
-                id: operation.orderNumber,
-                label: `Операция ${operation.orderNumber}`,
-                content: {
-                  formValues: {
-                    orderNumber: operation.orderNumber,
-                    operationDescription: operation.operationDescription,
-                    shopNumber: operation.shopNumber,
-                    areaNumber: operation.areaNumber,
-                    document: operation.document,
-                    grade: operation.grade,
-                    workingConditions: operation.workingConditions,
-                    numberOfWorkers: operation.numberOfWorkers,
-                    numberOfProcessedParts: operation.numberOfProcessedParts,
-                    laborEffort: operation.laborEffort,
-                    jobCode: {code: operation.jobCode, name: operation.jobName},
-                    operationCode: {code: operation.label, name: operation.secondaryLabel} || {code: '111', name: '222'}, /*operationItems.find(
-                          (option) => option.code === operation.label && option.name === operation.secondaryLabel)*/
-                    /*equipment: [{}],
-                    components: [{}],
-                    materials: [{}],
-                    tooling: [{}],
-                    measuringTools: [{}]*/
-  /*                },
-                  formErrors: existingTab?.content?.formErrors || {},
-                  expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault,
-                }
-              };
-            });
-  
-          // Если tabs уже загружены, не обновляем их
-          return prevTabs.length === 0 ? newTabs : prevTabs;
-        });
+        //
+        if (tabs.length === 0) {
+          dispatch(setTabs(newTabs));
+        }
+      }
   
         // Устанавливаем текущую выбранную технологию
-        dispatch(setTechnology({ name: technologiesItems[0].label, code: technologiesItems[0].secondaryLabel }));
-      }
+        //dispatch(setTechnology({ name: technologiesItems[0].label, code: technologiesItems[0].secondaryLabel }));
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
-  }, [technologiesLoading, technologiesItems]);*/
+  }, [technologiesLoading, technologiesItems, dispatch, tabs]);
   
+  const handleAddTab = () => {
+    const newTab = {
+      id: Date.now().toString(),
+      label: `Новая операция ${tabs.length + 1}`,
+      content: {
+        formValues: {},
+        formErrors: {},
+        expandedPanels: expandedPanelsDefault,
+      }
+    };
+    dispatch(addTab(newTab));
+  };
+
+  const handleRemoveTab = (id) => {
+    dispatch(removeTab(id));
+  };
+
+  const handleUpdateTabContent = (tabId, newContent, newValidateForm) => {
+    dispatch(updateTab({ id: tabId, newContent: newContent, newValidateForm: newValidateForm }));
+  };
 
   //очистить стейт вкладок/карточек
   useEffect(() => {
     if (!drawingExternalCode) {
-      setTabValue(0);
-      setTabs([]);
+      //setTabValue(0);
+      //setTabs([]);
     }
   }, [drawingExternalCode]);
  
-  const handleAddTab = () => {
+  /*const handleAddTab = () => {
     const maxId = Math.max(...tabs.map((tab) => tab.id), 0);
     const newTab = {
       id: maxId + 1,
@@ -255,7 +212,7 @@ export default function Content() {
       event.preventDefault();  // Блокируем стандартное поведение
       handleCloseTab(tabId);   // Закрываем вкладку
     }
-  };
+  };*/
 
   //отправка
   const handleSuccess = () => {
@@ -296,11 +253,12 @@ export default function Content() {
     setLoading((prev) => ({ ...prev, save: true }));  
     await new Promise((resolve) => setTimeout(() => {
       setOpen(true);
+      //dispatch(toggleValidateFormInSlice());
       if (validateForm()) {
         setRequestStatus('success');
       } else {
         setRequestStatus('error');
-      }  
+      }
       setLoading((prev) => ({ ...prev, save: false }));
       //dispatch(setUnsavedChanges(false));
     }, 2000));
@@ -393,7 +351,7 @@ export default function Content() {
               >   
                 <Tabs 
                   value={tabValue} 
-                  onChange={(e, newValue) => setTabValue(newValue)}
+                  onChange={(e, newValue) => dispatch(setTabValue(newValue))}
                   variant='scrollable' 
                   scrollButtons='auto' 
                   textColor="inherit"
@@ -410,7 +368,7 @@ export default function Content() {
                             sx={{ marginLeft: 1 }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleCloseTab(tab.id);
+                              handleRemoveTab(tab.id);
                             }}
                           >
                             <CloseIcon fontSize="small" sx={{color: 'white'}}/>
@@ -447,7 +405,7 @@ export default function Content() {
                     <TabPanel key={tabs[tabValue].id} value={tabValue} index={tabValue}>
                       <OperationCard
                         content={tabs[tabValue]?.content} 
-                        onUpdate={/*(newData) => updateTabContent(tabs[tabValue]?.id, newData)*/ console.log('111')}
+                        onUpdate={(newData) => handleUpdateTabContent(tabs[tabValue]?.id, newData, validateForm)}
                         setValidateForm={setValidateForm}
                         autocompleteOptions={autocompleteOptions}
                       />
