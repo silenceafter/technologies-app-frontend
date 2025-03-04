@@ -29,7 +29,7 @@ import { MemoizedTabPanel as TabPanel } from './TabPanel';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 import { selectItems as technologiesSelectItems, selectLoading as technologiesSelectLoading, selectError as technologiesSelectError} from '../store/slices/technologiesSlice';
-import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../store/slices/drawingsSlice';
+import { selectDrawingExternalCode, selectTechnology, setTechnology, selectOperation } from '../store/slices/drawingsSlice';
 import { setTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice } from '../store/slices/operationsTabsSlice';
 
 import Accordion from '@mui/material/Accordion';
@@ -45,6 +45,7 @@ import { OperationCard } from './OperationCard';
 import CloseIcon from "@mui/icons-material/Close";
 import { selectOperations, fetchData } from '../store/slices/operationsSlice';
 import CircularProgress from '@mui/material/CircularProgress';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -54,18 +55,7 @@ export default function Content() {
   const dispatch = useDispatch();
 
   //объекты
-  /*const expandedPanelsDefault = { 
-    parameters: true,
-    equipment: true,
-    components: true,
-    materials: true,
-    tooling: true,
-    measuringTools: true
-  };*/
-
   //стейты  
-  //const [tabs, setTabs] = useState([]); //useState([{ id: 1, label: 'Новая операция'}]);
-  //const [tabValue, setTabValue] = useState(0);
   const [validateForm, setValidateForm] = useState(() => () => true);
   const [autocompleteOptions, setAutocompleteOptions] = useState({});
   const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
@@ -77,6 +67,7 @@ export default function Content() {
   const technologiesErrors = useSelector(technologiesSelectError);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const currentTechnology = useSelector(selectTechnology);
+  const currentOperation = useSelector(selectOperation);
 
   const { tabs, tabValue, expandedPanelsDefault } = useSelector((state) => state.operationsTabs);
 
@@ -85,7 +76,7 @@ export default function Content() {
   const operationsLoading = operationsSelectors?.loading;
 
   useEffect(() => {
-    dispatch(fetchData({ search: '', limit: 100, page: 1 }));
+    dispatch(fetchData({ search: '', limit: 10, page: 1 }));
   }, [dispatch]);
 
   useEffect(() => {
@@ -140,7 +131,7 @@ export default function Content() {
       }
   
         // Устанавливаем текущую выбранную технологию
-        //dispatch(setTechnology({ name: technologiesItems[0].label, code: technologiesItems[0].secondaryLabel }));
+        dispatch(setTechnology({ name: technologiesItems[0].secondaryLabel, code: technologiesItems[0].label }));
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
@@ -279,6 +270,7 @@ export default function Content() {
   //
   return (
     <>
+    {console.log(currentOperation)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -403,6 +395,16 @@ export default function Content() {
               height: '91%',
               overflowY: 'auto'
             }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 2, paddingTop: 2 }}>
+                <Breadcrumbs aria-label="breadcrumb">
+                  <Typography color="inherit">Чертежи</Typography>
+                  <Typography color="inherit">{drawingExternalCode}</Typography>
+                  <Typography color="inherit">Технологии</Typography>
+                  <Typography color="inherit">{currentTechnology.name}</Typography>
+                  <Typography color="inherit">Операции</Typography>                  
+                  <Typography sx={{ color: 'text.primary' }}>{currentOperation.name}</Typography>
+                </Breadcrumbs>
+              </Box>
               {!isAutocompleteLoaded ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', height: '100%', alignItems: 'center', py: 5 }}>
                     <CircularProgress size={40} />

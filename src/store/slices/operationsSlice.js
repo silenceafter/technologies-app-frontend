@@ -6,7 +6,7 @@ const initialState = {
   error: null,
   hasMore: true,
   search: '',
-  limit: 100,
+  limit: 10,
   page: 1,
 };
 

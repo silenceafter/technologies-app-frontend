@@ -16,13 +16,18 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/operationsSlice';
 import { debounce } from 'lodash';
 import Skeleton from '@mui/material/Skeleton';
+import { selectDrawingExternalCode, selectTechnology, setTechnology, setOperation } from '../store/slices/drawingsSlice';
 
 const OperationsSearch = React.memo(({props, id, selectedValue, options, onChange, errorValue }) => {
   const dispatch = useDispatch();
   const onOptionSelect = onChange;
+
   //стейты
   const [inputValue, setInputValue] = useState(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
   const [selectedOption, setSelectedOption] = useState(selectedValue || null);
+
+  //селекторы
+  const tabs = useSelector((state) => state.operationsTabs.tabs);
   
   //запросы
   /*const search = useSelector(selectSearch);
@@ -77,30 +82,33 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
   useEffect(() => {
     setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
     setSelectedOption(selectedValue || null);
-  }, [selectedValue]);
+    dispatch(setOperation(selectedValue ? { code: selectedValue.code, name: selectedValue.name } : { code: '', name: `Новая операция ${tabs ? tabs.length : ''}` }));
+  }, [selectedValue, dispatch]);
   //
   return (    
     <>    
         <Autocomplete
-          freeSolo
+          /*freeSolo*/
           options={items || []}
           getOptionLabel={(option) => option == null || option == undefined ? '' : `${option.code} ${option.name}`}
           getOptionSelected={(option, value) => option.code === value.code && option.name === value.name}
           filterOptions={(options, state) => {
-              const { inputValue } = state;
-              return options.filter(option =>
-              option?.code.toLowerCase().includes(inputValue.toLowerCase()) ||
-              option?.name.toLowerCase().includes(inputValue.toLowerCase())
-              );
+            const { inputValue } = state;
+            return options.filter(option =>
+              option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+              option.name.toLowerCase().includes(inputValue.toLowerCase())
+            );
           }}
           onInputChange={(event, newInputValue) => {
-              setInputValue(newInputValue);
-              /*if (onOptionSelect) {
-                onOptionSelect(id, newInputValue);
-              }*/         
+            setInputValue(newInputValue);
+            /*if (onOptionSelect) {
+              onOptionSelect(id, newInputValue);
+            }*/
           }}
           onChange={(event, newValue) => {
             setSelectedOption(newValue);
+            dispatch(setOperation({ code: newValue.code, name: newValue.name }));
+            //
             if (onOptionSelect) {
               onOptionSelect('operationCode', newValue);
             }
