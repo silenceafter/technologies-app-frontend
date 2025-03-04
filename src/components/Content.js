@@ -43,7 +43,7 @@ import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import { OperationCard } from './OperationCard';
 import CloseIcon from "@mui/icons-material/Close";
-import { selectOperations } from '../store/slices/operationsSlice';
+import { selectOperations, fetchData } from '../store/slices/operationsSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -68,6 +68,7 @@ export default function Content() {
   //const [tabValue, setTabValue] = useState(0);
   const [validateForm, setValidateForm] = useState(() => () => true);
   const [autocompleteOptions, setAutocompleteOptions] = useState({});
+  const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
   
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
@@ -84,11 +85,16 @@ export default function Content() {
   const operationsLoading = operationsSelectors?.loading;
 
   useEffect(() => {
+    dispatch(fetchData({ search: '', limit: 100, page: 1 }));
+  }, [dispatch]);
+
+  useEffect(() => {
     if (!operationsLoading && operationsItems) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
         operations: operationsSelectors
       }));
+      setIsAutocompleteLoaded(true); //загрузка items завершена
     }
   }, [operationsItems, operationsLoading]);
   
@@ -118,10 +124,10 @@ export default function Content() {
                 numberOfProcessedParts: operation.numberOfProcessedParts,
                 laborEffort: operation.laborEffort,
                 jobCode: { code: operation.jobCode, name: operation.jobName },
-                operationCode: { code: operation.label, name: operation.secondaryLabel } || { code: '111', name: '222' },
+                operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.labelId },
               },
               formErrors: existingTab?.content?.formErrors || {}, // Сохраняем ошибки
-              expandedPanels: existingTab?.content?.expandedPanels || {}, // Сохраняем раскрытые панели
+              expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели
             }
           };
         });
@@ -129,6 +135,7 @@ export default function Content() {
         //
         if (tabs.length === 0) {
           dispatch(setTabs(newTabs));
+          dispatch(setTabValue(0)); //первая вкладка активна по умолчанию
         }
       }
   
@@ -137,7 +144,7 @@ export default function Content() {
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
-  }, [technologiesLoading, technologiesItems, dispatch, tabs]);
+  }, [technologiesLoading, technologiesItems, tabs]);
   
   const handleAddTab = () => {
     const newTab = {
@@ -150,6 +157,7 @@ export default function Content() {
       }
     };
     dispatch(addTab(newTab));
+    dispatch(setTabValue(tabs.length));
   };
 
   const handleRemoveTab = (id) => {
@@ -395,7 +403,7 @@ export default function Content() {
               height: '91%',
               overflowY: 'auto'
             }}>
-              {(autocompleteOptions && autocompleteOptions.operations && autocompleteOptions.operations.loading) ? (
+              {!isAutocompleteLoaded ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', height: '100%', alignItems: 'center', py: 5 }}>
                     <CircularProgress size={40} />
                   </Box>
@@ -404,7 +412,7 @@ export default function Content() {
                   {tabs.length > 0 && tabs[tabValue] ? (
                     <TabPanel key={tabs[tabValue].id} value={tabValue} index={tabValue}>
                       <OperationCard
-                        content={tabs[tabValue]?.content} 
+                        content={tabs[tabValue]?.content}
                         onUpdate={(newData) => handleUpdateTabContent(tabs[tabValue]?.id, newData, validateForm)}
                         setValidateForm={setValidateForm}
                         autocompleteOptions={autocompleteOptions}

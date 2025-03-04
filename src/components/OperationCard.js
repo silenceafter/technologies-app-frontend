@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Divider, Typography } from '@mui/material';
@@ -42,7 +42,7 @@ import { property } from 'lodash';
 
 const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions}) => {
   //стейты
-  const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {} });
+  const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {}, expandedPanels: {} });
   const [bb, setBb] = useState(autocompleteOptions.operations || null);
 
   //список числовых полей (для последующей валидации вместо type="number")
@@ -104,7 +104,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     }
   };
 
-  const handleOptionSelect = (id, option) => {
+  const handleOptionSelect = useCallback((id, option) => {
     // Обновляем значение поля
     setLocalData((prev) => ({
       ...prev,
@@ -127,7 +127,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     if (onUpdate) {
       onUpdate({ ...localData, formValues: { ...localData.formValues, [id]: option || null }, formErrors: { ...localData.formErrors, [id]: '' } });
     }
-  };
+  }, [localData, onUpdate]);
 
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setLocalData((prev) => ({
@@ -255,8 +255,8 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   return (
     <>
       {/* Параметры */}
-      <Accordion defaultExpanded 
-        expanded={localData.expandedPanels['parameters'] || false} 
+      <Accordion defaultExpanded
+        expanded={localData.expandedPanels['parameters'] || false}
         onChange={handleAccordionChange('parameters')} 
         elevation={2}
         sx={{ bgcolor: 'primary.secondary', color: 'primary.secondary', width: '100%', height: 'auto', overflow: 'hidden' }}
@@ -305,8 +305,8 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
                     {<OperationsSearch props={{id: "operation-code-2", placeholder: "Код операции"}}
                       id="operationCode"
                       selectedValue={localData.formValues.operationCode}
-                      options={bb}
-                      onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
+                      options={autocompleteOptions.operations || null}
+                      onChange={handleOptionSelect}
                       errorValue={localData.formErrors.operationCode}
                     />}
                   </Grid>

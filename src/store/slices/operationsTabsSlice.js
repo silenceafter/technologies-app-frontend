@@ -70,21 +70,24 @@ const operationsTabsSlice = createSlice({
     },
     updateTab: (state, action) => {
       const { id, newContent, newValidateForm } = action.payload;
-      state.tabs = state.tabs.map((tab) =>
-        tab.id === id
-          ? {
-              ...tab,
-              content: {
-                ...tab.content,
-                formValues: newContent.formValues,
-                formErrors: newContent.formErrors || tab.content.formErrors,
-                expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
-              },
-              validateForm: newValidateForm || tab.validateForm,
-            }
-          : tab
-      );
-      state.validateForm = true;
+      return {
+        ...state,
+        tabs: state.tabs.map((tab) =>
+          tab.id === id
+            ? {
+                ...tab,
+                content: {
+                  ...tab.content,
+                  formValues: newContent.formValues,
+                  formErrors: newContent.formErrors || tab.content.formErrors,
+                  expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
+                },
+                validateForm: newValidateForm || tab.validateForm,
+              }
+            : tab
+        ),
+        validateForm: true,
+      };
     },
     setTabValue: (state, action) => {
       return {

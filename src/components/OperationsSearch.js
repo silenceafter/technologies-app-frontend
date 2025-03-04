@@ -17,11 +17,12 @@ import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } 
 import { debounce } from 'lodash';
 import Skeleton from '@mui/material/Skeleton';
 
-const OperationsSearch = React.memo(({props, id, selectedValue, options, onOptionSelect, errorValue }) => {
+const OperationsSearch = React.memo(({props, id, selectedValue, options, onChange, errorValue }) => {
   const dispatch = useDispatch();
-
+  const onOptionSelect = onChange;
   //стейты
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
+  const [selectedOption, setSelectedOption] = useState(selectedValue || null);
   
   //запросы
   /*const search = useSelector(selectSearch);
@@ -72,30 +73,37 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onOptio
       }
     }
   };
-
-  const refValue = useRef(selectedValue);
+  
+  useEffect(() => {
+    setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
+    setSelectedOption(selectedValue || null);
+  }, [selectedValue]);
   //
   return (    
-    <>
-    {console.log(items)}
+    <>    
         <Autocomplete
+          freeSolo
           options={items || []}
-          getOptionLabel={(option) => `${option.code} ${option.name}`}
+          getOptionLabel={(option) => option == null || option == undefined ? '' : `${option.code} ${option.name}`}
           getOptionSelected={(option, value) => option.code === value.code && option.name === value.name}
           filterOptions={(options, state) => {
               const { inputValue } = state;
               return options.filter(option =>
-              option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
-              option.name.toLowerCase().includes(inputValue.toLowerCase())
+              option?.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+              option?.name.toLowerCase().includes(inputValue.toLowerCase())
               );
           }}
           onInputChange={(event, newInputValue) => {
               setInputValue(newInputValue);
+              /*if (onOptionSelect) {
+                onOptionSelect(id, newInputValue);
+              }*/         
           }}
           onChange={(event, newValue) => {
+            setSelectedOption(newValue);
             if (onOptionSelect) {
-              onOptionSelect(id, newValue);
-            }              
+              onOptionSelect('operationCode', newValue);
+            }
           }}
           inputValue={inputValue}
           loadingText="поиск данных"
@@ -124,10 +132,10 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onOptio
               </div>
           )}
           renderOption={(props, option) => (
-              <ListItem {...props} key={`${option.code}-${option.name}`} style={{ padding: '8px 16px' }}>
+              <ListItem {...props} key={`${option?.code}-${option?.name}`} style={{ padding: '8px 16px' }}>
               <ListItemText
-                  primary={option.code}
-                  secondary={option.name}
+                  primary={option?.code}
+                  secondary={option?.name}
                   primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
                   secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
               />
@@ -145,7 +153,8 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onOptio
                 placeholder={props.placeholder}
                 variant="outlined"
                 sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-                size='small'            
+                size='small'
+                value={props.placeholder}
               />
           )}
           sx={{
@@ -157,7 +166,7 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onOptio
               padding: '8px 16px'
               },
           }}
-          value={refValue.current}
+          value={selectedOption || null}
             />
     </>
   );
