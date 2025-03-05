@@ -270,7 +270,6 @@ export default function Content() {
   //
   return (
     <>
-    {console.log(currentOperation)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -6,7 +7,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { AppBar, Avatar, Button, Grid, IconButton, Link, Toolbar, Tooltip, Typography, Stack } from '@mui/material';
 import { HeaderSearch } from './HeaderSearch';
 import { useSelector, useDispatch } from 'react-redux';
-import { getUserData } from '../store/slices/usersSlice';
+import { getUserData, setTokens } from '../store/slices/usersSlice';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -48,6 +49,11 @@ function Header(props) {
   const { onDrawerToggle } = props;
   const dispatch = useDispatch();
 
+  //стейты
+  const [urlParams, setUrlParams] = useState(null);
+  const [urlParamsLoaded, setUrlParamsLoaded] = useState(false);
+  const location = useLocation();
+
   //селекторы
   const user = useSelector((state) => state.users.user);
   const loading = useSelector((state) => state.users.loading);
@@ -58,7 +64,27 @@ function Header(props) {
     if (!user) {
       dispatch(getUserData({}));
     }
-  }, [dispatch, user]);
+      
+  }, [user]);
+
+  //query parameters
+  /*useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const enterid = urlParams.get('enterid');
+    const usrhash = urlParams.get('usrhash');
+    //
+    if (enterid && usrhash) {
+      setUrlParams({ enterid: enterid, usrhash: usrhash });
+      
+      //сохранить токены в localStorage
+      localStorage.setItem('enterid', enterid);
+      localStorage.setItem('usrhash', usrhash);
+      dispatch(setTokens());
+      setUrlParamsLoaded(true);
+    } else {
+      setUrlParamsLoaded(false);
+    }
+  }, [location]);*/
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);

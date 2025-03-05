@@ -11,17 +11,22 @@ const initialState = {
 //загрузка данных пользователя
 export const getUserData = createAsyncThunk(
   'users/getUserData',
-  async ({}, { rejectWithValue }) => {
-    try {
-      const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php');
+  async ({}, { getState }) => {
+
+      const state = getState();
+      const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php', {
+        method: 'GET',
+        /*headers: {
+          'Content-Type': 'application/json',
+        },*/
+        credentials: 'include'
+      });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
       }
       return data;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
+  
   }
 );
 
@@ -29,6 +34,19 @@ const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
+    setTokens: (state) => {
+      const enterid = localStorage.getItem('enterid');
+      const usrhash = localStorage.getItem('usrhash');
+      //
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          enterid: enterid,
+          usrhash: usrhash,
+        },
+      };
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -47,4 +65,5 @@ const usersSlice = createSlice({
   },
 });
 
+export const { setTokens } = usersSlice.actions;
 export default usersSlice.reducer;
