@@ -51,7 +51,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-export default function Content() {
+function Content() {
   const dispatch = useDispatch();
 
   //объекты
@@ -305,7 +305,7 @@ export default function Content() {
             </Button>*/}
           </AccordionActions>
         </Accordion>
-        <Accordion defaultExpanded
+        <Accordion /*defaultExpanded*/ expanded={false}
           /*expanded={expanded === 'panel2'} 
           onChange={handleAccordeonChange('panel2')}*/
           elevation={3} 
@@ -457,3 +457,5 @@ export default function Content() {
     </>
   );
 }
+
+export {Content};

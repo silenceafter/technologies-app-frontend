@@ -59,14 +59,6 @@ function Header(props) {
   const loading = useSelector((state) => state.users.loading);
   const error = useSelector((state) => state.users.error);
 
-  //получить данные пользователя
-  useEffect(() => {
-    if (!user) {
-      dispatch(getUserData({}));
-    }
-      
-  }, [user]);
-
   //query parameters
   /*useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -98,7 +90,6 @@ function Header(props) {
   //
   return (
     <>
-    {console.log(user)}
       <AppBar color="primary" position="sticky" elevation={0}>
         <Toolbar>
           <Grid container spacing={1} sx={{ alignItems: 'center' }}>
@@ -218,4 +209,4 @@ Header.propTypes = {
   onDrawerToggle: PropTypes.func.isRequired,
 };
 
-export default Header;
+export {Header};

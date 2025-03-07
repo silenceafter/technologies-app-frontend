@@ -11,22 +11,64 @@ const initialState = {
 //загрузка данных пользователя
 export const getUserData = createAsyncThunk(
   'users/getUserData',
-  async ({}, { getState }) => {
+  async ({}, { getState, rejectWithValue }) => {
+    try {
+        const state = getState();
+        const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php', {
+          method: 'GET',
+          /*headers: {
+            'Content-Type': 'application/json',
+          },*/
+          credentials: 'include'
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || 'Network response was not ok');
+        }
+        return data;
+    } catch(error) {
+      return rejectWithValue(error.message);
+    }        
+  }
+);
 
-      const state = getState();
-      const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php', {
-        method: 'GET',
-        /*headers: {
-          'Content-Type': 'application/json',
-        },*/
-        credentials: 'include'
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Network response was not ok');
-      }
-      return data;
-  
+//авторизация
+export const signIn = createAsyncThunk(
+  'users/signIn',
+  async ({ login, password }, { getState, rejectWithValue }) => {
+    try {
+        const state = getState();
+
+        //параметры
+        const formData = new URLSearchParams();
+        formData.append('login', login);
+        formData.append('password', password);
+
+        //запрос
+        const response = await fetch('http://localhost/Ivc/Ogt/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formData,
+        });
+        const data = await response.text();
+        if (!response.ok) {
+          throw new Error(data.message || 'Network response was not ok');
+        }
+
+        //обработка html-ответа
+        const errorMessages = ['Не верный логин или пароль', 'Пользователь не зарегистрирован'];
+        for (const errorMessage of errorMessages) {
+          if (data.includes(errorMessage)) {
+            //пользователю не авторизован      
+            return errorMessage;
+          }
+        }
+        return '';
+    } catch(error) {
+      return rejectWithValue(error.message);
+    }        
   }
 );
 
@@ -61,7 +103,21 @@ const usersSlice = createSlice({
       .addCase(getUserData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+      .addCase(signIn.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(signIn.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(signIn.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      ;
   },
 });
 
