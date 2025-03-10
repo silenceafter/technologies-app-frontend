@@ -6,15 +6,16 @@ const initialState = {
   loading: LOADING_DEFAULT,
   error: null,
   user: null,
+  isAuthenticated: false,
 };
 
 //загрузка данных пользователя
-export const getUserData = createAsyncThunk(
-  'users/getUserData',
+export const authenticate = createAsyncThunk(
+  'users/authenticate',
   async ({}, { getState, rejectWithValue }) => {
     try {
         const state = getState();
-        const response = await fetch('http://localhost/Ivc/Ogt/index.php', {
+        const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -25,9 +26,38 @@ export const getUserData = createAsyncThunk(
         if (!response.ok) {
           throw new Error(data.message || 'Network response was not ok');
         }
+
         return data;
+        //обработка ответа
+        /*const errorMessage = 'Данные авторизации повреждены. Авторизуйтесь повторно!(0)';
+        //
+        if (data.dataState == 0) {
+          //пользователь не авторизован
+          let errorResponse = null;
+          if (data.UserMessage != null) {
+            //есть значение ошибки
+            errorResponse = data.UserMessage.trim().toLowerCase() == errorMessage.trim().toLowerCase() ? errorMessage : '';
+          }
+          response = { isAuthenticated: false, errorMessage: errorResponse, user: null };
+        } else if (data.dataState > 0) {
+          //пользователь авторизован
+          response = { isAuthenticated: true, errorMessage: errorResponse, user: null };
+        }
+
+        let errorResponse = null;
+        if (data.UserMessage != null) {
+          //есть значение ошибки
+          errorResponse = data.UserMessage.trim().toLowerCase() == errorMessage.trim().toLowerCase() ? errorMessage : '';
+        }
+        
+
+
+       
+          return { isAuthenticated: false, errorMessage: errorMessage, user: null };*/
+        
+
     } catch(error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue({ isAuthenticated: false, errorMessage: error.message, user: null });
     }        
   }
 );
@@ -93,17 +123,38 @@ const usersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getUserData.pending, (state) => {
+      .addCase(authenticate.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getUserData.fulfilled, (state, action) => {
+      .addCase(authenticate.fulfilled, (state, action) => {      
+        //обработка ответа
+        const errorMessage = 'Данные авторизации повреждены. Авторизуйтесь повторно!(0)'; 
+        const userMessage = action.payload.UserMessage; 
+        let errorResponse = null;        
+        if (userMessage != null) {
+          //есть значение ошибки
+          errorResponse = userMessage.trim().toLowerCase() == errorMessage.trim().toLowerCase() ? 'Авторизуйтесь повторно!' : '';
+        }
+        
+        //состояние
+        const dataState = action.payload.DataState;
+        if (dataState == 0) {
+          state.isAuthenticated = false;
+          state.user = null;
+        } else if (dataState > 0) {
+          state.isAuthenticated = true;
+          state.user = action.payload.UserInfoArray;
+        }
+        //
+        state.error = errorResponse;
         state.loading = false;
-        state.user = action.payload;
       })
-      .addCase(getUserData.rejected, (state, action) => {
+      .addCase(authenticate.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.isAuthenticated = false;
+        state.error = action.payload.errorMessage;
+        //state.user = null;
       })
       .addCase(signIn.pending, (state) => {
         state.loading = true;

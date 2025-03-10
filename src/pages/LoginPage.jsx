@@ -31,8 +31,8 @@ const LoginPage = () => {
 
     //селекторы
     const isAuthenticated = false;//useSelector(selectIsAuthenticated);
-    const loading = false;//useSelector(selectLoading);
-    const error = null;//useSelector(selectError);
+    const loading = useSelector((state) => state.users.loading);//useSelector(selectLoading);
+    //const error = null;//useSelector(selectError);
     const userError = useSelector((state) => state.users.error);
 
     useEffect(() => {
@@ -42,7 +42,7 @@ const LoginPage = () => {
                 setNotification({severity: 'success', message: 'Вход выполнен'});
                 setTimeout(() => {
                     navigate('/');
-                }, 2000);
+                }, 1000);
                 //
             } else if (userError) {
                 //error
@@ -110,9 +110,9 @@ const LoginPage = () => {
                         {notification.message}
                     </Alert>
                 )}
-                {error && !notification.severity && (
+                {userError && !notification.severity && (
                     <Alert severity='error' sx={{ width: '100%', mb: 2 }} /*onClose={() => dispatch({ type: 'auth/clearError' })}*/>
-                        {error}
+                        {userError}
                     </Alert>
                 )}
 

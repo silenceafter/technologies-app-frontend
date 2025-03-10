@@ -116,7 +116,7 @@ function Header(props) {
                 {!loading && !error ? (
                   <Avatar {...stringAvatar(`${user?.lastname} ${user?.firstname}`)} />
                 ) : (
-                  <Avatar {...stringAvatar('Kent Dodds')} />
+                  <Avatar {...stringAvatar('??')} />
                 )}                
               </IconButton>
               <Menu

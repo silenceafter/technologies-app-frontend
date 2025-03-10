@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid2, Paper, AppBar, Tabs, Tab, TextField, InputAdornment, Box, Typography, Button, Link } from '@mui/material';
+import { Grid2, Paper, AppBar, Tabs, Tab, TextField, InputAdornment, Box, Typography, Button, Link, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SortableTree from 'react-sortable-tree';
 import 'react-sortable-tree/style.css';
@@ -12,7 +12,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import theme from '../theme';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserData, setTokens } from '../store/slices/usersSlice';
+import { authenticate, setTokens } from '../store/slices/usersSlice';
 import { use } from 'react';
 
 function Copyright() {
@@ -37,7 +37,7 @@ function MainPage() {
   const navigate = useNavigate();
 
   //стейты
-  const [loaded, setLoaded] = useState(false);
+  const [isloaded, setIsLoaded] = useState(false);
 
   //селекторы
   const user = useSelector((state) => state.users.user);
@@ -46,44 +46,62 @@ function MainPage() {
   
   //получить данные пользователя
   useEffect(() => {
-    if (!user) {
-      dispatch(getUserData({}));
-      setLoaded(true);
-    }      
-  }, [user]);
+    dispatch(authenticate({})).then(() => {
+      setIsLoaded(true);
+    });
+  }, [dispatch]);
 
-  /*if (!user && !loaded) {
-    navigate('/login');
-  }*/
-
-  //
-  return (
-      <>
-      {console.log(user)}
+  /*useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);*/
+  
+  //загрузка
+  if (!isloaded) {
+    return (
       <ThemeProvider theme={theme}>
         <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'white' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Header onDrawerToggle={handleDrawerToggle} />
-            <Box component="main" sx={{ flex: 1, py: 2, px: 2, bgcolor: '#eaeff1' }}>
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                gap: 2,                   
-                padding: 2,
-                backgroundColor: 'background.paper',
-                borderRadius: 1,          
-                boxShadow: 3,
-                height: '735px',
-                overflow: 'hidden',                
-              }}>
-                <Content />
-              </Box>            
-            </Box>
-            <Box component="footer" sx={{ p: 1, bgcolor: '#eaeff1' }}>
-              <Copyright />
-            </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+            <CircularProgress size={'5rem'} />
           </Box>
+        </Box>
+      </ThemeProvider>
+    );
+  }
+  
+  //main
+  return (
+      <>
+      {console.log(user)}      
+      <ThemeProvider theme={theme}>        
+        <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'white' }}>
+          {!user ? (
+            navigate('/login')
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Header onDrawerToggle={handleDrawerToggle} />
+              <Box component="main" sx={{ flex: 1, py: 2, px: 2, bgcolor: '#eaeff1' }}>
+                <Box sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  gap: 2,                   
+                  padding: 2,
+                  backgroundColor: 'background.paper',
+                  borderRadius: 1,          
+                  boxShadow: 3,
+                  height: '735px',
+                  overflow: 'hidden',                
+                }}>
+                  <Content />
+                </Box>            
+              </Box>
+              <Box component="footer" sx={{ p: 1, bgcolor: '#eaeff1' }}>
+                <Copyright />
+              </Box>
+            </Box>
+          )}          
         </Box>
       </ThemeProvider>
       </>
