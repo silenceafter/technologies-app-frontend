@@ -14,11 +14,11 @@ export const getUserData = createAsyncThunk(
   async ({}, { getState, rejectWithValue }) => {
     try {
         const state = getState();
-        const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php', {
+        const response = await fetch('http://localhost/Ivc/Ogt/index.php', {
           method: 'GET',
-          /*headers: {
-            'Content-Type': 'application/json',
-          },*/
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
           credentials: 'include'
         });
         const data = await response.json();
@@ -51,6 +51,7 @@ export const signIn = createAsyncThunk(
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: formData,
+          credentials: 'include'
         });
         const data = await response.text();
         if (!response.ok) {

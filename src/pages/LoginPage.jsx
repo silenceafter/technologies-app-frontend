@@ -25,7 +25,7 @@ const LoginPage = () => {
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
     //
-    const [notification, setNotification] = useState({ severity: null, message: '' });
+    const [notification, setNotification] = useState({});
     const [errors, setErrors] = useState({});
     const [userErrorLoading, setUserErrorLoading] = useState(false);
 
@@ -36,15 +36,20 @@ const LoginPage = () => {
     const userError = useSelector((state) => state.users.error);
 
     useEffect(() => {
-        if (userError == '') {
-            //success
-            setNotification({severity: 'success', message: 'Вход выполнен'});
-            navigate('/');
-        } else {
-            //error
-            setNotification({severity: 'error', message: userError || 'Неудачная попытка входа'});
-        }
-    }, [userError]);
+        if (userErrorLoading) {
+            if (userError == '') {
+                //success
+                setNotification({severity: 'success', message: 'Вход выполнен'});
+                setTimeout(() => {
+                    navigate('/');
+                }, 2000);
+                //
+            } else if (userError) {
+                //error
+                setNotification({severity: 'error', message: userError || 'Неудачная попытка входа'});
+            }
+        }        
+    }, [userErrorLoading, userError]);
     
     const handleLogin = async () => {
         dispatch(signIn({ login: login , password: password }));
