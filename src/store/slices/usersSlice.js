@@ -134,7 +134,7 @@ const usersSlice = createSlice({
         let errorResponse = null;        
         if (userMessage != null) {
           //есть значение ошибки
-          errorResponse = userMessage.trim().toLowerCase() == errorMessage.trim().toLowerCase() ? 'Авторизуйтесь повторно!' : '';
+          errorResponse = userMessage.trim().toLowerCase() == errorMessage.trim().toLowerCase() ? errorMessage : '';
         }
         
         //состояние
@@ -147,7 +147,7 @@ const usersSlice = createSlice({
           state.user = action.payload.UserInfoArray;
         }
         //
-        state.error = errorResponse;
+        //state.error = errorResponse;
         state.loading = false;
       })
       .addCase(authenticate.rejected, (state, action) => {
