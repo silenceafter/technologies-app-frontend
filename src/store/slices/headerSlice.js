@@ -7,7 +7,7 @@ const initialState = {
   hasMore: true,
   search: '',
   drawing: '',
-  limit: 10,
+  limit: 5,
   page: 1,
 };
 

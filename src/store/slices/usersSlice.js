@@ -7,6 +7,7 @@ const initialState = {
   error: null,
   user: null,
   isAuthenticated: false,
+  isCrud: false,
 };
 
 //загрузка данных пользователя

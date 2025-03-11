@@ -79,10 +79,10 @@ function HeaderSearch(props) {
         <Toolbar>
           <Grid container spacing={2} sx={{ alignItems: 'center' }}>
             <Grid item>
-              <SearchIcon color="inherit" sx={{ display: 'block' }} />
+              {/*<SearchIcon color="inherit" sx={{ display: 'block' }} />*/}
             </Grid>
             <Grid item xs>
-              <Autocomplete
+              {/*<Autocomplete
                 disableListWrap                
                 autoComplete={false}
                 autoHighlight={false}
@@ -182,7 +182,7 @@ function HeaderSearch(props) {
                   },
                 }}
                 value={value}
-              />
+              />*/}
             </Grid>        
           </Grid>
         </Toolbar>

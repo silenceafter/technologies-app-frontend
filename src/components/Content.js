@@ -46,6 +46,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { selectOperations, fetchData } from '../store/slices/operationsSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import { TechnologyBreadcrumbs } from './TechnologyBreadcrumbs';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -274,10 +275,9 @@ function Content() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
-        width: '24rem',
+        width: '22%',/*24rem*/
         height: '705px',
-        overflow: 'hidden'
-        
+        overflow: 'hidden',        
       }}>
         <Accordion defaultExpanded
           expanded={expanded === 'panel1'} 
@@ -334,10 +334,10 @@ function Content() {
           padding: 0,
           paddingBottom: 0,
           paddingRight: 0,
-          backgroundColor: 'background.paper',
+          backgroundColor: 'rgb(245,245,245)',
           borderRadius: 1,          
           boxShadow: 0,
-          width: '90.5rem',
+          width: '100%',/*90.5rem*/
           height: '100%',
         }}>
           <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
@@ -395,14 +395,9 @@ function Content() {
               overflowY: 'auto'
             }}>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 2, paddingTop: 2 }}>
-                <Breadcrumbs aria-label="breadcrumb">
-                  <Typography color="inherit">Чертежи</Typography>
-                  <Typography color="inherit">{drawingExternalCode}</Typography>
-                  <Typography color="inherit">Технологии</Typography>
-                  <Typography color="inherit">{currentTechnology.name}</Typography>
-                  <Typography color="inherit">Операции</Typography>                  
-                  <Typography sx={{ color: 'text.primary' }}>{currentOperation.name}</Typography>
-                </Breadcrumbs>
+                {drawingExternalCode && (
+                  <TechnologyBreadcrumbs />
+                )}                
               </Box>
               {!isAutocompleteLoaded ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', height: '100%', alignItems: 'center', py: 5 }}>

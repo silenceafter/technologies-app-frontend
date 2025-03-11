@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { AppBar, Avatar, Button, Grid, IconButton, Link, Toolbar, Tooltip, Typography, Stack } from '@mui/material';
+import { AppBar, Avatar, Button, Grid, IconButton, Link, Toolbar, Tooltip, Typography, Stack, Box } from '@mui/material';
 import { HeaderSearch } from './HeaderSearch';
 import { useSelector, useDispatch } from 'react-redux';
 import { signOut } from '../store/slices/usersSlice';
@@ -70,7 +70,6 @@ function Header(props) {
     dispatch(signOut());
     setAnchorEl(null);
   };
-
   //
   return (
     <>
@@ -142,7 +141,20 @@ function Header(props) {
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
                 <MenuItem onClick={handleClose}>
-                  <Avatar /> Моя учетная запись
+                  <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                    
+                      <IconButton onClick={handleClick} color="inherit" sx={{ p: 0.5 }}>
+                        {!loading && !error ? (
+                          <Avatar {...stringAvatar(`${user?.lastname} ${user?.firstname}`)} />
+                        ) : (
+                          <Avatar {...stringAvatar('Неизвестный пользователь')} />
+                        )}                
+                      </IconButton> 
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography>{user?.lastname} {user?.firstname} {user?.patronimic}</Typography>
+                        <Typography sx={{ fontStyle: 'italic'}}>{user?.status}</Typography>
+                      </Box>                    
+                  </Box>
                 </MenuItem>
                 <Divider />                
                 <MenuItem onClick={handleClose}>
@@ -167,7 +179,7 @@ function Header(props) {
           <Grid container spacing={1} sx={{ alignItems: 'center' }}>
             <Grid item xs>
               <Typography color="inherit" variant="h5" component="h1">
-                Ввод чертежей
+                Технологии
               </Typography>
             </Grid>
             <Grid item>
