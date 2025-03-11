@@ -7,7 +7,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { AppBar, Avatar, Button, Grid, IconButton, Link, Toolbar, Tooltip, Typography, Stack } from '@mui/material';
 import { HeaderSearch } from './HeaderSearch';
 import { useSelector, useDispatch } from 'react-redux';
-import { getUserData, setTokens } from '../store/slices/usersSlice';
+import { signOut } from '../store/slices/usersSlice';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -50,36 +50,14 @@ function Header(props) {
   const dispatch = useDispatch();
 
   //стейты
-  const [urlParams, setUrlParams] = useState(null);
-  const [urlParamsLoaded, setUrlParamsLoaded] = useState(false);
-  const location = useLocation();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
   //селекторы
   const user = useSelector((state) => state.users.user);
   const loading = useSelector((state) => state.users.loading);
   const error = useSelector((state) => state.users.error);
 
-  //query parameters
-  /*useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const enterid = urlParams.get('enterid');
-    const usrhash = urlParams.get('usrhash');
-    //
-    if (enterid && usrhash) {
-      setUrlParams({ enterid: enterid, usrhash: usrhash });
-      
-      //сохранить токены в localStorage
-      localStorage.setItem('enterid', enterid);
-      localStorage.setItem('usrhash', usrhash);
-      dispatch(setTokens());
-      setUrlParamsLoaded(true);
-    } else {
-      setUrlParamsLoaded(false);
-    }
-  }, [location]);*/
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -87,9 +65,16 @@ function Header(props) {
     setAnchorEl(null);
   };
 
+  const handleUserExitClose = async () => {
+    //Учетная запись -> Выйти
+    dispatch(signOut());
+    setAnchorEl(null);
+  };
+
   //
   return (
     <>
+    {console.log(user)}
       <AppBar color="primary" position="sticky" elevation={0}>
         <Toolbar>
           <Grid container spacing={1} sx={{ alignItems: 'center' }}>
@@ -116,7 +101,7 @@ function Header(props) {
                 {!loading && !error ? (
                   <Avatar {...stringAvatar(`${user?.lastname} ${user?.firstname}`)} />
                 ) : (
-                  <Avatar {...stringAvatar('??')} />
+                  <Avatar {...stringAvatar('Неизвестный пользователь')} />
                 )}                
               </IconButton>
               <Menu
@@ -166,7 +151,7 @@ function Header(props) {
                   </ListItemIcon>
                   Настройки
                 </MenuItem>
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={handleUserExitClose}>
                   <ListItemIcon>
                     <Logout fontSize="small" />
                   </ListItemIcon>
