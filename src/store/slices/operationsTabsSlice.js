@@ -12,6 +12,7 @@ const initialState = {
     }*/
   ],
   tabValue: '1',
+  tabCnt: 1,
   validateForm: false,
   loading: false,
   error: null,
@@ -48,16 +49,25 @@ const operationsTabsSlice = createSlice({
   initialState,
   reducers: {
     setTabs: (state, action) => {
-      if (state.tabs.length === 0) {
-        state.tabs = action.payload;
-        state.activeTabId = action.payload.length > 0 ? action.payload[0].id : null;
-      }
+      return {
+        ...state,
+        tabs: action.payload,
+        tabCnt: action.payload.length + 1,
+        activeTabId: action.payload.length > 0 ? action.payload[0].id : null
+      };
+    },
+    resetTabs: (state) => {
+      return {
+        ...state,
+        tabs: [],
+      };
     },
     addTab: (state, action) => {
       return {
         ...state,
         tabs: [...state.tabs, action.payload],
         tabValue: action.payload.id,
+        tabCnt: state.tabCnt + 1,
       };
     },
     removeTab: (state, action) => {
@@ -97,7 +107,19 @@ const operationsTabsSlice = createSlice({
     },
     toggleValidateFormInSlice: (state) => {
       state.validateForm = !state.validateForm;
-    },    
+    },
+    incrementTabCnt: (state) => {
+      return {
+        ...state,
+        tabCnt: state.tabCnt + 1,
+      };
+    },
+    decrementTabCnt: (state) => {
+      return {
+        ...state,
+        tabCnt: state.tabCnt - 1,
+      }
+    },
   },
   /*extraReducers: (builder) => {
     builder
@@ -120,5 +142,5 @@ export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 
 export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation } = drawingsSlice.actions;*/
-export const { setTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice } = operationsTabsSlice.actions;
+export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice, incrementTabCnt, decrementTabCnt } = operationsTabsSlice.actions;
 export default operationsTabsSlice.reducer;

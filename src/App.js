@@ -6,6 +6,7 @@ import { Container } from '@mui/material';
 import { MainPage } from './pages/MainPage';
 import { NotFound } from './pages/notFound';
 import { LoginPage } from './pages/LoginPage';
+import { CrudPage } from './pages/CrudPage';
 import { Grid, Paper, AppBar, Tabs, Tab, TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import TreeView from '@mui/lab/TreeView';
@@ -20,6 +21,7 @@ function App() {
           <Routes>
             <Route index element={<MainPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/crud" element={<CrudPage />} />
           </Routes>
         </main>
       {/*</Container>*/}

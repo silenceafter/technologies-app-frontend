@@ -30,7 +30,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 import { selectItems as technologiesSelectItems, selectLoading as technologiesSelectLoading, selectError as technologiesSelectError} from '../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology, selectOperation } from '../store/slices/drawingsSlice';
-import { setTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice } from '../store/slices/operationsTabsSlice';
+import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, incrementTabCnt, decrementTabCnt } from '../store/slices/operationsTabsSlice';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
@@ -60,6 +60,7 @@ function Content() {
   const [validateForm, setValidateForm] = useState(() => () => true);
   const [autocompleteOptions, setAutocompleteOptions] = useState({});
   const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
+  const [loadingTimer, setLoadingTimer] = useState(true);
   
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
@@ -70,13 +71,21 @@ function Content() {
   const currentTechnology = useSelector(selectTechnology);
   const currentOperation = useSelector(selectOperation);
 
-  const { tabs, tabValue, expandedPanelsDefault } = useSelector((state) => state.operationsTabs);
+  const { tabs, tabValue, tabCnt, expandedPanelsDefault } = useSelector((state) => state.operationsTabs);
 
   const operationsSelectors = useSelector(selectOperations);
   const operationsItems = operationsSelectors?.items;
   const operationsLoading = operationsSelectors?.loading;
 
+  //эффекты
   useEffect(() => {
+    dispatch(resetTabs()); //гарантируем пустое начальное состояние tabs перед загрузкой вкладок
+    setTimeout(() => {
+      setLoadingTimer(false);
+    }, 500);    
+  }, []);
+
+  useEffect(() => {    
     dispatch(fetchData({ search: '', limit: 10, page: 1 }));
   }, [dispatch]);
 
@@ -138,10 +147,11 @@ function Content() {
     }
   }, [technologiesLoading, technologiesItems, tabs]);
   
+  //события
   const handleAddTab = () => {
     const newTab = {
       id: Date.now().toString(),
-      label: `Новая операция ${tabs.length + 1}`,
+      label: `Новая операция ${tabCnt}`,
       content: {
         formValues: {},
         formErrors: {},
@@ -154,6 +164,7 @@ function Content() {
 
   const handleRemoveTab = (id) => {
     dispatch(removeTab(id));
+    dispatch(setTabValue(1));
   };
 
   const handleUpdateTabContent = (tabId, newContent, newValidateForm) => {
@@ -168,40 +179,7 @@ function Content() {
     }
   }, [drawingExternalCode]);
  
-  /*const handleAddTab = () => {
-    const maxId = Math.max(...tabs.map((tab) => tab.id), 0);
-    const newTab = {
-      id: maxId + 1,
-      label: `Новая операция ${maxId + 1}`,
-      content: {
-        formValues: { orderNumber: maxId + 1 },
-        formErrors: {},
-        expandedPanels: expandedPanelsDefault,
-      },
-    };
-    //
-    setTabs((prevTabs) => [...prevTabs, newTab]);
-    setTabValue(tabs.length);
-  };
-
-  const handleCloseTab = (tabId) => {
-    setTabs((prevTabs) => {
-      const tabIndex = prevTabs.findIndex((tab) => tab.id === tabId);
-      const newTabs = prevTabs.filter((tab) => tab.id !== tabId);
-      //
-      if (tabValue === tabIndex) {
-        //закрытая вкладка была активной
-        const newActiveIndex = tabIndex > 0 ? tabIndex - 1 : 0; //берем предыдущую вкладку, если есть
-        setTabValue(newTabs.length > 0 ? newActiveIndex : null);
-      } else if (tabValue > tabIndex) {
-        //если закрыли вкладку перед активной, уменьшаем tabValue
-        setTabValue((prev) => Math.max(prev - 1, 0));
-      }  
-      return newTabs;
-    });
-  };
-
-  const handleTabMouseUp = (event, tabId) => {
+  /*const handleTabMouseUp = (event, tabId) => {
     if (event.button === 1) {
       handleCloseTab(tabId);
     }
@@ -268,9 +246,11 @@ function Content() {
   const handleAccordeonChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   }
-  //
+
+  //вывод
   return (
     <>
+    {console.log(tabCnt)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -321,7 +301,7 @@ function Content() {
           </AccordionSummary>
           <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px' }}>
             <Box sx={{ height: 'auto' }}>
-              {/*<ProductsTree />*/}
+              <ProductsTree />
             </Box>
           </AccordionDetails>          
         </Accordion>
@@ -329,7 +309,7 @@ function Content() {
       <Box sx={{
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-start',     
+          alignItems: 'flex-start',
           gap: 2,                   
           padding: 0,
           paddingBottom: 0,
@@ -354,7 +334,7 @@ function Content() {
                   variant='scrollable' 
                   scrollButtons='auto' 
                   textColor="inherit"
-                  sx={{ maxWidth: '100%', overflow: 'hidden'}}                
+                  sx={{ maxWidth: '100%', overflow: 'hidden' }}                
                 >
                   {tabs.map((tab, index) => (
                     <Tab 
@@ -374,6 +354,7 @@ function Content() {
                           </IconButton>
                         </Box>                      
                       }
+                      onClick={(e) => console.log(e, tabValue)}
                       /*onMouseUp={(e) => handleTabMouseUp(e, tab.id)}*/
                     />
                   ))}                
@@ -392,14 +373,14 @@ function Content() {
             </Box>            
             <Box sx={{           
               height: '91%',
-              overflowY: 'auto'
+              overflowY: 'auto',
             }}>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 2, paddingTop: 2 }}>
-                {drawingExternalCode && (
+                {drawingExternalCode && !loadingTimer && (
                   <TechnologyBreadcrumbs />
                 )}                
               </Box>
-              {!isAutocompleteLoaded ? (
+              {!isAutocompleteLoaded || loadingTimer ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', height: '100%', alignItems: 'center', py: 5 }}>
                     <CircularProgress size={40} />
                   </Box>

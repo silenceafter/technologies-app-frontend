@@ -4,7 +4,7 @@ import {
     AppBar,
     Autocomplete, 
     Box, 
-    CircularProgress, 
+    CircularProgress,
     Grid,
     Link,
     ListItem, 
@@ -18,21 +18,23 @@ import { setDrawing, clearDrawing, setTechnology, clearTechnology } from '../sto
 import { fetchData as productsFetchData, setItems as productsSetItems } from '../store/slices/productsSlice';
 import { getSavedData as technologiesFetchData, clearItems as technologiesSetItems } from '../store/slices/technologiesSlice';
 import { debounce } from 'lodash';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 function HeaderSearchT(props) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [value, setValue] = useState(null);
   const { key, ...restProps } = props;
 
   //TextField
   const [inputValue, setInputValue] = useState('');
+  const [loadingValues, setLoadingValues] = useState(false);
   
   //селекторы
-  const userDataRequest = useSelector((state) => state.getRequest.userDataRequest);
   const search = useSelector(selectSearch);
   const limit = useSelector(selectLimit);
-  const page = useSelector(selectPage); 
+  const page = useSelector(selectPage);
 
   //запросы для прокрутки списка
   const { items, loading, error, hasMore } = useSelector((state) => state.header);
@@ -41,7 +43,7 @@ function HeaderSearchT(props) {
 
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
-  }, 500); //задержка в 500 мс
+  }, 500);
 
   useEffect(() => {
     //загрузка данных при пустом поисковом запросе
@@ -51,12 +53,14 @@ function HeaderSearchT(props) {
   }, [dispatch, search, limit, page]);
 
   useEffect(() => {
-    //поиск при изменении значения в поле ввода
-    if (inputValue !== search) {
-      dispatch(setSearch(inputValue));
-      debouncedFetchData();
+    if (loadingValues) {
+      const timeoutId = setTimeout(() => {
+        debouncedFetchData();
+        setLoadingValues(false);        
+      }, 1000);
+      return () => clearTimeout(timeoutId);
     }
-  }, [inputValue, search, debouncedFetchData, dispatch]);
+  }, [loadingValues]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -66,21 +70,20 @@ function HeaderSearchT(props) {
   const handleScroll = (event) => {
     if (listRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
-      if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
+      if (scrollTop + clientHeight >= scrollHeight - 40 && !loading && !hasMore) {
         dispatch(setPage(page + 1));
         dispatch(fetchData({ search, limit, page: page + 1 }));
       }
     }
   };
   //
-  return (          
+  return (
+    <>
     <Autocomplete      
-      disableListWrap                
-      autoComplete={false}
-      autoHighlight={false}
+      autoHighlight={true}
       freeSolo={false}
       options={memoizedItems || []}
-      getOptionLabel={(option) => option.external_code || option.label}
+      getOptionLabel={(option) => option == null || option == undefined ? '' : option.external_code}
       filterOptions={(options, state) => {
         const { inputValue } = state;
         return options.filter(option =>
@@ -90,9 +93,15 @@ function HeaderSearchT(props) {
       }}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue);
+        setLoadingValues(true);
       }}
       onChange={(event, newValue) => {
-        setValue(newValue);              
+        setValue(newValue);                
+        dispatch(setSearch(inputValue));
+        
+        //обновить список и завершить таймер
+        debouncedFetchData();     
+        setLoadingValues(false);
 
         //обновить выбранное значение в redux                 
         if (newValue) {
@@ -102,7 +111,7 @@ function HeaderSearchT(props) {
               internalCode: newValue.internal_code, 
               name: newValue.name
             }
-          ));                
+          ));
         } else {
           dispatch(clearDrawing());
           dispatch(clearTechnology());
@@ -112,11 +121,13 @@ function HeaderSearchT(props) {
         dispatch(technologiesSetItems());                
         dispatch(productsFetchData({limit: 50, page: 1}));
         dispatch(technologiesFetchData({}));
-      }}      
+
+        navigate('/crud');
+      }}
       inputValue={inputValue}
       loadingText="поиск данных"
       noOptionsText="нет результатов"
-      loading={loading}
+      loading={loadingValues}
       ListboxProps={{                  
         onScroll: handleScroll,
         ref: listRef,
@@ -159,7 +170,18 @@ function HeaderSearchT(props) {
           placeholder="Код/Наименование"
           variant="outlined"
           sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-          size='small'          
+          size='small'
+          slotProps={{
+            input: {
+              ...params.InputProps,
+              endAdornment: (
+                <React.Fragment>
+                  {loadingValues ? <CircularProgress color="inherit" size={20} /> : null}
+                  {params.InputProps.endAdornment}
+                </React.Fragment>
+              ),
+            },
+          }}
         />
       )}
       sx={{
@@ -171,8 +193,9 @@ function HeaderSearchT(props) {
           padding: '8px 16px'
         },
       }}
-      value={value}
-    />                 
+      value={value || null}
+    />    
+    </>
   );
 }
 

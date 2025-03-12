@@ -12,7 +12,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import theme from '../theme';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { authenticate, setTokens } from '../store/slices/usersSlice';
+import { authenticate, setCrud } from '../store/slices/usersSlice';
 import { use } from 'react';
 
 import IconButton from '@mui/material/IconButton';
@@ -36,7 +36,7 @@ function Copyright() {
   );
 }
 
-function MainPage() {
+function CrudPage() {
   //константы
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
 
@@ -64,12 +64,6 @@ function MainPage() {
       setIsLoaded(true);
     });
   }, [dispatch]);
-
-  /*useEffect(() => {
-    if (!loading && !user) {
-      navigate('/login');
-    }
-  }, [user, loading, navigate]);*/
   
   //загрузка
   if (!isloaded) {
@@ -107,47 +101,8 @@ function MainPage() {
                   boxShadow: 3,
                   height: '46rem', /*735px*/
                   overflow: 'hidden',                
-                }}>
-                  <Content />
-                  {/*<Grid container spacing={2} sx={{ alignItems: 'center', width: '100%', height: '100%' }}>
-                    <Grid item sx={{ width: '100%'}}>
-                      <Paper sx={{ width: '30%', margin: 'auto', overflow: 'hidden' }}>
-                        <AppBar
-                          position="static"
-                          color="default"
-                          elevation={0}
-                          sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
-                        >
-                          <Toolbar>
-                            <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-                              <Grid item>
-                                <SearchIcon color="inherit" sx={{ display: 'block' }} />
-                              </Grid>
-                              <Grid item xs>
-                                <HeaderSearchT />
-                              </Grid>
-                              <Grid item>                            
-                                <Tooltip title="Reload">
-                                  <IconButton>
-                                    <RefreshIcon color="inherit" sx={{ display: 'block' }} />
-                                  </IconButton>
-                                </Tooltip>
-                              </Grid>
-                            </Grid>
-                          </Toolbar>
-                        </AppBar>
-                        
-                        <Typography align="center" sx={{ color: 'text.secondary', my: 5, mx: 2 }}></Typography>
-                      </Paper>
-                    </Grid>
-                    <Grid item></Grid>
-                  </Grid>*/}
-                  
-              
-              
-                  
-                          
-                     
+                }}>                 
+                  <Content />                    
                 </Box>            
               </Box>
               <Box component="footer" sx={{ paddingLeft: 1, paddingRight: 1, paddingBottom: 1, bgcolor: '#eaeff1' }}>
@@ -161,4 +116,4 @@ function MainPage() {
   );
 }
 
-export {MainPage};
+export {CrudPage};

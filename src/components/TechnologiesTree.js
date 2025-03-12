@@ -94,6 +94,7 @@ export default function TechnologiesTree() {
   const [editedItems, setEditedItems] = useState([]);
   const [developedTechnologies, setDevelopedTechnologies] = useState([]);
   const [anchorPopover, setAnchorPopover] = useState(null);
+  const [loadingTimer, setLoadingTimer] = useState(true);
 
   //селекторы
   const dispatch = useDispatch();
@@ -434,6 +435,12 @@ export default function TechnologiesTree() {
   }, [apiRef, dispatch, getItemDescendantsIds]);
 
   useEffect(() => {
+    setTimeout(() => {
+      setLoadingTimer(false);
+    }, 500);
+  }, []);
+
+  useEffect(() => {
     //для expandedItems
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
@@ -531,7 +538,7 @@ export default function TechnologiesTree() {
   };
   
   //вывод
-  if (loading) {
+  if (loadingTimer) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
         <CircularProgress size={40} />

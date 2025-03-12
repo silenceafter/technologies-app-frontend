@@ -21,18 +21,18 @@ import { debounce } from 'lodash';
 
 function HeaderSearch(props) {
   const dispatch = useDispatch();
-
-  const [value, setValue] = useState(null);
   const { key, ...restProps } = props;
-
-  //TextField
-  const [inputValue, setInputValue] = useState('');
   
   //селекторы
   const userDataRequest = useSelector((state) => state.getRequest.userDataRequest);
   const search = useSelector(selectSearch);
   const limit = useSelector(selectLimit);
-  const page = useSelector(selectPage); 
+  const page = useSelector(selectPage);
+  const drawing = useSelector((state) => state.drawings.drawing);
+  
+  //стейты
+  const [inputValue, setInputValue] = useState('');
+  const [value, setValue] = useState(null);
 
   //запросы для прокрутки списка
   const { items, loading, error, hasMore } = useSelector((state) => state.header);
@@ -43,6 +43,7 @@ function HeaderSearch(props) {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
   }, 500); //задержка в 500 мс
 
+  //эффекты
   useEffect(() => {
     //загрузка данных при пустом поисковом запросе
     if (!search) {
@@ -63,6 +64,7 @@ function HeaderSearch(props) {
     return () => window.removeEventListener('scroll', handleScroll);//чистим обработчик при размонтировании
   }, [loading, hasMore]);
 
+  //события
   const handleScroll = (event) => {
     if (listRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
@@ -82,7 +84,7 @@ function HeaderSearch(props) {
               {/*<SearchIcon color="inherit" sx={{ display: 'block' }} />*/}
             </Grid>
             <Grid item xs>
-              {/*<Autocomplete
+              {<Autocomplete
                 disableListWrap                
                 autoComplete={false}
                 autoHighlight={false}
@@ -121,7 +123,6 @@ function HeaderSearch(props) {
                   dispatch(productsFetchData({limit: 50, page: 1}));
                   dispatch(technologiesFetchData({}));
                 }}
-                onClose={console.log('clear')}
                 inputValue={inputValue}
                 loadingText="поиск данных"
                 noOptionsText="нет результатов"
@@ -181,8 +182,8 @@ function HeaderSearch(props) {
                     padding: '8px 16px'
                   },
                 }}
-                value={value}
-              />*/}
+                value={value || null}
+              />}
             </Grid>        
           </Grid>
         </Toolbar>
