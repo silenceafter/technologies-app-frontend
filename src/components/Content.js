@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useContext, createContext } from 'react';
+import React, { useState, useEffect, useMemo, useContext, createContext, useCallback } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Divider, Typography } from '@mui/material';
@@ -60,7 +60,8 @@ function Content() {
   const [validateForm, setValidateForm] = useState(() => () => true);
   const [autocompleteOptions, setAutocompleteOptions] = useState({});
   const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
-  const [loadingTimer, setLoadingTimer] = useState(true);
+  const [loadingTimer, setLoadingTimer] = useState(false);
+  const [expanded, setExpanded] = useState('panel1');
   
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
@@ -78,12 +79,15 @@ function Content() {
   const operationsLoading = operationsSelectors?.loading;
 
   //эффекты
+  //анимация загрузки вкладки
   useEffect(() => {
-    dispatch(resetTabs()); //гарантируем пустое начальное состояние tabs перед загрузкой вкладок
-    setTimeout(() => {
-      setLoadingTimer(false);
-    }, 500);    
-  }, []);
+    if (drawingExternalCode != '') {
+      setLoadingTimer(true);
+      setTimeout(() => {
+        setLoadingTimer(false);
+      }, 500); 
+    }
+  }, [drawingExternalCode]);
 
   useEffect(() => {    
     dispatch(fetchData({ search: '', limit: 10, page: 1 }));
@@ -146,9 +150,23 @@ function Content() {
       console.error("Ошибка при обработке технологий:", error);
     }
   }, [technologiesLoading, technologiesItems, tabs]);
+
+  useEffect(() => {
+    if (tabs.length === 0) {
+      dispatch(setTabValue(0)); // или 0, если вкладок нет
+    }
+  }, [tabs, dispatch]);
+
+  //очистить стейт вкладок/карточек
+  useEffect(() => {
+    if (!drawingExternalCode) {
+      //setTabValue(0);
+      //setTabs([]);
+    }
+  }, [drawingExternalCode]);
   
   //события
-  const handleAddTab = () => {
+  const handleAddTab = useCallback(() => {
     const newTab = {
       id: Date.now().toString(),
       label: `Новая операция ${tabCnt}`,
@@ -160,25 +178,37 @@ function Content() {
     };
     dispatch(addTab(newTab));
     dispatch(setTabValue(tabs.length));
-  };
+  }, [dispatch, tabCnt/*, tabs*/]); 
 
-  const handleRemoveTab = (id) => {
-    dispatch(removeTab(id));
-    dispatch(setTabValue(1));
-  };
+  const handleRemoveTab = useCallback(
+    (id) => {
+      dispatch(removeTab(id));
+      dispatch(setTabValue(1));
+    },
+    [dispatch]
+  );
 
-  const handleUpdateTabContent = (tabId, newContent, newValidateForm) => {
-    dispatch(updateTab({ id: tabId, newContent: newContent, newValidateForm: newValidateForm }));
-  };
+  const handleUpdateTabContent = useCallback(
+    (tabId, newContent, newValidateForm) => {
+      dispatch(updateTab({ id: tabId, newContent: newContent, newValidateForm: newValidateForm }));
+    }, 
+    [dispatch]
+  );
 
-  //очистить стейт вкладок/карточек
-  useEffect(() => {
-    if (!drawingExternalCode) {
-      //setTabValue(0);
-      //setTabs([]);
-    }
-  }, [drawingExternalCode]);
- 
+  const handleOperationUpdate = useCallback(
+    (newData) => {
+      const currentTab = tabs[tabValue];
+      if (currentTab && currentTab.id) {
+        handleUpdateTabContent(currentTab.id, newData, validateForm);
+      }
+    },
+    [handleUpdateTabContent, tabValue, tabs, validateForm]
+  );
+
+  const handleAccordeonChange = useCallback((panel) => (event, newExpanded) => {
+    setExpanded(newExpanded ? panel : false);
+  }, [setExpanded]);
+
   /*const handleTabMouseUp = (event, tabId) => {
     if (event.button === 1) {
       handleCloseTab(tabId);
@@ -242,10 +272,43 @@ function Content() {
     }, 2000));
   };    
 
-  const [expanded, setExpanded] = useState('panel1');
-  const handleAccordeonChange = (panel) => (event, newExpanded) => {
-    setExpanded(newExpanded ? panel : false);
-  }
+  //Tabs, Tab
+  const MemoizedTabs = React.memo(({ tabs, tabValue, handleRemoveTab, setTabValue }) => {
+    return (
+      <Tabs
+        value={tabValue}
+        onChange={(e, newValue) => setTabValue(newValue)}
+        variant='scrollable'
+        scrollButtons='auto'
+        textColor="inherit"
+        sx={{ maxWidth: '100%', overflow: 'hidden' }}
+      >
+        {tabs.map((tab, index) => (
+          <Tab
+            key={tab.id}
+            label={
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                {tab.label}
+                {loadingTimer && <CircularProgress size={20} color="inherit" />}
+                <IconButton
+                  size="small"
+                  sx={{ marginLeft: 1 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveTab(tab.id);
+                  }}
+                >
+                  <CloseIcon fontSize="small" sx={{ color: 'white' }} />
+                </IconButton>
+              </Box>
+            }
+            onClick={(e) => console.log(e, tabValue)}
+            /*onMouseUp={(e) => handleTabMouseUp(e, tab.id)}*/
+          />
+        ))}
+      </Tabs>
+    );
+  });
 
   //вывод
   return (
@@ -257,7 +320,7 @@ function Content() {
         alignItems: 'flex-start',
         width: '22%',/*24rem*/
         height: '705px',
-        overflow: 'hidden',        
+        overflow: 'hidden',
       }}>
         <Accordion defaultExpanded
           expanded={expanded === 'panel1'} 
@@ -327,8 +390,14 @@ function Content() {
                 color="primary"
                 elevation={0}
                 sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}
-              >   
-                <Tabs 
+              >
+                <MemoizedTabs
+                  tabs={tabs}
+                  tabValue={tabValue}
+                  handleRemoveTab={handleRemoveTab}
+                  setTabValue={(newValue) => dispatch(setTabValue(newValue))}
+                />
+                {/*<Tabs 
                   value={tabValue} 
                   onChange={(e, newValue) => dispatch(setTabValue(newValue))}
                   variant='scrollable' 
@@ -356,9 +425,9 @@ function Content() {
                       }
                       onClick={(e) => console.log(e, tabValue)}
                       /*onMouseUp={(e) => handleTabMouseUp(e, tab.id)}*/
-                    />
+                 /*   />
                   ))}                
-                </Tabs>
+                </Tabs>*/}
                 <IconButton 
                   onClick={handleAddTab}
                   size="small" 
@@ -390,7 +459,7 @@ function Content() {
                     <TabPanel key={tabs[tabValue].id} value={tabValue} index={tabValue}>
                       <OperationCard
                         content={tabs[tabValue]?.content}
-                        onUpdate={(newData) => handleUpdateTabContent(tabs[tabValue]?.id, newData, validateForm)}
+                        onUpdate={handleOperationUpdate/*(newData) => handleUpdateTabContent(tabs[tabValue]?.id, newData, validateForm)*/}
                         setValidateForm={setValidateForm}
                         autocompleteOptions={autocompleteOptions}
                       />

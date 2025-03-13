@@ -35,7 +35,7 @@ const rootReducer = combineReducers({
   technologies: technologiesReducer,
   products: productsReducer,
   equipment: equipmentReducer,
-  users: usersReducer,
+  users: usersReducer, /* храним обязательно */
   operationsTabs: operationsTabsReducer,
 });
 
@@ -43,7 +43,8 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage,
-  stateReconciler: autoMergeLevel2,
+  whitelist: ['users']
+  /*stateReconciler: autoMergeLevel2,*/
 };
 
 

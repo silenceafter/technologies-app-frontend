@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { 
     AppBar,
@@ -69,7 +69,7 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
     return () => window.removeEventListener('scroll', handleScroll);//чистим обработчик при размонтировании
   }, [loading, hasMore]);*/
 
-  const handleScroll = (event) => {
+  const handleScroll = useCallback((event) => {
     if (listRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
       if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
@@ -77,7 +77,7 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
         dispatch(fetchData({ search, limit, page: page + 1 }));
       }
     }
-  };
+  }, [dispatch, page, search, limit, loading, hasMore]);
   
   useEffect(() => {
     setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');

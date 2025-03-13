@@ -94,7 +94,7 @@ export default function TechnologiesTree() {
   const [editedItems, setEditedItems] = useState([]);
   const [developedTechnologies, setDevelopedTechnologies] = useState([]);
   const [anchorPopover, setAnchorPopover] = useState(null);
-  const [loadingTimer, setLoadingTimer] = useState(true);
+  const [loadingTimer, setLoadingTimer] = useState(false);
 
   //селекторы
   const dispatch = useDispatch();
@@ -434,11 +434,22 @@ export default function TechnologiesTree() {
     toggledItemRef.current = {};
   }, [apiRef, dispatch, getItemDescendantsIds]);
 
+  //эффекты
+  //анимация загрузки вкладки
   useEffect(() => {
+    if (drawingExternalCode != '') {
+      setLoadingTimer(true);
+      setTimeout(() => {
+        setLoadingTimer(false);
+      }, 500); 
+    }
+  }, [drawingExternalCode]);
+  
+  /*useEffect(() => {
     setTimeout(() => {
       setLoadingTimer(false);
     }, 500);
-  }, []);
+  }, []);*/
 
   useEffect(() => {
     //для expandedItems

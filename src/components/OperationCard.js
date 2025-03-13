@@ -57,7 +57,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     'laborEffort'
   ];
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
 
     //formValues
@@ -102,7 +102,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
         }
       );
     }
-  };
+  }, [localData, setLocalData, numericFields, onUpdate]);
 
   const handleOptionSelect = useCallback((id, option) => {
     // Обновляем значение поля
@@ -129,26 +129,29 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     }
   }, [localData, onUpdate]);
 
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setLocalData((prev) => ({
-      ...prev,
-      expandedPanels: {
-        ...prev.expandedPanels,
-        [panel]: isExpanded
-      },
-    }));
-    //
-    onUpdate(
-      { 
-        ...localData, 
-        expandedPanels: 
-        { 
-          ...localData.expandedPanels,
-          [panel]: isExpanded 
+  const handleAccordionChange = useCallback(
+    (panel) => (event, isExpanded) => {
+      setLocalData((prev) => ({
+        ...prev,
+        expandedPanels: {
+          ...prev.expandedPanels,
+          [panel]: isExpanded
         },
-      }
-    );
-  };
+      }));
+      //
+      onUpdate(
+        { 
+          ...localData, 
+          expandedPanels: 
+          { 
+            ...localData.expandedPanels,
+            [panel]: isExpanded 
+          },
+        }
+      );
+    }, 
+    [localData, setLocalData]
+  );
 
   //проверка формы
   const validateForm = (e) => {
@@ -251,7 +254,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   useEffect(() => {
     setValidateForm(() => validateForm);
   }, [setValidateForm]);
-
+  //
   return (
     <>
       {/* Параметры */}
