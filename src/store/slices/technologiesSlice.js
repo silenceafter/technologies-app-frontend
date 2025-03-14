@@ -7,6 +7,7 @@ const initialState = {
   items: [], /* основные элементы дерева */
   selectedItems: [], /* выделенные элементы */
   disabledItems: [], /* помеченные на удаление */
+  selectedItemId: null,
   loading: LOADING_DEFAULT,
   error: null,
   newItemCnt: 1,
@@ -172,6 +173,12 @@ const technologiesSlice = createSlice({
       return {
         ...state,
         selectedItems: action.payload
+      };
+    },
+    setSelectedItemId: (state, action) => {
+      return {
+        ...state,
+        selectedItemId: action.payload,
       };
     },
     addItems: (state) => {
@@ -399,6 +406,7 @@ const technologiesSlice = createSlice({
 export const { 
   clearItems, setItems, addItems,
   setSelectedItems, addSelectedItems, deleteSelectedItems,
+  setSelectedItemId,
   setDisabledItems, restoreItems,
   setSearch, setLimit, setPage
 } = technologiesSlice.actions;

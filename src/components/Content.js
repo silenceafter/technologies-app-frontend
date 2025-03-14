@@ -62,6 +62,7 @@ function Content() {
   const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [expanded, setExpanded] = useState('panel1');
+  const [currentOperationSelectedItemId, setCurrentOperationSelectedItemId] = useState(null);
   
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
@@ -71,6 +72,7 @@ function Content() {
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const currentTechnology = useSelector(selectTechnology);
   const currentOperation = useSelector(selectOperation);
+  const operationSelectedItemId = useSelector((state) => state.technologies.selectedItemId);
 
   const { tabs, tabValue, tabCnt, expandedPanelsDefault } = useSelector((state) => state.operationsTabs);
 
@@ -164,6 +166,26 @@ function Content() {
       //setTabs([]);
     }
   }, [drawingExternalCode]);
+
+  //следим за текущей выбранной операцией
+  useEffect(() => {
+    //для null
+    if (currentOperationSelectedItemId == null) {
+      setCurrentOperationSelectedItemId(operationSelectedItemId);
+      return;
+    }
+    //
+    if (operationSelectedItemId != currentOperationSelectedItemId) {
+      setCurrentOperationSelectedItemId(operationSelectedItemId);
+
+      //закрыть открытые вкладки операций
+      for(const tabItem of tabs) {
+        handleRemoveTab(tabItem.id);
+      }      
+    }
+    
+        
+  }, operationSelectedItemId);
   
   //события
   const handleAddTab = useCallback(() => {
@@ -313,7 +335,6 @@ function Content() {
   //вывод
   return (
     <>
-    {console.log(tabCnt)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

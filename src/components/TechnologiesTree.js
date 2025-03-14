@@ -21,7 +21,8 @@ import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
 import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { TreeItem2LabelInput } from '@mui/x-tree-view/TreeItem2LabelInput';
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
-import { fetchData, setItems, addItems, setSelectedItems, addSelectedItems, deleteSelectedItems, setDisabledItems, restoreItems, deleteSavedData} from '../store/slices/technologiesSlice';
+import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
+import { fetchData, setItems, addItems, setSelectedItems, setSelectedItemId, addSelectedItems, deleteSelectedItems, setDisabledItems, restoreItems, deleteSavedData} from '../store/slices/technologiesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import Card from '@mui/material/Card';
@@ -86,9 +87,6 @@ export default function TechnologiesTree() {
   //стейты
   const [loadedItems, setLoadedItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState([]);
-  //const [disabledItems, setDisabledItems] = useState([]);
-  //const [selectedItems, setSelectedItems] = useState([]);
-  //const [technologyChip, setTechnologyChip] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
   const [editedItems, setEditedItems] = useState([]);
@@ -96,6 +94,7 @@ export default function TechnologiesTree() {
   const [anchorPopover, setAnchorPopover] = useState(null);
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [focusedItem, setFocusedItem] = useState([]);
+  //const [selectedItemId, setSelectedItemId] = useState(null);
 
   //селекторы
   const dispatch = useDispatch();
@@ -106,12 +105,12 @@ export default function TechnologiesTree() {
   const technologySelector = useSelector(selectTechnology);
   const selectedItems = useSelector((state) => state.technologies.selectedItems);
   const disabledItems = useSelector((state) => state.technologies.disabledItems);
+  const selectedItemId = useSelector((state) => state.technologies.selectedItemId);
 
   //refs
   const itemRef = useRef(null);
   const toggledItemRef = React.useRef({});
-  const apiRef = useTreeViewApiRef();
-  const focusedItemRef = useRef({});
+  const apiRef = useTreeViewApiRef();  
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -167,10 +166,10 @@ export default function TechnologiesTree() {
     );
   }*/
 
-  function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel, type, labelRef }) {
+  function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel, type, labelRef, focused, pp }) {
     const [isEditing, setIsEditing] = useState(edited);
-    const [isFocused, setIsFocused] = useState(false);
-    const [value, setValue] = useState(customLabel);
+    const [isFocused, setIsFocused] = useState(focusedItem.includes(pp));
+    const [value, setValue] = useState(customLabel);  
     //
     return (
       <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }} ref={labelRef}>
@@ -206,8 +205,8 @@ export default function TechnologiesTree() {
           ) : (
             <Typography 
               onClick={(e) => { 
-                /*e.stopPropagation();*/ 
-                /*setIsEditing(true);*/                
+                /*e.stopPropagation();*/
+                /*setIsEditing(true);*/
                 onLabelClick?.(e);                
               }}
             >
@@ -223,8 +222,6 @@ export default function TechnologiesTree() {
                   variant="caption" 
                   color="secondary" 
                   onClick={(e) => { 
-                    /*e.stopPropagation();*/
-                    onSecondaryLabelClick?.(e);
                   }}
                 >
                   {secondaryLabel}
@@ -255,7 +252,14 @@ export default function TechnologiesTree() {
       itemId: props.itemId,
       children: props.children,
     });
+    const {
+      status: { focused, selected /*, editable, editing*/ },
+    } = useTreeItem2(props);
     const item = publicAPI.getItem(props.itemId);
+
+    if (focused) {
+      let h;
+    }
 
     //стейты
     const [isProcessing, setIsProcessing] = useState(false);
@@ -263,22 +267,24 @@ export default function TechnologiesTree() {
     const [dataLoaded, setDataLoaded] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [disabled, setDisabled] = useState(false);
-    const [selected, setSelected] = useState(false);
-    const [focused, setFocused] = useState(false);
+    /*const [selected, setSelected] = useState(false);*/
+    const [isFocused, setIsFocused] = useState(selected);
     const [anchorPopover, setAnchorPopover] = useState(null);
 
     //рефы
     const timerRef = useRef(null);
     const labelRef = useRef(null);
 
+
+
     //эффекты
     useEffect(() => {
       setExpanded(expandedItems.includes(props.itemId));
       setDisabled(disabledItems.includes(props.itemId));
-      setSelected(selectedItems.includes(props.itemId));
+      /*setSelected(selectedItems.includes(props.itemId));*/
       setEdited(editedItems.includes(props.itemId));
-      setFocused(focusedItem.includes(props.itemId));
-    }, [expandedItems, disabledItems, selectedItems, editedItems, focusedItem, props.itemId]);
+      /*setFocused(focusedItem.includes(props.itemId));*/
+    }, [expandedItems, disabledItems, /*selectedItems,*/ editedItems, props.itemId]);
 
     //expanded
     const handleRootClick = (e) => {
@@ -302,15 +308,13 @@ export default function TechnologiesTree() {
     const handleChildClick = (e) => {
       if (dataLoaded) return;
       e.stopPropagation();
-
-      setFocusedItem((prevExpanded) => {
-        if (focused) {
-          return [...prevExpanded, props.itemId];
-        } else {
-          return prevExpanded.filter((id) => id !== props.itemId)
-        }
-      });
-      //apiRef.current?.focusItem(e, props.itemId);
+      
+      handleCustomTreeItemClick(e, props.itemId);
+      //фокус, глобальное состояние
+      /*if (selected1) {
+        setFocusedItem(props.itemId);
+      }*/
+      
       //popover
       /*if (labelRef.current) {
         setAnchorPopover(labelRef.current);
@@ -342,10 +346,12 @@ export default function TechnologiesTree() {
             secondaryLabel: item?.secondaryLabel || '',
             edited: edited,
             onLabelClick: (e) => <TextField>111</TextField>,
-            onSecondaryLabelClick: (e) => console.log(item?.type),
+            onSecondaryLabelClick: (e) => console.log('onSecondaryLabelClick'),
             customLabel: item?.label || '',
             type: item?.type,
             labelRef: labelRef,
+            focused: false,/*selected1,*/
+            pp: props.itemId,
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
@@ -407,10 +413,6 @@ export default function TechnologiesTree() {
     [itemRef, editedItems]
   );
 
-  /*const handleItemFocusToggle = useCallback((event, nodeId, focused) => {
-    setFocusedItem(() => focused ? nodeId : '');
-  }, [setFocusedItem]);*/
-
   const handleItemExpansionToggle = useCallback((event, nodeId, expanded) => {
     setExpandedItems((prevExpanded) => {
       if (expanded) {
@@ -450,6 +452,17 @@ export default function TechnologiesTree() {
     dispatch(setSelectedItems(newSelectedItemsWithChildren));//setSelectedItems(newSelectedItemsWithChildren);
     toggledItemRef.current = {};
   }, [apiRef, dispatch, getItemDescendantsIds]);
+
+  //selected, CustomTreeItem
+  const handleCustomTreeItemClick = (event, itemId) => {
+    apiRef.current.selectItem({
+      event,
+      itemId,
+      keepExistingSelection: false,
+      shouldBeSelected: true,       
+    });
+    dispatch(setSelectedItemId(itemId));//setSelectedItemId(itemId);
+  };
 
   //эффекты
   //анимация загрузки вкладки
@@ -567,11 +580,15 @@ export default function TechnologiesTree() {
       </Box>
     );
   }
+
+  const MemoizedRichTreeView = React.memo((props) => (
+    <RichTreeView {...props} />
+  ));
   //
   return (
     <>
-    {console.log(focusedItemRef)}
-      <RichTreeView
+    {console.log(selectedItemId)}
+      <MemoizedRichTreeView
         checkboxSelection
         multiSelect
         slots={{ item: renderCustomTreeItem }}
