@@ -29,7 +29,7 @@ import { MemoizedTabPanel as TabPanel } from './TabPanel';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 import { selectItems as technologiesSelectItems, selectLoading as technologiesSelectLoading, selectError as technologiesSelectError} from '../store/slices/technologiesSlice';
-import { selectDrawingExternalCode, selectTechnology, setTechnology, selectOperation } from '../store/slices/drawingsSlice';
+import { selectDrawingExternalCode, selectTechnology, setTechnology, setOperation, selectOperation } from '../store/slices/drawingsSlice';
 import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, incrementTabCnt, decrementTabCnt } from '../store/slices/operationsTabsSlice';
 
 import Accordion from '@mui/material/Accordion';
@@ -63,6 +63,7 @@ function Content() {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [expanded, setExpanded] = useState('panel1');
   const [currentOperationSelectedItemId, setCurrentOperationSelectedItemId] = useState(null);
+  const [isUserClosedAllTabs, setIsUserClosedAllTabs] = useState(false);
   
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
@@ -109,55 +110,55 @@ function Content() {
   useEffect(() => {
     try {
       if (!technologiesLoading && technologiesItems.length > 0) {
-        const newTabs = technologiesItems[0].children
-        .filter(operation => operation.orderNumber)
-        .map(operation => {
-          // Ищем существующую вкладку, чтобы сохранить ошибки и состояние панелей
-          const existingTab = tabs.find(tab => tab.id === operation.orderNumber);
-
-          return {
-            id: operation.orderNumber,
-            label: `Операция ${operation.orderNumber}`,
-            content: {
-              formValues: {
-                orderNumber: operation.orderNumber,
-                operationDescription: operation.operationDescription,
-                shopNumber: operation.shopNumber,
-                areaNumber: operation.areaNumber,
-                document: operation.document,
-                grade: operation.grade,
-                workingConditions: operation.workingConditions,
-                numberOfWorkers: operation.numberOfWorkers,
-                numberOfProcessedParts: operation.numberOfProcessedParts,
-                laborEffort: operation.laborEffort,
-                jobCode: { code: operation.jobCode, name: operation.jobName },
-                operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.labelId },
-              },
-              formErrors: existingTab?.content?.formErrors || {}, // Сохраняем ошибки
-              expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели
+        if (tabs.length === 0 && !isUserClosedAllTabs) {
+          //изначально вкладки создаются из technologiesItems 
+          const newTabs = technologiesItems[0].children
+            .filter(operation => operation.orderNumber)
+            .map(operation => {
+              // Ищем существующую вкладку, чтобы сохранить ошибки и состояние панелей
+              const existingTab = tabs.find(tab => tab.id === operation.orderNumber);
+              return {
+                id: operation.orderNumber,
+                label: `${operation.secondaryLabel} (${operation.label})`,/*`Операция ${operation.orderNumber}`,*/
+                content: {
+                  formValues: {
+                    orderNumber: operation.orderNumber,
+                    operationDescription: operation.operationDescription,
+                    shopNumber: operation.shopNumber,
+                    areaNumber: operation.areaNumber,
+                    document: operation.document,
+                    grade: operation.grade,
+                    workingConditions: operation.workingConditions,
+                    numberOfWorkers: operation.numberOfWorkers,
+                    numberOfProcessedParts: operation.numberOfProcessedParts,
+                    laborEffort: operation.laborEffort,
+                    jobCode: { code: operation.jobCode, name: operation.jobName },
+                    operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.labelId },
+                  },
+                  formErrors: existingTab?.content?.formErrors || {}, // Сохраняем ошибки
+                  expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели
+                }
+              };
             }
-          };
-        });
-
-        //
-        if (tabs.length === 0) {
+          );
+          //
           dispatch(setTabs(newTabs));
           dispatch(setTabValue(0)); //первая вкладка активна по умолчанию
         }
       }
   
-        // Устанавливаем текущую выбранную технологию
-        dispatch(setTechnology({ name: technologiesItems[0].secondaryLabel, code: technologiesItems[0].label }));
+      // Устанавливаем текущую выбранную технологию
+      dispatch(setTechnology({ name: technologiesItems[0].secondaryLabel, code: technologiesItems[0].label }));
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
-  }, [technologiesLoading, technologiesItems, tabs]);
+  }, [technologiesLoading, technologiesItems, tabs, isUserClosedAllTabs]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (tabs.length === 0) {
       dispatch(setTabValue(0)); // или 0, если вкладок нет
     }
-  }, [tabs, dispatch]);
+  }, [tabs, dispatch]);*/
 
   //очистить стейт вкладок/карточек
   useEffect(() => {
@@ -169,8 +170,16 @@ function Content() {
 
   //следим за текущей выбранной операцией
   useEffect(() => {
+    if (!technologiesLoading && technologiesItems.length > 0) {
+      //поиск технологии
+      //if (technologiesItems.id == operationSelectedItemId) {
+        
+      //}
+    }
+    
+
     //для null
-    if (currentOperationSelectedItemId == null) {
+    /*if (currentOperationSelectedItemId == null) {
       setCurrentOperationSelectedItemId(operationSelectedItemId);
       return;
     }
@@ -178,19 +187,14 @@ function Content() {
     if (operationSelectedItemId != currentOperationSelectedItemId) {
       setCurrentOperationSelectedItemId(operationSelectedItemId);
 
-      //закрыть открытые вкладки операций
-      for(const tabItem of tabs) {
-        handleRemoveTab(tabItem.id);
-      }      
-    }
-    
-        
-  }, operationSelectedItemId);
+      //закрыть открытые вкладки операций   
+    }*/
+  }, [operationSelectedItemId]);
   
   //события
   const handleAddTab = useCallback(() => {
     const newTab = {
-      id: Date.now().toString(),
+      id: tabCnt, /*Date.now().toString(),*/
       label: `Новая операция ${tabCnt}`,
       content: {
         formValues: {},
@@ -199,15 +203,28 @@ function Content() {
       }
     };
     dispatch(addTab(newTab));
-    dispatch(setTabValue(tabs.length));
+    dispatch(setTabValue(tabCnt));
+    //dispatch(setOperation({name: '', code: ''}));
   }, [dispatch, tabCnt/*, tabs*/]); 
 
   const handleRemoveTab = useCallback(
     (id) => {
+      //найти максимальный id в tabs
+    //const maxId = Math.max(...tabs.map(tab => tab.id));
+
       dispatch(removeTab(id));
-      dispatch(setTabValue(1));
+      //найти предмаксимальный id в tabs
+      const remainingTabs = tabs.filter(tab => tab.id !== id);
+      const minimalId = Math.min(...remainingTabs.map(tab => tab.id));
+      const yy = tabValue;
+      dispatch(setTabValue(tabValue));
+
+      //флаг
+      if (tabs.length === 1) {
+        setIsUserClosedAllTabs(true);
+      }
     },
-    [dispatch]
+    [dispatch, tabs]
   );
 
   const handleUpdateTabContent = useCallback(
@@ -299,7 +316,7 @@ function Content() {
     return (
       <Tabs
         value={tabValue}
-        onChange={(e, newValue) => setTabValue(newValue)}
+        onChange={(e, newValue) => /*setTabValue(newValue)*/ console.log('zz') }
         variant='scrollable'
         scrollButtons='auto'
         textColor="inherit"
@@ -324,7 +341,7 @@ function Content() {
                 </IconButton>
               </Box>
             }
-            onClick={(e) => console.log(e, tabValue)}
+            onClick={(e) => console.log(e, tabValue) /* tabValue управляется автоматически, при закрытии вкладок счетчик сбрасывается */}
             /*onMouseUp={(e) => handleTabMouseUp(e, tab.id)}*/
           />
         ))}
@@ -335,6 +352,7 @@ function Content() {
   //вывод
   return (
     <>
+      {console.log(tabs)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -416,39 +434,8 @@ function Content() {
                   tabs={tabs}
                   tabValue={tabValue}
                   handleRemoveTab={handleRemoveTab}
-                  setTabValue={(newValue) => dispatch(setTabValue(newValue))}
-                />
-                {/*<Tabs 
-                  value={tabValue} 
-                  onChange={(e, newValue) => dispatch(setTabValue(newValue))}
-                  variant='scrollable' 
-                  scrollButtons='auto' 
-                  textColor="inherit"
-                  sx={{ maxWidth: '100%', overflow: 'hidden' }}                
-                >
-                  {tabs.map((tab, index) => (
-                    <Tab 
-                      key={tab.id} 
-                      label={
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          {tab.label}
-                          <IconButton
-                            size="small"
-                            sx={{ marginLeft: 1 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveTab(tab.id);
-                            }}
-                          >
-                            <CloseIcon fontSize="small" sx={{color: 'white'}}/>
-                          </IconButton>
-                        </Box>                      
-                      }
-                      onClick={(e) => console.log(e, tabValue)}
-                      /*onMouseUp={(e) => handleTabMouseUp(e, tab.id)}*/
-                 /*   />
-                  ))}                
-                </Tabs>*/}
+                  setTabValue={(newValue) => console.log('uu') /*dispatch(setTabValue(newValue))*/}
+                />                
                 <IconButton 
                   onClick={handleAddTab}
                   size="small" 
@@ -466,8 +453,9 @@ function Content() {
               overflowY: 'auto',
             }}>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 2, paddingTop: 2 }}>
-                {drawingExternalCode && !loadingTimer && (
-                  <TechnologyBreadcrumbs />
+                {drawingExternalCode && !loadingTimer && tabs.length > 0 && tabs[tabValue] && (
+                  <TechnologyBreadcrumbs operationLabel={tabs[tabValue].label} />
+                  
                 )}                
               </Box>
               {!isAutocompleteLoaded || loadingTimer ? (
