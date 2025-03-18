@@ -11,7 +11,7 @@ const initialState = {
       validateForm: () => true,
     }*/
   ],
-  tabValue: '1',
+  tabValue: 0,
   tabCnt: 1,
   validateForm: false,
   loading: false,
@@ -66,7 +66,7 @@ const operationsTabsSlice = createSlice({
       return {
         ...state,
         tabs: [...state.tabs, action.payload],
-        tabValue: action.payload.id,
+        /*tabValue: action.payload.id,*/
         tabCnt: state.tabCnt + 1,
       };
     },
@@ -75,7 +75,8 @@ const operationsTabsSlice = createSlice({
       return {
         ...state,
         tabs: updatedTabs,
-        tabValue: updatedTabs.length ? updatedTabs[0].id : null,
+        /*tabValue: state.tabValue != 0 ? state.tabValue - 1 : 0,*/
+        /*tabValue: updatedTabs.length ? updatedTabs[0].id : null,*/
       };
     },
     updateTab: (state, action) => {
@@ -120,6 +121,12 @@ const operationsTabsSlice = createSlice({
         tabCnt: state.tabCnt - 1,
       }
     },
+    incrementTabValue: (state) => {
+      return {
+        ...state,
+        tabValue: state.tabValue + 1,
+      };
+    },
   },
   /*extraReducers: (builder) => {
     builder
@@ -142,5 +149,5 @@ export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 
 export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation } = drawingsSlice.actions;*/
-export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice, incrementTabCnt, decrementTabCnt } = operationsTabsSlice.actions;
+export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice, incrementTabCnt, decrementTabCnt, incrementTabValue } = operationsTabsSlice.actions;
 export default operationsTabsSlice.reducer;

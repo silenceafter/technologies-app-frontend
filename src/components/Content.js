@@ -30,7 +30,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 import { selectItems as technologiesSelectItems, selectLoading as technologiesSelectLoading, selectError as technologiesSelectError} from '../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology, setOperation, selectOperation } from '../store/slices/drawingsSlice';
-import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, incrementTabCnt, decrementTabCnt } from '../store/slices/operationsTabsSlice';
+import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, incrementTabCnt, decrementTabCnt, incrementTabValue } from '../store/slices/operationsTabsSlice';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
@@ -190,11 +190,18 @@ function Content() {
       //закрыть открытые вкладки операций   
     }*/
   }, [operationSelectedItemId]);
+
+  //корректируем tabValue для того, чтобы сохранялась активная вкладка при удалении других вкладок
+  useEffect(() => {
+    if (tabValue >= tabs.length) {
+      dispatch(setTabValue(tabs.length - 1));
+    }
+  }, [tabs, tabValue, dispatch]);
   
   //события
   const handleAddTab = useCallback(() => {
     const newTab = {
-      id: tabCnt, /*Date.now().toString(),*/
+      id: tabCnt,
       label: `Новая операция ${tabCnt}`,
       content: {
         formValues: {},
@@ -202,30 +209,35 @@ function Content() {
         expandedPanels: expandedPanelsDefault,
       }
     };
+    //
     dispatch(addTab(newTab));
-    dispatch(setTabValue(tabCnt));
+    dispatch(setTabValue(tabs.length));
     //dispatch(setOperation({name: '', code: ''}));
-  }, [dispatch, tabCnt/*, tabs*/]); 
+  }, [dispatch, tabCnt, tabs]);
 
   const handleRemoveTab = useCallback(
     (id) => {
-      //найти максимальный id в tabs
-    //const maxId = Math.max(...tabs.map(tab => tab.id));
-
+      const removedIndex = tabs.findIndex(tab => tab.id === id);
       dispatch(removeTab(id));
-      //найти предмаксимальный id в tabs
-      const remainingTabs = tabs.filter(tab => tab.id !== id);
-      const minimalId = Math.min(...remainingTabs.map(tab => tab.id));
-      const yy = tabValue;
-      dispatch(setTabValue(tabValue));
-
-      //флаг
-      if (tabs.length === 1) {
-        setIsUserClosedAllTabs(true);
+      //
+      let newTabValue = tabValue;    
+      if (removedIndex === tabValue) {
+        //если удалили активную вкладку:
+        if (removedIndex === tabs.length - 1) {          
+          newTabValue = Math.max(0, removedIndex - 1);//удалили последнюю вкладку — выбрать предыдущую
+        } else {          
+          newTabValue = removedIndex;//выбрать следующую вкладку
+        }
       }
+      //      
+      if (tabs.length === 1) {
+        newTabValue = 0;//если после удаления вкладок остался 0, установить tabValue в 0 (или null)
+        setIsUserClosedAllTabs(true);//флаг
+      } 
+      dispatch(setTabValue(newTabValue)); 
     },
-    [dispatch, tabs]
-  );
+    [dispatch, tabs, tabValue, setIsUserClosedAllTabs]
+  );  
 
   const handleUpdateTabContent = useCallback(
     (tabId, newContent, newValidateForm) => {
@@ -316,7 +328,7 @@ function Content() {
     return (
       <Tabs
         value={tabValue}
-        onChange={(e, newValue) => /*setTabValue(newValue)*/ console.log('zz') }
+        onChange={(event, newValue) => setTabValue(newValue)}
         variant='scrollable'
         scrollButtons='auto'
         textColor="inherit"
@@ -341,18 +353,25 @@ function Content() {
                 </IconButton>
               </Box>
             }
-            onClick={(e) => console.log(e, tabValue) /* tabValue управляется автоматически, при закрытии вкладок счетчик сбрасывается */}
+            /*onClick={(e) => {
+              const removedIndex = index;         
+      dispatch(setTabValue(removedIndex)); 
+            }*/
             /*onMouseUp={(e) => handleTabMouseUp(e, tab.id)}*/
           />
         ))}
       </Tabs>
     );
-  });
+  }, 
+  (prevProps, nextProps) => {
+    return prevProps.tabs === nextProps.tabs && prevProps.tabValue === nextProps.tabValue;
+  }
+  );
 
   //вывод
   return (
     <>
-      {console.log(tabs)}
+      {/*console.log(tabValue)*/}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -434,7 +453,7 @@ function Content() {
                   tabs={tabs}
                   tabValue={tabValue}
                   handleRemoveTab={handleRemoveTab}
-                  setTabValue={(newValue) => console.log('uu') /*dispatch(setTabValue(newValue))*/}
+                  setTabValue={(newValue) => dispatch(setTabValue(newValue))}
                 />                
                 <IconButton 
                   onClick={handleAddTab}
