@@ -30,7 +30,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 import { selectItems as technologiesSelectItems, selectLoading as technologiesSelectLoading, selectError as technologiesSelectError} from '../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology, setOperation, selectOperation } from '../store/slices/drawingsSlice';
-import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, incrementTabCnt, decrementTabCnt, incrementTabValue } from '../store/slices/operationsTabsSlice';
+import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, incrementTabCnt, decrementTabCnt, incrementTabValue, setData } from '../store/slices/operationsTabsSlice';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
@@ -76,6 +76,7 @@ function Content() {
   const operationSelectedItemId = useSelector((state) => state.technologies.selectedItemId);
 
   const { tabs, tabValue, tabCnt, expandedPanelsDefault } = useSelector((state) => state.operationsTabs);
+  const bb = useSelector((state) => state.operationsTabs.validateForm);
 
   const operationsSelectors = useSelector(selectOperations);
   const operationsItems = operationsSelectors?.items;
@@ -313,14 +314,17 @@ function Content() {
     await new Promise((resolve) => setTimeout(() => {
       setOpen(true);
       //dispatch(toggleValidateFormInSlice());
-      if (validateForm()) {
-        setRequestStatus('success');
+      //dispatch(setData(tabs[tabValue]?.content));
+      let yy = validateForm();
+      if (validateForm()) { 
+        
+            setRequestStatus('success');         
       } else {
         setRequestStatus('error');
       }
       setLoading((prev) => ({ ...prev, save: false }));
       //dispatch(setUnsavedChanges(false));
-    }, 2000));
+    }, 500));
   };    
 
   //Tabs, Tab
@@ -353,10 +357,6 @@ function Content() {
                 </IconButton>
               </Box>
             }
-            /*onClick={(e) => {
-              const removedIndex = index;         
-      dispatch(setTabValue(removedIndex)); 
-            }*/
             /*onMouseUp={(e) => handleTabMouseUp(e, tab.id)}*/
           />
         ))}
@@ -371,7 +371,7 @@ function Content() {
   //вывод
   return (
     <>
-      {/*console.log(tabValue)*/}
+      {console.log(tabs[tabValue]?.content.formErrors)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -492,11 +492,15 @@ function Content() {
                         autocompleteOptions={autocompleteOptions}
                       />
                     </TabPanel>
-                  ) : null}
+                  ) : null}                  
                 </Box>
                 )
               }
-              
+              {tabs.length == 0 && (
+                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center',/* alignItems: 'center',*/ margin: 2, height: '90%' }}>
+                    <Typography>Нет открытых вкладок</Typography>
+                    </Box>
+                  )}
               
               
               {/* уведомления */}

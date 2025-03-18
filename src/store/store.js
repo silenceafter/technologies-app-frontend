@@ -47,7 +47,6 @@ const persistConfig = {
   /*stateReconciler: autoMergeLevel2,*/
 };
 
-
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 //хранилище redux

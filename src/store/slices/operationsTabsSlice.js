@@ -27,13 +27,14 @@ const initialState = {
 };
 
 //сохранить введенные данные
-/*export const setData = createAsyncThunk(
+export const setData = createAsyncThunk(
   'technologiesTree/setData',
   async (payload, { rejectWithValue }) => {
     try {
       const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/SetData.v0.php', {
         method: 'POST',
         body: JSON.stringify(payload),
+        credentials: 'include'
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Ошибка запроса');
@@ -42,7 +43,7 @@ const initialState = {
       return rejectWithValue(error.message);
     }
   }
-);*/
+);
 
 const operationsTabsSlice = createSlice({
   name: 'operationsTabs',
@@ -97,7 +98,7 @@ const operationsTabsSlice = createSlice({
               }
             : tab
         ),
-        validateForm: true,
+        /*validateForm: true,*/
       };
     },
     setTabValue: (state, action) => {

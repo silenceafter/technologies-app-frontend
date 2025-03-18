@@ -210,7 +210,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     }
 
     //equipment
-    if (!localData.formValues.equipment) {
+    /*if (!localData.formValues.equipment) {
       errors.equipment = autocompleteTextFieldMessage;
     }
 
@@ -232,7 +232,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     //measuringTools
     if (!localData.formValues.measuringTools) {
       errors.measuringTools = autocompleteTextFieldMessage;
-    }
+    }*/
 
     //обновляем ошибки
     setLocalData((prev) => ({
@@ -254,9 +254,17 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   useEffect(() => {
     setValidateForm(() => validateForm);
   }, [setValidateForm]);
+
+  /*useEffect(() => {
+    if (JSON.stringify(localData) !== JSON.stringify(content)) {
+      //setLocalData(content);
+      let y;
+    }
+  }, [content]);*/
   //
   return (
     <>
+    {/*console.log(localData)*/}
       {/* Параметры */}
       <Accordion defaultExpanded
         expanded={localData.expandedPanels['parameters'] || false}
@@ -719,6 +727,11 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
       </Accordion>
     </>
   );
+}, (prevProps, nextProps) => {
+  return prevProps.content === nextProps.content &&
+    prevProps.autocompleteOptions === nextProps.autocompleteOptions &&
+    prevProps.setValidateForm === nextProps.setValidateForm &&
+    prevProps.onUpdate === nextProps.onUpdate;
 });
 
 export {OperationCard};
