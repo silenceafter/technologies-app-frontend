@@ -251,10 +251,15 @@ function Content() {
     (newData) => {
       const currentTab = tabs[tabValue];
       if (currentTab && currentTab.id) {
-        handleUpdateTabContent(currentTab.id, newData, validateForm);
+        handleUpdateTabContent(currentTab.id, newData, newData.validateForm);
       }
     },
-    [handleUpdateTabContent, tabValue, tabs, validateForm]
+    [handleUpdateTabContent, tabValue, tabs/*, validateForm*/]
+  );
+
+  const setValidateFormStable = useCallback(
+    (newValidateForm) => setValidateForm(newValidateForm),
+    [setValidateForm]
   );
 
   const handleAccordeonChange = useCallback((panel) => (event, newExpanded) => {
@@ -313,12 +318,10 @@ function Content() {
     setLoading((prev) => ({ ...prev, save: true }));  
     await new Promise((resolve) => setTimeout(() => {
       setOpen(true);
-      //dispatch(toggleValidateFormInSlice());
-      //dispatch(setData(tabs[tabValue]?.content));
-      let yy = validateForm();
-      if (validateForm()) { 
-        
-            setRequestStatus('success');         
+      //dispatch(toggleValidateFormInSlice());      
+      if (validateForm()) {
+        dispatch(setData(tabs[tabValue]?.content));
+        setRequestStatus('success');         
       } else {
         setRequestStatus('error');
       }
@@ -363,15 +366,15 @@ function Content() {
       </Tabs>
     );
   }, 
-  (prevProps, nextProps) => {
+  /*(prevProps, nextProps) => {
     return prevProps.tabs === nextProps.tabs && prevProps.tabValue === nextProps.tabValue;
-  }
+  }*/
   );
 
   //вывод
   return (
     <>
-      {console.log(tabs[tabValue]?.content.formErrors)}
+      {/*console.log(tabs[tabValue]?.content.formErrors)*/}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -488,7 +491,7 @@ function Content() {
                       <OperationCard
                         content={tabs[tabValue]?.content}
                         onUpdate={handleOperationUpdate/*(newData) => handleUpdateTabContent(tabs[tabValue]?.id, newData, validateForm)*/}
-                        setValidateForm={setValidateForm}
+                        setValidateForm={setValidateFormStable}
                         autocompleteOptions={autocompleteOptions}
                       />
                     </TabPanel>

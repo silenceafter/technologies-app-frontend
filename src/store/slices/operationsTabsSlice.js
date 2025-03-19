@@ -91,7 +91,7 @@ const operationsTabsSlice = createSlice({
                 content: {
                   ...tab.content,
                   formValues: newContent.formValues,
-                  formErrors: newContent.formErrors || tab.content.formErrors,
+                  formErrors: newContent.formErrors /*|| tab.content.formErrors*/,
                   expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
                 },
                 validateForm: newValidateForm || tab.validateForm,

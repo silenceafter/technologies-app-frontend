@@ -45,6 +45,9 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {}, expandedPanels: {} });
   const [bb, setBb] = useState(autocompleteOptions.operations || null);
 
+  //селекторы
+  const reduxContent = useSelector((state) => state.operationsTabs.tabs);
+
   //список числовых полей (для последующей валидации вместо type="number")
   const numericFields = [
     'orderNumber', 
@@ -154,7 +157,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   );
 
   //проверка формы
-  const validateForm = (e) => {
+  const validateForm = useCallback(() => {
     const errors = {};
     const textFieldMessage = 'Поле обязательно для заполнения';
     const autocompleteTextFieldMessage = 'Выберите значение из списка';
@@ -244,7 +247,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
       onUpdate({ ...localData, formValues: {...localData.formValues}, formErrors: errors });
     }
     return Object.keys(errors).length === 0;
-  };
+  }, [content]);
 
   //textField
   /* handleInputChange = (e) => {
@@ -253,18 +256,11 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
 
   useEffect(() => {
     setValidateForm(() => validateForm);
-  }, [setValidateForm]);
-
-  /*useEffect(() => {
-    if (JSON.stringify(localData) !== JSON.stringify(content)) {
-      //setLocalData(content);
-      let y;
-    }
-  }, [content]);*/
+  }, [setValidateForm, validateForm]);
   //
   return (
     <>
-    {/*console.log(localData)*/}
+    {console.log(localData)}
       {/* Параметры */}
       <Accordion defaultExpanded
         expanded={localData.expandedPanels['parameters'] || false}
@@ -727,11 +723,11 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
       </Accordion>
     </>
   );
-}, (prevProps, nextProps) => {
-  return prevProps.content === nextProps.content &&
-    prevProps.autocompleteOptions === nextProps.autocompleteOptions &&
+}/*, (prevProps, nextProps) => {
+  return JSON.stringify(prevProps.content) === JSON.stringify(nextProps.content) &&
+    JSON.stringify(prevProps.autocompleteOptions) === JSON.stringify(nextProps.autocompleteOptions) &&
     prevProps.setValidateForm === nextProps.setValidateForm &&
     prevProps.onUpdate === nextProps.onUpdate;
-});
+}*/);
 
 export {OperationCard};
