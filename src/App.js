@@ -4,9 +4,10 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Container } from '@mui/material';
 import { MainPage } from './pages/MainPage';
-import { NotFound } from './pages/notFound';
+import { AccessDenied } from './pages/AccessDenied';
 import { LoginPage } from './pages/LoginPage';
 import { CrudPage } from './pages/CrudPage';
+import ProtectedRoute from './ProtectedRoute';
 import { Grid, Paper, AppBar, Tabs, Tab, TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import TreeView from '@mui/lab/TreeView';
@@ -22,6 +23,7 @@ function App() {
             <Route index element={<MainPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/crud" element={<CrudPage />} />
+            <Route path="/access-denied" element={<AccessDenied />} />
           </Routes>
         </main>
       {/*</Container>*/}

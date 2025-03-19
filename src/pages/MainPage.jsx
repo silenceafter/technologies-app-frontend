@@ -23,6 +23,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
+import ProtectedRoute from '../ProtectedRoute';
 
 function Copyright() {
   return (
@@ -49,7 +50,6 @@ function MainPage() {
 
   //стейты
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [isloaded, setIsLoaded] = useState(false);
 
   //селекторы
   const user = useSelector((state) => state.users.user);
@@ -58,41 +58,12 @@ function MainPage() {
   const isCrud = useSelector((state) => state.users.isCrud);
   const drawing = useSelector((state) => state.drawings.drawing);
   
-  //получить данные пользователя
-  useEffect(() => {
-    dispatch(authenticate({})).then(() => {
-      setIsLoaded(true);
-    });
-  }, [dispatch]);
-
-  /*useEffect(() => {
-    if (!loading && !user) {
-      navigate('/login');
-    }
-  }, [user, loading, navigate]);*/
-  
-  //загрузка
-  if (!isloaded) {
-    return (
-      <ThemeProvider theme={theme}>
-        <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'white' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            <CircularProgress size={'5rem'} />
-          </Box>
-        </Box>
-      </ThemeProvider>
-    );
-  }
-  
   //main
   return (
       <>
-      {console.log(drawing)}      
-      <ThemeProvider theme={theme}>
-        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-          {!user ? (
-            navigate('/login')
-          ) : (
+      <ProtectedRoute>
+        <ThemeProvider theme={theme}>
+          <Box sx={{ display: 'flex', minHeight: '100vh' }}>          
             <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
               <Header onDrawerToggle={handleDrawerToggle} />
               <Box component="main" sx={{ flex: 1, py: 2, px: 2, bgcolor: '#eaeff1' }}>
@@ -147,16 +118,16 @@ function MainPage() {
               
                   
                           
-                     
+                      
                 </Box>            
               </Box>
               <Box component="footer" sx={{ paddingLeft: 1, paddingRight: 1, paddingBottom: 1, bgcolor: '#eaeff1' }}>
                 <Copyright />
               </Box>
-            </Box>
-          )}          
-        </Box>
-      </ThemeProvider>
+            </Box>         
+          </Box>
+        </ThemeProvider>
+      </ProtectedRoute>
       </>
   );
 }
