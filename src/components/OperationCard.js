@@ -42,7 +42,14 @@ import { property } from 'lodash';
 
 const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions}) => {
   //стейты
-  const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {}, expandedPanels: {} });
+  const [localData, setLocalData] = useState(
+    content || { 
+      dbValues: { orderNumber: 1 },
+      formValues: { orderNumber: 1 }, 
+      formErrors: {}, 
+      changedValues: {},
+      expandedPanels: {},             
+    });
   const [bb, setBb] = useState(autocompleteOptions.operations || null);
 
   //селекторы
@@ -64,13 +71,33 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     const { name, value } = e.target;
 
     //formValues
-    setLocalData((prev) => ({
-      ...prev,
-      formValues: {
-        ...prev.formValues,
-        [name]: value,
-      },
-    }));
+    setLocalData((prev) => {
+      const prevValue = prev.dbValues[name];
+      //проверяем изменения
+      if (prevValue != value) {
+        //есть изменения
+        return {
+          ...prev,
+          formValues: {
+            ...prev.formValues,
+            [name]: value,
+          },
+          changedValues: {
+            ...prev.changedValues,
+            [name]: value,
+          }
+        };
+      } else {
+        //нет изменений
+        return {
+          ...prev,
+          formValues: {
+            ...prev.formValues,
+            [name]: value,
+          },
+        };
+      }      
+    });
 
     //formErrors
     const errorMessage = numericFields.includes(name) && (value && !/^\d*$/.test(value))
@@ -101,7 +128,12 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
             ...localData.formErrors,
             [name]: errorMessage
           },
-          validateForm
+          validateForm,
+          changedValues:
+          {
+            ...localData.changedValues,
+            [name]: value
+          }
         }
       );
     }
@@ -109,13 +141,45 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
 
   const handleOptionSelect = useCallback((id, option) => {
     // Обновляем значение поля
-    setLocalData((prev) => ({
+    /*setLocalData((prev) => ({
       ...prev,
       formValues: {
         ...prev.formValues,
         [id]: option || null,
       },
-    }));
+      changedValues: {
+        ...prev.changedValues,
+        [id]: option || null,
+      },
+    }));*/
+
+    setLocalData((prev) => {
+      const prevOption = prev.dbValues[id];
+      //проверяем изменения
+      if (prevOption != option) {
+        //есть изменения
+        return {
+          ...prev,
+          formValues: {
+            ...prev.formValues,
+            [id]: option || null,
+          },
+          changedValues: {
+            ...prev.changedValues,
+            [id]: option || null,
+          }
+        };
+      } else {
+        //нет изменений
+        return {
+          ...prev,
+          formValues: {
+            ...prev.formValues,
+            [id]: option || null,
+          },
+        };
+      }      
+    });
   
     // Убираем ошибку для этого поля
     setLocalData((prev) => ({
@@ -128,7 +192,14 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   
     // Передаем изменения в родительский компонент
     if (onUpdate) {
-      onUpdate({ ...localData, formValues: { ...localData.formValues, [id]: option || null }, formErrors: { ...localData.formErrors, [id]: '' } });
+      onUpdate(
+        { 
+          ...localData, 
+          formValues: { ...localData.formValues, [id]: option || null }, 
+          formErrors: { ...localData.formErrors, [id]: '' },
+          changedValues: { ...localData.changedValues, [id]: option || null },
+        }
+      );
     }
   }, [localData, onUpdate]);
 
@@ -244,7 +315,14 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     }));
     //
     if (Object.keys(errors).length > 0) {
-      onUpdate({ ...localData, formValues: {...localData.formValues}, formErrors: errors });
+      onUpdate(
+        { 
+          ...localData, 
+          formValues: {...localData.formValues}, 
+          formErrors: errors,
+          changedValues: { ...localData.changedValues},
+        }
+      );
     }
     return Object.keys(errors).length === 0;
   }, [content]);
@@ -260,7 +338,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   //
   return (
     <>
-    {console.log(localData)}
+    {/*console.log(localData)*/}
       {/* Параметры */}
       <Accordion defaultExpanded
         expanded={localData.expandedPanels['parameters'] || false}

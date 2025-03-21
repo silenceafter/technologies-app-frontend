@@ -61,6 +61,7 @@ function MainPage() {
   //main
   return (
       <>
+      {console.log(user)}
       <ProtectedRoute>
         <ThemeProvider theme={theme}>
           <Box sx={{ display: 'flex', minHeight: '100vh' }}>          

@@ -146,7 +146,7 @@ const usersSlice = createSlice({
       if (dataState == 0) {
         state.isAuthenticated = false;
         state.user = null;
-      } else if (dataState > 0) {
+      } else if (dataState > 0) {        
         state.isAuthenticated = true;
         state.user = action.payload.UserInfoArray;
       }

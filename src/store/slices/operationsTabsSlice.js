@@ -31,8 +31,8 @@ export const setData = createAsyncThunk(
   'technologiesTree/setData',
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/SetData.v0.php', {
-        method: 'POST',
+      const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/UpdateOperation.v0.php', {
+        method: 'PATCH',
         body: JSON.stringify(payload),
         credentials: 'include'
       });
@@ -93,6 +93,7 @@ const operationsTabsSlice = createSlice({
                   formValues: newContent.formValues,
                   formErrors: newContent.formErrors /*|| tab.content.formErrors*/,
                   expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
+                  changedValues: newContent.changedValues,
                 },
                 validateForm: newValidateForm || tab.validateForm,
               }

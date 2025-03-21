@@ -37,13 +37,13 @@ function ProtectedRoute({ children }) {
   }, [dispatch]);
 
   // Проверяем доступ к странице
-  /*useEffect(() => {
+  useEffect(() => {
     if (user) {
-      if (user.division !== 1 && user.status.toLowerCase() !== 'администратор') {
+      if (user.idstatus != 3 && user.division != 1) {
         navigate('/access-denied'); // Если нет прав доступа, переходим на страницу "доступ запрещен"
       }
     }
-  }, [navigate, user]);*/
+  }, [navigate, user]);
 
   // Если ещё загружается информация о пользователе, показываем спиннер
   if (!isloaded) {

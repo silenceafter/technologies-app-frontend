@@ -118,26 +118,30 @@ function Content() {
             .map(operation => {
               // Ищем существующую вкладку, чтобы сохранить ошибки и состояние панелей
               const existingTab = tabs.find(tab => tab.id === operation.orderNumber);
+              const data = {
+                orderNumber: operation.orderNumber,
+                operationDescription: operation.operationDescription,
+                shopNumber: operation.shopNumber,
+                areaNumber: operation.areaNumber,
+                document: operation.document,
+                grade: operation.grade,
+                workingConditions: operation.workingConditions,
+                numberOfWorkers: operation.numberOfWorkers,
+                numberOfProcessedParts: operation.numberOfProcessedParts,
+                laborEffort: operation.laborEffort,
+                jobCode: { code: operation.jobCode, name: operation.jobName },
+                operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.labelId },
+              };
+              //
               return {
                 id: operation.orderNumber,
                 label: `${operation.secondaryLabel} (${operation.label})`,/*`Операция ${operation.orderNumber}`,*/
                 content: {
-                  formValues: {
-                    orderNumber: operation.orderNumber,
-                    operationDescription: operation.operationDescription,
-                    shopNumber: operation.shopNumber,
-                    areaNumber: operation.areaNumber,
-                    document: operation.document,
-                    grade: operation.grade,
-                    workingConditions: operation.workingConditions,
-                    numberOfWorkers: operation.numberOfWorkers,
-                    numberOfProcessedParts: operation.numberOfProcessedParts,
-                    laborEffort: operation.laborEffort,
-                    jobCode: { code: operation.jobCode, name: operation.jobName },
-                    operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.labelId },
-                  },
+                  dbValues: data,
+                  formValues: data,
                   formErrors: existingTab?.content?.formErrors || {}, // Сохраняем ошибки
-                  expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели
+                  changedValues: existingTab?.content?.changedValues || {}, //реквизиты, в которых были изменения
+                  expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели                                    
                 }
               };
             }
@@ -205,9 +209,11 @@ function Content() {
       id: tabCnt,
       label: `Новая операция ${tabCnt}`,
       content: {
+        dbValues: {},
         formValues: {},
         formErrors: {},
-        expandedPanels: expandedPanelsDefault,
+        changedValues: {},
+        expandedPanels: expandedPanelsDefault,                
       }
     };
     //
@@ -374,7 +380,7 @@ function Content() {
   //вывод
   return (
     <>
-      {/*console.log(tabs[tabValue]?.content.formErrors)*/}
+      {console.log(tabs[tabValue]?.content)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
