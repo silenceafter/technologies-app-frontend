@@ -101,13 +101,14 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
           }}
           onInputChange={(event, newInputValue) => {
             setInputValue(newInputValue);
+            dispatch(fetchData({ search: newInputValue, limit, page: 1 }));
             /*if (onOptionSelect) {
               onOptionSelect(id, newInputValue);
             }*/
           }}
           onChange={(event, newValue) => {
             setSelectedOption(newValue);
-            dispatch(setOperation({ code: newValue.code, name: newValue.name }));
+            dispatch(setOperation({ code: !newValue ? '' : newValue.code, name: !newValue ? '' : newValue.name }));
             //
             if (onOptionSelect) {
               onOptionSelect('operationCode', newValue);

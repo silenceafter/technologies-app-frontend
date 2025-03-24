@@ -74,6 +74,7 @@ function Content() {
   const currentTechnology = useSelector(selectTechnology);
   const currentOperation = useSelector(selectOperation);
   const operationSelectedItemId = useSelector((state) => state.technologies.selectedItemId);
+  const user = useSelector((state) => state.users.user);
 
   const { tabs, tabValue, tabCnt, expandedPanelsDefault } = useSelector((state) => state.operationsTabs);
   const bb = useSelector((state) => state.operationsTabs.validateForm);
@@ -136,6 +137,15 @@ function Content() {
               return {
                 id: operation.orderNumber,
                 label: `${operation.secondaryLabel} (${operation.label})`,/*`Операция ${operation.orderNumber}`,*/
+                operation: { code: operation.label, name: operation.secondaryLabel },
+                technology: {
+                  code: technologiesItems[0].label, 
+                  name: technologiesItems[0].secondaryLabel,
+                  userId: operation.technologyUserId,
+                  creationDate: operation.technologyCreationDate, 
+                  lastModified: operation.technologyLastModified 
+                },
+                drawing: { code: operation.drawingExternalCode },
                 content: {
                   dbValues: data,
                   formValues: data,
@@ -152,7 +162,7 @@ function Content() {
         }
       }
   
-      // Устанавливаем текущую выбранную технологию
+      //устанавливаем текущую выбранную технологию
       dispatch(setTechnology({ name: technologiesItems[0].secondaryLabel, code: technologiesItems[0].label }));
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
@@ -326,7 +336,14 @@ function Content() {
       setOpen(true);
       //dispatch(toggleValidateFormInSlice());      
       if (validateForm()) {
-        dispatch(setData(tabs[tabValue]?.content));
+        dispatch(
+          setData(
+            {
+              user: user,
+              tabs: tabs
+            }
+          )
+        );
         setRequestStatus('success');         
       } else {
         setRequestStatus('error');
@@ -380,7 +397,7 @@ function Content() {
   //вывод
   return (
     <>
-      {console.log(tabs[tabValue]?.content)}
+      {console.log(tabs[tabValue])}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

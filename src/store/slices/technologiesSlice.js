@@ -66,7 +66,11 @@ export const getSavedData = createAsyncThunk(
         numberOfProcessedParts: item.numberOfProcessedParts,
         laborEffort: item.laborEffort,
         jobName: item.jobName,
-        jobCode: item.jobCode
+        jobCode: item.jobCode,
+        technologyUserId: item.technologyUserId,
+        technologyCreationDate: item.technologyCreationDate,
+        technologyLastModified: item.technologyLastModified,
+        drawingExternalCode: item.drawingExternalCode,
       });
       return data.map(processItem);
     } catch (error) {

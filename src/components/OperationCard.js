@@ -38,14 +38,14 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
-import { property } from 'lodash';
+import _ from 'lodash';
 
 const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions}) => {
   //стейты
   const [localData, setLocalData] = useState(
     content || { 
       dbValues: { orderNumber: 1 },
-      formValues: { orderNumber: 1 }, 
+      formValues: { orderNumber: 1 },
       formErrors: {}, 
       changedValues: {},
       expandedPanels: {},             
@@ -156,7 +156,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     setLocalData((prev) => {
       const prevOption = prev.dbValues[id];
       //проверяем изменения
-      if (prevOption != option) {
+      if (!_.isEqual(prevOption, option) /*prevOption != option*/) {
         //есть изменения
         return {
           ...prev,
@@ -168,7 +168,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
             ...prev.changedValues,
             [id]: option || null,
           }
-        };
+        };        
       } else {
         //нет изменений
         return {
@@ -177,11 +177,15 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
             ...prev.formValues,
             [id]: option || null,
           },
+          changedValues: {
+            ...prev.changedValues,
+            [id]: option || null,
+          },
         };
-      }      
+      }
     });
   
-    // Убираем ошибку для этого поля
+    //убираем ошибку для этого поля
     setLocalData((prev) => ({
       ...prev,
       formErrors: {
@@ -190,14 +194,14 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
       },
     }));
   
-    // Передаем изменения в родительский компонент
+    //передаем изменения в родительский компонент
     if (onUpdate) {
       onUpdate(
         { 
           ...localData, 
           formValues: { ...localData.formValues, [id]: option || null }, 
           formErrors: { ...localData.formErrors, [id]: '' },
-          changedValues: { ...localData.changedValues, [id]: option || null },
+          changedValues: { ...localData.changedValues, [id]: option || null }, 
         }
       );
     }
