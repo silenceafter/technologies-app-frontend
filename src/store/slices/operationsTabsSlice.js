@@ -36,9 +36,8 @@ export const setData = createAsyncThunk(
         body: JSON.stringify(payload),
         credentials: 'include'
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Ошибка запроса');
-      return { payload };
+      if (!response.ok) throw new Error('Ошибка запроса');
+      return response.ok && response.status == '204' ? true : false;
     } catch (error) {
       return rejectWithValue(error.message);
     }

@@ -50,9 +50,9 @@ export const getSavedData = createAsyncThunk(
       const processItem = (item) => ({
         ...item,
         id: item.id || item.ItemId,
-        label: item.label || 'Unnamed Item',
-        secondaryLabel: item.secondaryLabel || null,
-        labelId: item.labelId,
+        label: item.label || 'Unnamed Item', /* код операции */
+        secondaryLabel: item.secondaryLabel || null, /* наименование операции */
+        labelId: item.labelId, /* id операции */
         children: item.children.map(processItem) || [],
         type: item.type,
         description: item.operationDescription != null ? item.operationDescription : '',

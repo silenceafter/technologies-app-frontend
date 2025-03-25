@@ -332,24 +332,20 @@ function Content() {
   const handleSave = async () => {
     //сохранение
     setLoading((prev) => ({ ...prev, save: true }));  
-    await new Promise((resolve) => setTimeout(() => {
+    await new Promise((resolve) => setTimeout(async () => {
       setOpen(true);
-      //dispatch(toggleValidateFormInSlice());      
+
       if (validateForm()) {
-        dispatch(
-          setData(
-            {
-              user: user,
-              tabs: tabs
-            }
-          )
-        );
-        setRequestStatus('success');         
+        try {
+          await dispatch(setData({ user: user, tabs: tabs })).unwrap();
+          setRequestStatus('success');
+        } catch (error) {
+          setRequestStatus('error');
+        }
       } else {
         setRequestStatus('error');
       }
-      setLoading((prev) => ({ ...prev, save: false }));
-      //dispatch(setUnsavedChanges(false));
+      setLoading((prev) => ({ ...prev, save: false }));        
     }, 500));
   };    
 
