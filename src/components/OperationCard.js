@@ -257,9 +257,9 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
       errors.document = textFieldMessage;
     }
 
-    //jobCode
-    if (!localData.formValues.jobCode) {
-      errors.jobCode = autocompleteTextFieldMessage;
+    //job
+    if (!localData.formValues.job) {
+      errors.job = autocompleteTextFieldMessage;
     }
 
     //grade
@@ -472,8 +472,8 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
                     {/*<JobsSearch 
                       id="job-code-6" 
                       onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues['jobCode']} 
-                      errorValue={localData.formErrors['jobCode']}
+                      selectedValue={localData.formValues['job']} 
+                      errorValue={localData.formErrors['job']}
                     />*/}
                   </Grid>
                 </Grid>

@@ -111,47 +111,53 @@ function Content() {
   //стейт вкладок/карточек
   useEffect(() => {
     try {
-      if (!technologiesLoading && technologiesItems.length > 0) {
+      if (!technologiesLoading && technologiesItems.length > 0 && drawingExternalCode.length > 0) {
         if (tabs.length === 0 && !isUserClosedAllTabs) {
           //изначально вкладки создаются из technologiesItems 
           const newTabs = technologiesItems[0].children
-            .filter(operation => operation.orderNumber)
+            .filter(operation => operation.parameters.orderNumber)
             .map(operation => {
               // Ищем существующую вкладку, чтобы сохранить ошибки и состояние панелей
-              const existingTab = tabs.find(tab => tab.id === operation.orderNumber);
+              const existingTab = tabs.find(tab => tab.id === operation.parameters.orderNumber);
               const data = {
-                orderNumber: operation.orderNumber,
-                operationDescription: operation.operationDescription,
-                shopNumber: operation.shopNumber,
-                areaNumber: operation.areaNumber,
-                document: operation.document,
-                grade: operation.grade,
-                workingConditions: operation.workingConditions,
-                numberOfWorkers: operation.numberOfWorkers,
-                numberOfProcessedParts: operation.numberOfProcessedParts,
-                laborEffort: operation.laborEffort,
-                jobCode: { code: operation.jobCode, name: operation.jobName },
-                operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.labelId },
+                //parameters
+                orderNumber: operation.parameters.orderNumber,
+                operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.proxyOId },                
+                shopNumber: operation.parameters.shopNumber,
+                areaNumber: operation.parameters.areaNumber,
+                document: operation.parameters.document,
+                operationDescription: operation.parameters.operationDescription,
+              
+                //jobs  
+                grade: operation.jobs.grade,
+                workingConditions: operation.jobs.workingConditions,
+                numberOfWorkers: operation.jobs.numberOfWorkers,
+                numberOfProcessedParts: operation.jobs.numberOfProcessedParts,
+                laborEffort: operation.jobs.laborEffort,
+                job: { code: operation.jobs.jobCode, name: operation.jobs.jobName },
               };
               //
               return {
-                id: operation.orderNumber,
-                label: `${operation.secondaryLabel} (${operation.label})`,/*`Операция ${operation.orderNumber}`,*/
+                id: operation.parameters.orderNumber,
+                label: `${operation.secondaryLabel} (${operation.label})`,
                 operation: { code: operation.label, name: operation.secondaryLabel },
                 technology: {
                   code: technologiesItems[0].label, 
                   name: technologiesItems[0].secondaryLabel,
-                  userId: operation.technologyUserId,
-                  creationDate: operation.technologyCreationDate, 
-                  lastModified: operation.technologyLastModified 
+                  userId: technologiesItems[0].userId,
+                  creationDate: technologiesItems[0].creationDate,
+                  lastModified: technologiesItems[0].lastModified
                 },
-                drawing: { code: operation.drawingExternalCode },
+                drawing: { code: drawingExternalCode },
                 content: {
                   dbValues: data,
                   formValues: data,
                   formErrors: existingTab?.content?.formErrors || {}, // Сохраняем ошибки
                   changedValues: existingTab?.content?.changedValues || {}, //реквизиты, в которых были изменения
                   expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели                                    
+                },
+                proxy: {
+                  proxyTOId: operation.proxyTOId,                  
                 }
               };
             }
@@ -167,7 +173,7 @@ function Content() {
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
-  }, [technologiesLoading, technologiesItems, tabs, isUserClosedAllTabs]);
+  }, [technologiesLoading, technologiesItems, drawingExternalCode, tabs, isUserClosedAllTabs]);
 
   /*useEffect(() => {
     if (tabs.length === 0) {
@@ -295,55 +301,45 @@ function Content() {
     }
   };*/
 
-  //отправка
-  const handleSuccess = () => {
-    setRequestStatus('success');
-    setOpen(true);
-  };
-
-  // Функция, имитирующая ошибку отправки
-  const handleError = () => {
-    setRequestStatus('error');
-    setOpen(true);
-  };
-
   //alert
   const [open, setOpen] = useState(false);
   const [requestStatus, setRequestStatus] = useState(false);
-  const handleClose = (reason) => {
+
+  const handleClose = useCallback((reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
-  };
+  }, []);
+
+  const showSnackbar = useCallback(() => {
+    setTimeout(() => {
+      setOpen(true); 
+    }, 300);
+  }, []);
 
   //buttonGroup
   const [loading, setLoading] = useState({ save: false });
-  /*const handleSave = async () => {
-    setLoading((prev) => ({ ...prev, save: true }));  
-    await new Promise((resolve) => setTimeout(() => {
-      setOpen(true);
-      //validateForm();
-      setLoading((prev) => ({ ...prev, save: false }));
-      //dispatch(setUnsavedChanges(false));
-    }, 2000));
-  }*/
 
   const handleSave = async () => {
     //сохранение
     setLoading((prev) => ({ ...prev, save: true }));  
-    await new Promise((resolve) => setTimeout(async () => {
-      setOpen(true);
-
+    await new Promise((resolve) => setTimeout(async () => {      
       if (validateForm()) {
         try {
           await dispatch(setData({ user: user, tabs: tabs })).unwrap();
+          handleClose();          
           setRequestStatus('success');
+          showSnackbar();
         } catch (error) {
+          handleClose();
           setRequestStatus('error');
+          showSnackbar();
         }
       } else {
+        handleClose();
         setRequestStatus('error');
+        showSnackbar();
       }
       setLoading((prev) => ({ ...prev, save: false }));        
     }, 500));

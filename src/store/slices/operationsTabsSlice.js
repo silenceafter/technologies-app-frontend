@@ -81,6 +81,15 @@ const operationsTabsSlice = createSlice({
     },
     updateTab: (state, action) => {
       const { id, newContent, newValidateForm } = action.payload;
+      //operationCode
+      let operationCode = { code: '', name: '' };
+      if (newContent.changedValues.hasOwnProperty('operationCode')) {
+        if (newContent.changedValues.operationCode) {
+          operationCode.code = newContent.changedValues.operationCode.code;
+          operationCode.name = newContent.changedValues.operationCode.name;
+        }
+      }
+      //
       return {
         ...state,
         tabs: state.tabs.map((tab) =>
@@ -93,6 +102,11 @@ const operationsTabsSlice = createSlice({
                   formErrors: newContent.formErrors /*|| tab.content.formErrors*/,
                   expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
                   changedValues: newContent.changedValues,
+                },
+                operation: {
+                  ...tab.operation,
+                  code: operationCode.code,
+                  name: operationCode.name,                   
                 },
                 validateForm: newValidateForm || tab.validateForm,
               }
@@ -129,20 +143,27 @@ const operationsTabsSlice = createSlice({
       };
     },
   },
-  /*extraReducers: (builder) => {
+  extraReducers: (builder) => {
     builder
       .addCase(setData.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(setData.fulfilled, (state, action) => {
-        state.loading = false;        
+        state.loading = false;
+        state.tabs = state.tabs.map((tab) => ({
+          ...tab,
+          content: {
+            ...tab.content,
+            changedValues: tab.content.changedValues ? [] : tab.content.changedValues,
+          },
+        }));
       })
       .addCase(setData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
-    },*/
+    },
 });
 
 /*export const selectDrawingExternalCode = (state) => state?.drawings?.drawing?.externalCode || '';
