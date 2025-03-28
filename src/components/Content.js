@@ -157,7 +157,9 @@ function Content() {
                   expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели                                    
                 },
                 proxy: {
-                  proxyTOId: operation.proxyTOId,                  
+                  proxyTOId: operation.proxyTOId,
+                  keyHex: technologiesItems[0].keyHex,
+                  ivHex: technologiesItems[0].ivHex
                 }
               };
             }
