@@ -149,21 +149,6 @@ export default function TechnologiesTree() {
       },
     })
   }));
-  
-  /*function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick }) {    
-    return (
-      <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-        <div>
-          <Typography onClick={(e) => { e.stopPropagation(); onLabelClick?.(e); }}>{children}</Typography>
-          {secondaryLabel && (
-            <Typography variant="caption" color="secondary" onClick={(e) => { e.stopPropagation(); onSecondaryLabelClick?.(e); }}>
-              {secondaryLabel}
-            </Typography>
-          )}
-        </div>
-      </div>
-    );
-  }*/
 
   function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel, type, labelRef, focused, pp }) {
     const [isEditing, setIsEditing] = useState(edited);

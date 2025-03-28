@@ -51,32 +51,8 @@ export const getSavedData = createAsyncThunk(
         id: item.id || item.ItemId,
         label: item.label || 'Unnamed Item', /* код операции */
         secondaryLabel: item.secondaryLabel || null, /* наименование операции */
-        /*labelId: item.labelId, id операции */
         children: item.children.map(processItem) || [],
         type: item.type,
-        /*parameters: item.parameters,
-        jobs: item.jobs,
-        proxyTOId: item.proxyTOId,
-        proxyOPId: item.proxyOPId,
-        proxyOJId: item.proxyOJId,
-        proxyJId: item.proxyJId,*/
-
-        /*description: item.operationDescription != null ? item.operationDescription : '',
-        orderNumber: item.orderNumber,
-        shopNumber: item.shopNumber,
-        areaNumber: item.areaNumber != null ? item.areaNumber : '',
-        document: item.document != null ? item.document : '',
-        grade: item.grade,
-        workingConditions: item.workingConditions,
-        numberOfWorkers: item.numberOfWorkers,
-        numberOfProcessedParts: item.numberOfProcessedParts,
-        laborEffort: item.laborEffort,
-        jobName: item.jobName,
-        jobCode: item.jobCode,
-        technologyUserId: item.technologyUserId,
-        technologyCreationDate: item.technologyCreationDate,
-        technologyLastModified: item.technologyLastModified,
-        drawingExternalCode: item.drawingExternalCode,*/
       });
       console.log(data.map(processItem));
       return data.map(processItem);

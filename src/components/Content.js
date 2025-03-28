@@ -28,9 +28,15 @@ import MuiAlert from '@mui/material/Alert';
 import { MemoizedTabPanel as TabPanel } from './TabPanel';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
-import { selectItems as technologiesSelectItems, selectLoading as technologiesSelectLoading, selectError as technologiesSelectError} from '../store/slices/technologiesSlice';
+import { 
+  getSavedData as technologiesFetchData, 
+  selectItems as technologiesSelectItems, 
+  selectLoading as technologiesSelectLoading, 
+  selectError as technologiesSelectError,
+  clearItems as technologiesSetItems
+} from '../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology, setOperation, selectOperation } from '../store/slices/drawingsSlice';
-import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, incrementTabCnt, decrementTabCnt, incrementTabValue, setData } from '../store/slices/operationsTabsSlice';
+import { setTabs, resetTabs, addTab, removeTab, updateTab, updateTabLabel, setTabValue, incrementTabCnt, decrementTabCnt, incrementTabValue, setData } from '../store/slices/operationsTabsSlice';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
@@ -329,10 +335,19 @@ function Content() {
     await new Promise((resolve) => setTimeout(async () => {      
       if (validateForm()) {
         try {
+          //обновление
           await dispatch(setData({ user: user, tabs: tabs })).unwrap();
-          handleClose();          
+          //dispatch(productsSetItems());
+          dispatch(technologiesSetItems()); //очистить компонент технологий
+          //dispatch(productsFetchData({limit: 50, page: 1}));
+          dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
+          dispatch(updateTabLabel(tabs[tabValue].id)); //обновить заголовок активной вкладки
+          
+      
+
+          handleClose();         
           setRequestStatus('success');
-          showSnackbar();
+          showSnackbar();          
         } catch (error) {
           handleClose();
           setRequestStatus('error');

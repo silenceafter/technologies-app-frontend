@@ -80,7 +80,10 @@ const operationsTabsSlice = createSlice({
       };
     },
     updateTab: (state, action) => {
+      //обновить вкладку
       const { id, newContent, newValidateForm } = action.payload;
+
+      //orderNumber
       //operationCode
       let operationCode = { code: '', name: '' };
       if (newContent.changedValues.hasOwnProperty('operationCode')) {
@@ -89,6 +92,74 @@ const operationsTabsSlice = createSlice({
           operationCode.name = newContent.changedValues.operationCode.name;
         }
       }
+
+      //areaNumber
+      let areaNumber = null;
+      if (newContent.changedValues.hasOwnProperty('areaNumber')) {
+        if (newContent.changedValues.areaNumber) {
+          areaNumber = newContent.changedValues.areaNumber;
+        }
+      }
+
+      //document
+      let document = null;
+      if (newContent.changedValues.hasOwnProperty('document')) {
+        if (newContent.changedValues.document) {
+          document = newContent.changedValues.document;
+        }
+      }
+
+      //operationDescription
+      let operationDescription = null;
+      if (newContent.changedValues.hasOwnProperty('operationDescription')) {
+        if (newContent.changedValues.operationDescription) {
+          operationDescription = newContent.changedValues.operationDescription;
+        }
+      }
+
+      //grade
+      let grade = null;
+      if (newContent.changedValues.hasOwnProperty('grade')) {
+        if (newContent.changedValues.grade) {
+          grade = newContent.changedValues.grade;
+        }
+      }
+
+      //workingConditions
+      let workingConditions = null;
+      if (newContent.changedValues.hasOwnProperty('workingConditions')) {
+        if (newContent.changedValues.workingConditions) {
+          workingConditions = newContent.changedValues.workingConditions;
+        }
+      }
+
+      //numberOfWorkers
+      let numberOfWorkers = null;
+      if (newContent.changedValues.hasOwnProperty('numberOfWorkers')) {
+        if (newContent.changedValues.numberOfWorkers) {
+          numberOfWorkers = newContent.changedValues.numberOfWorkers;
+        }
+      }
+
+      //numberOfProcessedParts
+      let numberOfProcessedParts = null;
+      if (newContent.changedValues.hasOwnProperty('numberOfProcessedParts')) {
+        if (newContent.changedValues.numberOfProcessedParts) {
+          numberOfProcessedParts = newContent.changedValues.numberOfProcessedParts;
+        }
+      }
+
+      //laborEffort
+      let laborEffort = null;
+      if (newContent.changedValues.hasOwnProperty('laborEffort')) {
+        if (newContent.changedValues.laborEffort) {
+          laborEffort = newContent.changedValues.laborEffort;
+        }
+      }
+
+      //jobCode
+      //jobName
+
       //
       return {
         ...state,
@@ -113,6 +184,21 @@ const operationsTabsSlice = createSlice({
             : tab
         ),
         /*validateForm: true,*/
+      };
+    },
+    updateTabLabel: (state, action) => {
+      //обновить заголовок активной вкладки
+      const id = action.payload;
+      return {
+        ...state,
+        tabs: state.tabs.map((tab) =>
+          tab.id === id
+            ? {
+                ...tab,
+                label: `${tab.operation.name} (${tab.operation.code})`,
+              }
+            : tab
+        ),
       };
     },
     setTabValue: (state, action) => {
@@ -171,5 +257,5 @@ export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 
 export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation } = drawingsSlice.actions;*/
-export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice, incrementTabCnt, decrementTabCnt, incrementTabValue } = operationsTabsSlice.actions;
+export const { setTabs, resetTabs, addTab, removeTab, updateTab, updateTabLabel, setTabValue, toggleValidateFormInSlice, incrementTabCnt, decrementTabCnt, incrementTabValue } = operationsTabsSlice.actions;
 export default operationsTabsSlice.reducer;
