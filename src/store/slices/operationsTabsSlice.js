@@ -37,7 +37,7 @@ export const setData = createAsyncThunk(
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Ошибка запроса');
-      return response.ok && response.status == '204' ? true : false;
+      return response.ok && response.status == '200' ? true : false;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -86,8 +86,10 @@ const operationsTabsSlice = createSlice({
       //orderNumber
       //operationCode
       let operationCode = { code: '', name: '' };
+      let newoperationCode = false;
       if (newContent.changedValues.hasOwnProperty('operationCode')) {
         if (newContent.changedValues.operationCode) {
+          newoperationCode = true;
           operationCode.code = newContent.changedValues.operationCode.code;
           operationCode.name = newContent.changedValues.operationCode.name;
         }
@@ -176,29 +178,15 @@ const operationsTabsSlice = createSlice({
                 },
                 operation: {
                   ...tab.operation,
-                  code: operationCode.code,
-                  name: operationCode.name,                   
+                  code: newoperationCode ? operationCode.code : tab.operation.code,
+                  name: newoperationCode ? operationCode.name : tab.operation.name,
                 },
+                label: newoperationCode ? `${operationCode.name} (${operationCode.code})` : `${tab.operation.name} (${tab.operation.code})`,
                 validateForm: newValidateForm || tab.validateForm,
               }
             : tab
         ),
         /*validateForm: true,*/
-      };
-    },
-    updateTabLabel: (state, action) => {
-      //обновить заголовок активной вкладки
-      const id = action.payload;
-      return {
-        ...state,
-        tabs: state.tabs.map((tab) =>
-          tab.id === id
-            ? {
-                ...tab,
-                label: `${tab.operation.name} (${tab.operation.code})`,
-              }
-            : tab
-        ),
       };
     },
     setTabValue: (state, action) => {
@@ -257,5 +245,5 @@ export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 
 export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation } = drawingsSlice.actions;*/
-export const { setTabs, resetTabs, addTab, removeTab, updateTab, updateTabLabel, setTabValue, toggleValidateFormInSlice, incrementTabCnt, decrementTabCnt, incrementTabValue } = operationsTabsSlice.actions;
+export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice, incrementTabCnt, decrementTabCnt, incrementTabValue } = operationsTabsSlice.actions;
 export default operationsTabsSlice.reducer;

@@ -605,7 +605,9 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
                       name='operationDescription'
                       id="operation-description-12"
                       label="Описание операции"
-                      size='small'                      
+                      size='small'
+                      onChange={handleInputChange}
+                      value={localData.formValues.operationDescription || ''}
                       /*sx={{ resize: 'both', overflow: 'auto' }}*/
                     />                  
                   </Grid>

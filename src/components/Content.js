@@ -36,7 +36,7 @@ import {
   clearItems as technologiesSetItems
 } from '../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology, setOperation, selectOperation } from '../store/slices/drawingsSlice';
-import { setTabs, resetTabs, addTab, removeTab, updateTab, updateTabLabel, setTabValue, incrementTabCnt, decrementTabCnt, incrementTabValue, setData } from '../store/slices/operationsTabsSlice';
+import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, incrementTabCnt, decrementTabCnt, incrementTabValue, setData } from '../store/slices/operationsTabsSlice';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
@@ -341,10 +341,7 @@ function Content() {
           dispatch(technologiesSetItems()); //очистить компонент технологий
           //dispatch(productsFetchData({limit: 50, page: 1}));
           dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
-          dispatch(updateTabLabel(tabs[tabValue].id)); //обновить заголовок активной вкладки
-          
-      
-
+                          
           handleClose();         
           setRequestStatus('success');
           showSnackbar();          
