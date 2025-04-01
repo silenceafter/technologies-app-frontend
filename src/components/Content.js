@@ -121,13 +121,13 @@ function Content() {
         if (tabs.length === 0 && !isUserClosedAllTabs) {
           //изначально вкладки создаются из technologiesItems 
           const newTabs = technologiesItems[0].children
-            .filter(operation => operation.parameters.orderNumber)
+            .filter(operation => operation.orderNumber)
             .map(operation => {
               // Ищем существующую вкладку, чтобы сохранить ошибки и состояние панелей
-              const existingTab = tabs.find(tab => tab.id === operation.parameters.orderNumber);
-              const data = {
+              const existingTab = tabs.find(tab => tab.id === operation.orderNumber);
+              const data = {                
                 //parameters
-                orderNumber: operation.parameters.orderNumber,
+                orderNumber: operation.orderNumber,
                 operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.proxyOId },                
                 shopNumber: operation.parameters.shopNumber,
                 areaNumber: operation.parameters.areaNumber,
@@ -144,7 +144,7 @@ function Content() {
               };
               //
               return {
-                id: operation.parameters.orderNumber,
+                id: operation.orderNumber,
                 label: `${operation.secondaryLabel} (${operation.label})`,
                 operation: { code: operation.label, name: operation.secondaryLabel },
                 technology: {
