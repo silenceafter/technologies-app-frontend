@@ -270,7 +270,7 @@ export default function TechnologiesTree() {
     const handleRootClick = (e) => {
       //записать выбранную технологию
       handleCustomTreeItemClick(e, props.itemId);//
-      dispatch(setTechnology({ name: item.label, code: item.secondaryLabel }));
+      dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
       const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
       //
       if (isIconClick) {
@@ -478,7 +478,7 @@ export default function TechnologiesTree() {
   }, [technologySelector]);*/
 
   const technologyChip = useMemo(() => {
-    return `${technologySelector.name}: ${technologySelector.code}`;
+    return '111';//return `${technologySelector.name}: ${technologySelector.code}`;
   }, [technologySelector]);
 
   const handleSpeedDialActionClick = useCallback((action) => {
@@ -592,11 +592,11 @@ export default function TechnologiesTree() {
               <>
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
                 {
-                  technologySelector.code.trim() != ''
+                  /*technologySelector.code.trim() != ''
                     ? (                                            
                       technologyChip && <Chip label={technologyChip} variant="outlined" onDelete={handleDelete} />
                     )
-                    : ('')
+                    : ('')*/
                 }
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
                     {/*<Fab size='small' color="primary" aria-label="add">

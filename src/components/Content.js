@@ -145,7 +145,7 @@ function Content() {
               //
               return {
                 id: operation.orderNumber,
-                label: `${operation.secondaryLabel} (${operation.label})`,
+                label: `${operation.secondaryLabel} (${operation.label})`,                
                 operation: { code: operation.label, name: operation.secondaryLabel },
                 technology: {
                   code: technologiesItems[0].label, 
@@ -163,6 +163,7 @@ function Content() {
                   expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели                                    
                 },
                 proxy: {
+                  proxyDTId: operation.proxyDTId,
                   proxyTOId: operation.proxyTOId,
                   keyHex: technologiesItems[0].keyHex,
                   ivHex: technologiesItems[0].ivHex
@@ -177,7 +178,7 @@ function Content() {
       }
   
       //устанавливаем текущую выбранную технологию
-      dispatch(setTechnology({ name: technologiesItems[0].secondaryLabel, code: technologiesItems[0].label }));
+      dispatch(setTechnology(/*{ name: technologiesItems[0].secondaryLabel, code: technologiesItems[0].label }*/ technologiesItems[0]));
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
@@ -229,6 +230,10 @@ function Content() {
   
   //события
   const handleAddTab = useCallback(() => {
+    if (!currentTechnology) {
+      return;
+    }
+    //
     const newTab = {
       id: tabCnt,
       label: `Новая операция ${tabCnt}`,
@@ -238,7 +243,21 @@ function Content() {
         formErrors: {},
         changedValues: {},
         expandedPanels: expandedPanelsDefault,                
-      }
+      },
+      drawing: { code: drawingExternalCode },
+      operation: null,
+      technology: {
+        code: technologiesItems[0].label, 
+        name: technologiesItems[0].secondaryLabel,
+        userId: technologiesItems[0].userId,
+        creationDate: technologiesItems[0].creationDate,
+        lastModified: technologiesItems[0].lastModified
+      },
+      proxy: {
+        proxyDTId: currentTechnology.proxyId,
+        ivHex: currentTechnology.ivHex,
+        keyHex: currentTechnology.keyHex,
+      },
     };
     //
     dispatch(addTab(newTab));
@@ -404,6 +423,7 @@ function Content() {
   return (
     <>
       {console.log(tabs[tabValue])}
+      {console.log(currentTechnology)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

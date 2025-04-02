@@ -1,14 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { act } from 'react';
 
 //данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {
-  drawing: {
-    externalCode: '',
-    internalCode: '',
-    name: '',
-  },
-  technology: { name: '', code: '' },
-  operation: { name: '', code: '' },
+  drawing: null,
+  technology: null,
+  operation: { name: '', code: '' },/*?*/
   loading: false,
   error: null,
 };
@@ -36,22 +33,38 @@ const drawingsSlice = createSlice({
   initialState,
   reducers: {
     setDrawing: (state, action) => {
-      state.drawing.externalCode = action.payload.externalCode;
+      /*state.drawing.externalCode = action.payload.externalCode;
       state.drawing.internalCode = action.payload.internalCode;
-      state.drawing.name = action.payload.name;
+      state.drawing.name = action.payload.name;*/
+      return {
+        ...state,
+        drawing: action.payload,
+      };
     },
     clearDrawing: (state) => {
-      state.drawing.externalCode = '';
+      /*state.drawing.externalCode = '';
       state.drawing.internalCode = '';
-      state.drawing.name = '';
+      state.drawing.name = '';*/
+      return {
+        ...state,
+        drawing: null
+      };
     },
     setTechnology: (state, action) => {
-      state.technology.name = action.payload.name;
-      state.technology.code = action.payload.code;
+      /*state.technology.name = action.payload.name;
+      state.technology.code = action.payload.code;*/
+      return {
+        ...state,
+        technology: action.payload,
+      };
     },
     clearTechnology: (state) => {
-      state.technology.name = '';
-      state.technology.code = '';
+      /*state.technology.name = '';
+      state.technology.code = '';*/
+      return {
+        ...state,
+        technology: null,
+      };
     },
     setOperation: (state, action) => {
       state.operation.name = action.payload.name;
@@ -74,7 +87,7 @@ const drawingsSlice = createSlice({
     },
 });
 
-export const selectDrawingExternalCode = (state) => state?.drawings?.drawing?.externalCode || '';
+export const selectDrawingExternalCode = (state) => state?.drawings?.drawing?.externalcode || '';
 export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 

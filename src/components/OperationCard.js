@@ -258,9 +258,9 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     }
 
     //job
-    if (!localData.formValues.job) {
+    /*if (!localData.formValues.job) {
       errors.job = autocompleteTextFieldMessage;
-    }
+    }*/
 
     //grade
     if (!localData.formValues.grade) {

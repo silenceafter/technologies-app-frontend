@@ -90,11 +90,12 @@ function HeaderSearch(props) {
                 autoHighlight={false}
                 freeSolo={false}
                 options={memoizedItems || []}
-                getOptionLabel={(option) => option.external_code || option.label}
+                getOptionLabel={(option) => option.externalcode || option.label}
                 filterOptions={(options, state) => {
                   const { inputValue } = state;
+
                   return options.filter(option =>
-                    option.external_code.toLowerCase().includes(inputValue.toLowerCase()) ||
+                    option.externalcode.toLowerCase().includes(inputValue.toLowerCase()) ||
                     option.name.toLowerCase().includes(inputValue.toLowerCase())
                   );
                 }}
@@ -106,13 +107,14 @@ function HeaderSearch(props) {
 
                   //обновить выбранное значение в redux                 
                   if (newValue) {
-                    dispatch(setDrawing(
+                    dispatch(setDrawing(newValue));
+                    /*dispatch(setDrawing(
                       {
-                        externalCode: newValue.external_code, 
-                        internalCode: newValue.internal_code, 
+                        externalCode: newValue.externalCode, 
+                        internalCode: newValue.internalCode, 
                         name: newValue.name
                       }
-                    ));                
+                    ));*/               
                   } else {
                     dispatch(clearDrawing());
                     dispatch(clearTechnology());
@@ -152,11 +154,11 @@ function HeaderSearch(props) {
                 renderOption={(props, option) => (
                   <ListItem 
                     {...props} 
-                    key={`${option.external_code}-${option.internal_code}-${option.name}`} 
+                    key={`${option.externalcode}-${option.internalcode}-${option.name}`} 
                     style={{ padding: '8px 16px' }}
                   >
                     <ListItemText
-                      primary={option.external_code}
+                      primary={option.externalcode}
                       secondary={option.name}
                       primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
                       secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}

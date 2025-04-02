@@ -54,8 +54,8 @@ const headerSlice = createSlice({
         state.loading = false;
         const newItems = action.payload.data.filter(newItem => 
           !state.items.some(existingItem => {
-            return `${existingItem.external_code}-${existingItem.internal_code}-${existingItem.name}` === 
-                `${newItem.external_code}-${newItem.internal_code}-${newItem.name}`;
+            return `${existingItem.externalCode}-${existingItem.internalCode}-${existingItem.name}` === 
+                `${newItem.externalCode}-${newItem.internalCode}-${newItem.name}`;
             })
         );
         //

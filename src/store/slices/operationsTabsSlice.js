@@ -93,6 +93,9 @@ const operationsTabsSlice = createSlice({
           operationCode.code = newContent.changedValues.operationCode.code;
           operationCode.name = newContent.changedValues.operationCode.name;
         }
+      } else {
+        operationCode.code = id;
+        operationCode.name = 'Новая операция';
       }
 
       //areaNumber
@@ -178,10 +181,10 @@ const operationsTabsSlice = createSlice({
                 },
                 operation: {
                   ...tab.operation,
-                  code: newoperationCode ? operationCode.code : tab.operation.code,
-                  name: newoperationCode ? operationCode.name : tab.operation.name,
+                  code: /*newoperationCode ?*/ operationCode.code /*: ''*/,
+                  name: /*newoperationCode ?*/ operationCode.name /*: ''*/,
                 },
-                label: newoperationCode ? `${operationCode.name} (${operationCode.code})` : `${tab.operation.name} (${tab.operation.code})`,
+                label: /*newoperationCode ?*/ `${operationCode.name} (${operationCode.code})` /*: `${tab.operation.name} (${tab.operation.code})`*/,
                 validateForm: newValidateForm || tab.validateForm,
               }
             : tab

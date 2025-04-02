@@ -82,7 +82,7 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
   useEffect(() => {
     setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
     setSelectedOption(selectedValue || null);
-    dispatch(setOperation(selectedValue ? { code: selectedValue.code, name: selectedValue.name } : { code: '', name: `Новая операция ${tabs ? tabs.length : ''}` }));
+    //dispatch(setOperation(selectedValue ? { code: selectedValue.code, name: selectedValue.name } : { code: '', name: `Новая операция ${tabs ? tabs.length : ''}` }));
   }, [selectedValue, dispatch]);
   //
   return (    
@@ -108,7 +108,7 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
           }}
           onChange={(event, newValue) => {
             setSelectedOption(newValue);
-            dispatch(setOperation({ code: !newValue ? '' : newValue.code, name: !newValue ? '' : newValue.name }));
+            //dispatch(setOperation({ code: !newValue ? '' : newValue.code, name: !newValue ? '' : newValue.name }));
             //
             if (onOptionSelect) {
               onOptionSelect('operationCode', newValue);
