@@ -32,7 +32,25 @@ export const setData = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/UpdateOperation.v0.php', {
-        method: 'PATCH',
+        method: 'POST',
+        body: JSON.stringify(payload),
+        credentials: 'include'
+      });
+      if (!response.ok) throw new Error('Ошибка запроса');
+      return response.ok && response.status == '200' ? true : false;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+//удалить операцию
+export const deleteData = createAsyncThunk(
+  'technologiesTree/deleteData',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/UpdateOperation.v0.php', {
+        method: 'DELETE',
         body: JSON.stringify(payload),
         credentials: 'include'
       });
@@ -85,17 +103,19 @@ const operationsTabsSlice = createSlice({
 
       //orderNumber
       //operationCode
-      let operationCode = { code: '', name: '' };
-      let newoperationCode = false;
+      let operationCode = { code: id, name: 'Новая операция' };
+
+      //если операция изменена
       if (newContent.changedValues.hasOwnProperty('operationCode')) {
         if (newContent.changedValues.operationCode) {
-          newoperationCode = true;
           operationCode.code = newContent.changedValues.operationCode.code;
           operationCode.name = newContent.changedValues.operationCode.name;
         }
       } else {
-        operationCode.code = id;
-        operationCode.name = 'Новая операция';
+        const tab = state.tabs.find(tab => tab.id === id);
+        if (tab.content.formValues.hasOwnProperty('operationCode')) {
+          operationCode = tab.content.formValues.operationCode;
+        }
       }
 
       //areaNumber
@@ -164,7 +184,6 @@ const operationsTabsSlice = createSlice({
 
       //jobCode
       //jobName
-
       //
       return {
         ...state,
@@ -178,18 +197,18 @@ const operationsTabsSlice = createSlice({
                   formErrors: newContent.formErrors /*|| tab.content.formErrors*/,
                   expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
                   changedValues: newContent.changedValues,
+                  isDeleted: newContent.isDeleted /*|| tab.content.isDeleted*/,
                 },
                 operation: {
                   ...tab.operation,
-                  code: /*newoperationCode ?*/ operationCode.code /*: ''*/,
-                  name: /*newoperationCode ?*/ operationCode.name /*: ''*/,
+                  code: operationCode.code,
+                  name: operationCode.name,
                 },
-                label: /*newoperationCode ?*/ `${operationCode.name} (${operationCode.code})` /*: `${tab.operation.name} (${tab.operation.code})`*/,
+                label: `${operationCode.name} (${operationCode.code})`,
                 validateForm: newValidateForm || tab.validateForm,
               }
             : tab
         ),
-        /*validateForm: true,*/
       };
     },
     setTabValue: (state, action) => {
@@ -237,6 +256,24 @@ const operationsTabsSlice = createSlice({
         }));
       })
       .addCase(setData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteData.fulfilled, (state, action) => {
+        const { id } = action.payload;
+        state.loading = false;
+        state.tabs = state.tabs.map((tab) => tab.id !== id);
+        
+        //tabValue
+        if (state.tabValue >= state.tabs.length) {
+          state.tabValue = Math.max(0, state.tabValue - 1);
+        }
+      })
+      .addCase(deleteData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -50,10 +50,6 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
       changedValues: {},
       expandedPanels: {},             
     });
-  const [bb, setBb] = useState(autocompleteOptions.operations || null);
-
-  //селекторы
-  const reduxContent = useSelector((state) => state.operationsTabs.tabs);
 
   //список числовых полей (для последующей валидации вместо type="number")
   const numericFields = [
@@ -231,6 +227,23 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     [localData, setLocalData]
   );
 
+  const handleDeleteTab = useCallback((e) => {
+    setLocalData((prev) => ({
+      ...prev,
+      isDeleted: !prev.isDeleted,
+    }));
+
+    //передать изменения в родительский компонент
+    if (onUpdate) {
+      onUpdate({...localData, isDeleted: !localData.isDeleted});
+    }
+  }, [localData, setLocalData, onUpdate]);
+  
+  //textField
+  /* handleInputChange = (e) => {
+    //dispatch(setUnsavedChanges(true));
+  };*/
+
   //проверка формы
   const validateForm = useCallback(() => {
     const errors = {};
@@ -330,11 +343,6 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     }
     return Object.keys(errors).length === 0;
   }, [content]);
-
-  //textField
-  /* handleInputChange = (e) => {
-    //dispatch(setUnsavedChanges(true));
-  };*/
 
   useEffect(() => {
     setValidateForm(() => validateForm);
@@ -616,8 +624,31 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
               {/* Девятая строка */}
               <Grid item xs={12}>
                 <Grid container spacing={2}>
-                  <Grid item xs={2.4}>
-                    <Button variant='contained'>Удалить операцию</Button>                
+                  <Grid item xs={4.8}>
+                    {localData.isDeleted
+                      ? (
+                          <Button 
+                            variant='contained'
+                            color='error'
+                            onClick={(e) => {
+                              //e.stopPropagation();
+                              handleDeleteTab(e);
+                            }}
+                          >
+                            Восстановить операцию
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant='contained'
+                            onClick={(e) => {
+                              //e.stopPropagation();
+                              handleDeleteTab(e);
+                            }}
+                          >
+                            Удалить операцию
+                          </Button>
+                          )
+                    }                                  
                   </Grid>
                 </Grid>
               </Grid>                                                    

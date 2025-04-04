@@ -160,7 +160,8 @@ function Content() {
                   formValues: data,
                   formErrors: existingTab?.content?.formErrors || {}, // Сохраняем ошибки
                   changedValues: existingTab?.content?.changedValues || {}, //реквизиты, в которых были изменения
-                  expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели                                    
+                  expandedPanels: existingTab?.content?.expandedPanels || expandedPanelsDefault, // Сохраняем раскрытые панели
+                  isDeleted: false,
                 },
                 proxy: {
                   proxyDTId: operation.proxyDTId,
@@ -242,7 +243,8 @@ function Content() {
         formValues: {},
         formErrors: {},
         changedValues: {},
-        expandedPanels: expandedPanelsDefault,                
+        expandedPanels: expandedPanelsDefault,
+        isDeleted: false,
       },
       drawing: { code: drawingExternalCode },
       operation: null,
@@ -422,8 +424,8 @@ function Content() {
   //вывод
   return (
     <>
-      {console.log(tabs[tabValue])}
-      {console.log(currentTechnology)}
+      {console.log(tabs)}
+      {/*console.log(currentTechnology)*/}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -539,7 +541,7 @@ function Content() {
                     <TabPanel key={tabs[tabValue].id} value={tabValue} index={tabValue}>
                       <OperationCard
                         content={tabs[tabValue]?.content}
-                        onUpdate={handleOperationUpdate/*(newData) => handleUpdateTabContent(tabs[tabValue]?.id, newData, validateForm)*/}
+                        onUpdate={handleOperationUpdate}
                         setValidateForm={setValidateFormStable}
                         autocompleteOptions={autocompleteOptions}
                       />

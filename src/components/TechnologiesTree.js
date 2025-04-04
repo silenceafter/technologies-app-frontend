@@ -568,7 +568,6 @@ export default function TechnologiesTree() {
   //
   return (
     <>
-    {console.log(items)}
       <MemoizedRichTreeView
         checkboxSelection
         multiSelect

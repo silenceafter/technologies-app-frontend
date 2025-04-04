@@ -5,7 +5,7 @@ import { act } from 'react';
 const initialState = {
   drawing: null,
   technology: null,
-  operation: { name: '', code: '' },/*?*/
+  operation: null, /*?*/
   loading: false,
   error: null,
 };
