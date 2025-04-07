@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { Breadcrumbs, Typography } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { selectDrawingExternalCode, selectTechnology, selectOperation } from '../store/slices/drawingsSlice';
+import { Breadcrumbs, Typography } from '@mui/material';
+import { selectDrawingExternalCode, selectTechnology, selectOperation } from '../../../store/slices/drawingsSlice'; //'../store/slices/drawingsSlice';
 
 function TechnologyBreadcrumbs(props) {
   //селекторы

@@ -1,62 +1,61 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
-import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Popover from '@mui/material/Popover';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import { 
+  Box, 
+  Button, 
+  Chip, 
+  CircularProgress, 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogContentText, 
+  DialogTitle, 
+  IconButton, 
+  Menu, 
+  MenuItem, 
+  SpeedDial, 
+  SpeedDialIcon, 
+  SpeedDialAction, 
+  Stack, 
+  TextField, 
+  Typography 
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { styled, alpha } from '@mui/material/styles';
 import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { 
   TreeItem2, 
-  TreeItem2Content,
-  TreeItem2Root,
-  TreeItem2GroupTransition,
-  TreeItem2IconContainer,
-  TreeItem2Label 
+  TreeItem2IconContainer
 } from '@mui/x-tree-view/TreeItem2';
-import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
-import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
-import { TreeItem2LabelInput } from '@mui/x-tree-view/TreeItem2LabelInput';
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
-import { fetchData, setItems, addItems, setSelectedItems, setSelectedItemId, addSelectedItems, deleteSelectedItems, setDisabledItems, restoreItems, deleteSavedData} from '../store/slices/technologiesSlice';
-import CircularProgress from '@mui/material/CircularProgress';
-import IconButton from '@mui/material/IconButton';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import CardActionArea from '@mui/material/CardActionArea';
-import { selectDrawingExternalCode, setTechnology, selectTechnology, selectOperation } from '../store/slices/drawingsSlice';
-import { makeStyles } from '@mui/styles';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Fab from '@mui/material/Fab';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import { 
+  selectDrawingExternalCode, 
+  setTechnology, 
+  selectTechnology, 
+  selectOperation 
+} from '../../../store/slices/drawingsSlice'; //'../store/slices/drawingsSlice';
+import { 
+  fetchData, 
+  setItems, 
+  addItems, 
+  setSelectedItems, 
+  setSelectedItemId, 
+  addSelectedItems, 
+  deleteSelectedItems, 
+  setDisabledItems, 
+  restoreItems, 
+  deleteSavedData
+} from '../../../store/slices/technologiesSlice'; //'../store/slices/technologiesSlice';
+import { TechnologySearch } from '../components/TechnologySearch'; //'./TechnologySearch';
 import AdjustIcon from '@mui/icons-material/Adjust';
-import SpeedDial from '@mui/material/SpeedDial';
-import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import SpeedDialAction from '@mui/material/SpeedDialAction';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import RestoreIcon from '@mui/icons-material/Restore';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Autocomplete from '@mui/material/Autocomplete';
-import { TechnologySearch } from './TechnologySearch';
-import Divider from '@mui/material/Divider';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import AddIcon from '@mui/icons-material/Add';
+import RestoreIcon from '@mui/icons-material/Restore';
 
 //действия для SpeedDial
 const actions = [

@@ -1,40 +1,55 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import SearchIcon from '@mui/icons-material/Search';
 import { 
+    AppBar,
     Autocomplete, 
     Box, 
-    Chip,
     CircularProgress, 
+    Grid,
+    Link,
     ListItem, 
     ListItemText,
-    TextField
+    TextField,
+    Toolbar
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage } from '../store/slices/technologiesSlice';
+import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../store/slices/operationsSlice'; //'../store/slices/operationsSlice';
 import { debounce } from 'lodash';
+import Skeleton from '@mui/material/Skeleton';
+import { selectDrawingExternalCode, selectTechnology, setTechnology, setOperation } from '../../../store/slices/drawingsSlice'; //'../store/slices/drawingsSlice';
 
-function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
+const OperationsSearch = React.memo(({props, id, selectedValue, options, onChange, errorValue }) => {
   const dispatch = useDispatch();
+  const onOptionSelect = onChange;
 
-  //TextField
-  const [inputValue, setInputValue] = useState('');
+  //стейты
+  const [inputValue, setInputValue] = useState(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
+  const [selectedOption, setSelectedOption] = useState(selectedValue || null);
+
+  //селекторы
+  const tabs = useSelector((state) => state.operationsTabs.tabs);
   
   //запросы
-  const search = useSelector((state) => state.technologies.search);
-  const limit = useSelector((state) => state.technologies.limit);
-  const page = useSelector((state) => state.technologies.page);
+  /*const search = useSelector(selectSearch);
+  const limit = useSelector(selectLimit);
+  const page = useSelector(selectPage);*/
+  const { 
+    search = '', 
+    limit = 10, 
+    page = 1, 
+    items = [], 
+    loading = false, 
+    hasMore = false 
+  } = options;
 
   //запросы для прокрутки списка
-  const items = useSelector((state) => state.technologies.searchedItems);
-  const loading = useSelector((state) => state.technologies.searchedLoading);
-  const error = useSelector((state) => state.technologies.searchingError);
-  const hasMore = useSelector((state) => state.technologies.searchingHasMore);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
   }, 1);
 
-  useEffect(() => {
+  /*useEffect(() => {
     //загрузка данных при пустом поисковом запросе
     if (!search) {
       dispatch(fetchData({ search: '', limit, page: 1 }));
@@ -52,9 +67,9 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);//чистим обработчик при размонтировании
-  }, [loading, hasMore]);
+  }, [loading, hasMore]);*/
 
-  const handleScroll = (event) => {
+  const handleScroll = useCallback((event) => {
     if (listRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
       if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
@@ -62,25 +77,42 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
         dispatch(fetchData({ search, limit, page: page + 1 }));
       }
     }
-  };
-  return (
-    <>
+  }, [dispatch, page, search, limit, loading, hasMore]);
+  
+  useEffect(() => {
+    setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
+    setSelectedOption(selectedValue || null);
+    //dispatch(setOperation(selectedValue ? { code: selectedValue.code, name: selectedValue.name } : { code: '', name: `Новая операция ${tabs ? tabs.length : ''}` }));
+  }, [selectedValue, dispatch]);
+  //
+  return (    
+    <>    
         <Autocomplete
-          multiple
+          /*freeSolo*/
           options={items || []}
-          getOptionLabel={(option) => `${option.code} ${option.name}`}
+          getOptionLabel={(option) => option == null || option == undefined ? '' : `${option.code} ${option.name}`}
+          getOptionSelected={(option, value) => option.code === value.code && option.name === value.name}
           filterOptions={(options, state) => {
-              const { inputValue } = state;
-              return options.filter(option =>
+            const { inputValue } = state;
+            return options.filter(option =>
               option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
               option.name.toLowerCase().includes(inputValue.toLowerCase())
-              );
+            );
           }}
           onInputChange={(event, newInputValue) => {
-              setInputValue(newInputValue);
+            setInputValue(newInputValue);
+            dispatch(fetchData({ search: newInputValue, limit, page: 1 }));
+            /*if (onOptionSelect) {
+              onOptionSelect(id, newInputValue);
+            }*/
           }}
           onChange={(event, newValue) => {
-              onOptionSelect(id, newValue);
+            setSelectedOption(newValue);
+            //dispatch(setOperation({ code: !newValue ? '' : newValue.code, name: !newValue ? '' : newValue.name }));
+            //
+            if (onOptionSelect) {
+              onOptionSelect('operationCode', newValue);
+            }
           }}
           inputValue={inputValue}
           loadingText="поиск данных"
@@ -90,7 +122,7 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
               onScroll: handleScroll,
               ref: listRef,
               sx: {
-              maxHeight: '48vh',
+              maxHeight: '42.5vh',
               overflowY: 'auto'
               }
           }}
@@ -109,10 +141,10 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
               </div>
           )}
           renderOption={(props, option) => (
-              <ListItem {...props} key={`${option.code}-${option.name}`} style={{ padding: '8px 16px' }}>
+              <ListItem {...props} key={`${option?.code}-${option?.name}`} style={{ padding: '8px 16px' }}>
               <ListItemText
-                  primary={option.code}
-                  secondary={option.name}
+                  primary={option?.code}
+                  secondary={option?.name}
                   primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
                   secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
               />
@@ -123,26 +155,18 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
                 {...params}
                 required
                 fullWidth
-                id="technologies"
+                name='operationCode2'
+                id={props.id}
                 error={!!errorValue}
                 helperText={errorValue}
-                placeholder="Технология"
+                placeholder={props.placeholder}
                 variant="outlined"
                 sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                 size='small'
+                value={props.placeholder}
               />
           )}
-          renderTags={(tagValue, getTagProps) =>
-            tagValue.map((option, index) => (
-              <Chip
-                key={index}
-                label={option.name || option.label}
-                {...getTagProps({ index })}         
-              />
-            ))
-          }
           sx={{
-              width: '100%',
               '& .MuiAutocomplete-listbox': {
               backgroundColor: '#fff',
               boxShadow: 2
@@ -151,10 +175,10 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
               padding: '8px 16px'
               },
           }}
-          value={selectedValue}
-        />
+          value={selectedOption || null}
+            />
     </>
   );
-}
+});
 
-export { TechnologySearch };
+export { OperationsSearch };

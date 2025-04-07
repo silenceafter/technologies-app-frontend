@@ -9,7 +9,7 @@ import {
     TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/componentsSlice';
+import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../store/slices/componentsSlice'; //'../store/slices/componentsSlice';
 import { debounce } from 'lodash';
 
 function ComponentsSearch({ id, selectedValue, onOptionSelect, errorValue }) {

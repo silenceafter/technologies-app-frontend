@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { selectOperations } from './operationsSlice';
 
 //данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {

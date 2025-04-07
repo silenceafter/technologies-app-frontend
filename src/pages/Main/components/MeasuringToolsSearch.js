@@ -1,22 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
 import { 
-    AppBar,
     Autocomplete, 
-    Box, 
+    Box,
+    Chip,
     CircularProgress, 
-    Grid,
-    Link,
     ListItem, 
     ListItemText,
-    TextField,
-    Toolbar
+    TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/jobsSlice';
+import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../store/slices/measuringToolsSlice';
 import { debounce } from 'lodash';
 
-function JobsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
+function MeasuringToolsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const dispatch = useDispatch();
 
   //TextField
@@ -28,7 +24,7 @@ function JobsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const page = useSelector(selectPage);
 
   //запросы для прокрутки списка
-  const { items, loading, error, hasMore } = useSelector((state) => state.jobs);
+  const { items, loading, error, hasMore } = useSelector((state) => state.measuringTools);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
@@ -65,10 +61,11 @@ function JobsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
     }
   };
   return (
-    <>
+    <>         
       <Autocomplete
+        multiple
         options={items || []}
-        getOptionLabel={(option) => `${option.code} ${option.name}`}
+        getOptionLabel={(option) => option.code || option.label}
         filterOptions={(options, state) => {
           const { inputValue } = state;
           return options.filter(option =>
@@ -77,69 +74,74 @@ function JobsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
           );
         }}
         onInputChange={(event, newInputValue) => {
-            setInputValue(newInputValue);
+          setInputValue(newInputValue);
         }}
-        onChange={(event, newValue) => {                           
-            onOptionSelect(id, newValue);//setValue(newValue);
+        onChange={(event, newValue) => {
+          onOptionSelect(id, newValue);
         }}
         inputValue={inputValue}
         loadingText="поиск данных"
         noOptionsText="нет результатов"
         loading={loading}
-        ListboxProps={{                  
-            onScroll: handleScroll,
-            ref: listRef,
-            sx: {
-            maxHeight: '25vh',
-            overflowY: 'auto'
-            }
+        ListboxProps={{
+          onScroll: handleScroll,
+          ref: listRef,
+          sx: {
+            maxHeight: '48vh',
+            overflowY: 'auto',
+          },
         }}
         renderGroup={(params) => (
-            <div key={params.key}>
+          <div key={params.key}>
             {params.children}
             {loading && (
-                <Box sx={{ 
-                display: 'flex',
-                justifyContent: 'center',
-                padding: '10px'}}
-                >
-                  <CircularProgress size={24} />
-                </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
+                <CircularProgress size={24} />
+              </Box>
             )}
-            </div>
+          </div>
         )}
         renderOption={(props, option) => (
-            <ListItem {...props} key={`${option.code}-${option.name}`} style={{ padding: '8px 16px' }}>
+          <ListItem {...props} key={`${option.code}-${option.name}`} style={{ padding: '8px 16px' }}>
             <ListItemText
-                primary={option.code}
-                secondary={option.name}
-                primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
-                secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
+              primary={option.code}
+              secondary={option.name}
+              primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
+              secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
             />
-            </ListItem>
+          </ListItem>
         )}
         renderInput={(params) => (
-            <TextField
+          <TextField
               {...params}
               required
               fullWidth
-              id="profession-code-6"
+              id="measuring-tools-13"
               error={!!errorValue}
               helperText={errorValue}
-              placeholder="Код профессии"
+              placeholder="Измерительный инструмент"
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}
               size='small'
-            />
+          />
         )}
+        renderTags={(tagValue, getTagProps) =>
+          tagValue.map((option, index) => (
+            <Chip
+              key={index}
+              label={option.name || option.label}
+              {...getTagProps({ index })}         
+            />
+          ))
+        }
         sx={{
-            '& .MuiAutocomplete-listbox': {
+          '& .MuiAutocomplete-listbox': {
             backgroundColor: '#fff',
-            boxShadow: 2
-            },
-            '& .MuiAutocomplete-option': {
-            padding: '8px 16px'
-            },
+            boxShadow: 2,
+          },
+          '& .MuiAutocomplete-option': {
+            padding: '8px 16px',
+          },
         }}
         value={selectedValue}
       />
@@ -147,4 +149,4 @@ function JobsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   );
 }
 
-export { JobsSearch };
+export { MeasuringToolsSearch };

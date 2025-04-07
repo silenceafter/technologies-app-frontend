@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Divider, Typography } from '@mui/material';
@@ -13,22 +13,21 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import Box from '@mui/material/Box';
 import { ButtonGroup, Tabs, Tab } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import TechnologiesTree from './TechnologiesTree';
-import ProductsTree from './ProductsTree';
+import TechnologiesTree from './TechnologiesTree'; //'../../../components/TechnologiesTree';
+import ProductsTree from './ProductsTree'; //'../../../components/ProductsTree';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import { OperationsSearch } from './OperationsSearch';
-import { JobsSearch } from './JobsSearch';
-import { MeasuringToolsSearch } from './MeasuringToolsSearch';
-import { ToolingSearch } from './ToolingSearch';
-import { ComponentsSearch } from './ComponentsSearch';
-import { MaterialsSearch } from './MaterialsSearch';
-import { EquipmentSearch } from './EquipmentSearch';
+import { OperationsSearch } from './OperationsSearch'; //'../../../components/OperationsSearch';
+import { JobsSearch } from './JobsSearch'; //'../../../components/JobsSearch';
+import { MeasuringToolsSearch } from './MeasuringToolsSearch'; //'../../../components/MeasuringToolsSearch';
+import { ToolingSearch } from './ToolingSearch'; //'../../../components/ToolingSearch';
+import { ComponentsSearch } from './ComponentsSearch'; //'../../../components/ComponentsSearch';
+import { MaterialsSearch } from './MaterialsSearch'; //'../../../components/MaterialsSearch';
+import { EquipmentSearch } from './EquipmentSearch'; //'../../../components/EquipmentSearch';
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
-import { TabPanel } from './TabPanel';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUnsavedChanges } from '../store/slices/unsavedChangesSlice';
+//import { setUnsavedChanges } from '../../../store/slices/unsavedChangesSlice';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionActions from '@mui/material/AccordionActions';
@@ -39,10 +38,18 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import _ from 'lodash';
 
-const OperationCard = ({content, onUpdate, setValidateForm}) => {
+const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions}) => {
   //стейты
-  const [localData, setLocalData] = useState(content || { formValues: { orderNumber: 1 }, formErrors: {} });
+  const [localData, setLocalData] = useState(
+    content || { 
+      dbValues: { orderNumber: 1 },
+      formValues: { orderNumber: 1 },
+      formErrors: {}, 
+      changedValues: {},
+      expandedPanels: {},             
+    });
 
   //список числовых полей (для последующей валидации вместо type="number")
   const numericFields = [
@@ -56,17 +63,37 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
     'laborEffort'
   ];
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
 
     //formValues
-    setLocalData((prev) => ({
-      ...prev,
-      formValues: {
-        ...prev.formValues,
-        [name]: value,
-      },
-    }));
+    setLocalData((prev) => {
+      const prevValue = prev.dbValues[name];
+      //проверяем изменения
+      if (prevValue != value) {
+        //есть изменения
+        return {
+          ...prev,
+          formValues: {
+            ...prev.formValues,
+            [name]: value,
+          },
+          changedValues: {
+            ...prev.changedValues,
+            [name]: value,
+          }
+        };
+      } else {
+        //нет изменений
+        return {
+          ...prev,
+          formValues: {
+            ...prev.formValues,
+            [name]: value,
+          },
+        };
+      }      
+    });
 
     //formErrors
     const errorMessage = numericFields.includes(name) && (value && !/^\d*$/.test(value))
@@ -97,23 +124,64 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
             ...localData.formErrors,
             [name]: errorMessage
           },
-          validateForm
+          validateForm,
+          changedValues:
+          {
+            ...localData.changedValues,
+            [name]: value
+          }
         }
       );
     }
-  };
+  }, [localData, setLocalData, numericFields, onUpdate]);
 
-  const handleOptionSelect = (id, option) => {
+  const handleOptionSelect = useCallback((id, option) => {
     // Обновляем значение поля
-    setLocalData((prev) => ({
+    /*setLocalData((prev) => ({
       ...prev,
       formValues: {
         ...prev.formValues,
         [id]: option || null,
       },
-    }));
+      changedValues: {
+        ...prev.changedValues,
+        [id]: option || null,
+      },
+    }));*/
+
+    setLocalData((prev) => {
+      const prevOption = prev.dbValues[id];
+      //проверяем изменения
+      if (!_.isEqual(prevOption, option) /*prevOption != option*/) {
+        //есть изменения
+        return {
+          ...prev,
+          formValues: {
+            ...prev.formValues,
+            [id]: option || null,
+          },
+          changedValues: {
+            ...prev.changedValues,
+            [id]: option || null,
+          }
+        };        
+      } else {
+        //нет изменений
+        return {
+          ...prev,
+          formValues: {
+            ...prev.formValues,
+            [id]: option || null,
+          },
+          changedValues: {
+            ...prev.changedValues,
+            [id]: option || null,
+          },
+        };
+      }
+    });
   
-    // Убираем ошибку для этого поля
+    //убираем ошибку для этого поля
     setLocalData((prev) => ({
       ...prev,
       formErrors: {
@@ -122,35 +190,62 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
       },
     }));
   
-    // Передаем изменения в родительский компонент
+    //передаем изменения в родительский компонент
     if (onUpdate) {
-      onUpdate({ ...localData, formValues: { ...localData.formValues, [id]: option || null }, formErrors: { ...localData.formErrors, [id]: '' } });
+      onUpdate(
+        { 
+          ...localData, 
+          formValues: { ...localData.formValues, [id]: option || null }, 
+          formErrors: { ...localData.formErrors, [id]: '' },
+          changedValues: { ...localData.changedValues, [id]: option || null }, 
+        }
+      );
     }
-  };
+  }, [localData, onUpdate]);
 
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
+  const handleAccordionChange = useCallback(
+    (panel) => (event, isExpanded) => {
+      setLocalData((prev) => ({
+        ...prev,
+        expandedPanels: {
+          ...prev.expandedPanels,
+          [panel]: isExpanded
+        },
+      }));
+      //
+      onUpdate(
+        { 
+          ...localData, 
+          expandedPanels: 
+          { 
+            ...localData.expandedPanels,
+            [panel]: isExpanded 
+          },
+        }
+      );
+    },
+    [localData, setLocalData]
+  );
+
+  const handleDeleteTab = useCallback((e) => {
     setLocalData((prev) => ({
       ...prev,
-      expandedPanels: {
-        ...prev.expandedPanels,
-        [panel]: isExpanded
-      },
+      isDeleted: !prev.isDeleted,
     }));
-    //
-    onUpdate(
-      { 
-        ...localData, 
-        expandedPanels: 
-        { 
-          ...localData.expandedPanels,
-          [panel]: isExpanded 
-        },
-      }
-    );
-  };
+
+    //передать изменения в родительский компонент
+    if (onUpdate) {
+      onUpdate({...localData, isDeleted: !localData.isDeleted});
+    }
+  }, [localData, setLocalData, onUpdate]);
+  
+  //textField
+  /* handleInputChange = (e) => {
+    //dispatch(setUnsavedChanges(true));
+  };*/
 
   //проверка формы
-  const validateForm = (e) => {
+  const validateForm = useCallback(() => {
     const errors = {};
     const textFieldMessage = 'Поле обязательно для заполнения';
     const autocompleteTextFieldMessage = 'Выберите значение из списка';
@@ -175,10 +270,10 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
       errors.document = textFieldMessage;
     }
 
-    //jobCode
-    if (!localData.formValues.jobCode) {
-      errors.jobCode = autocompleteTextFieldMessage;
-    }
+    //job
+    /*if (!localData.formValues.job) {
+      errors.job = autocompleteTextFieldMessage;
+    }*/
 
     //grade
     if (!localData.formValues.grade) {
@@ -206,7 +301,7 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
     }
 
     //equipment
-    if (!localData.formValues.equipment) {
+    /*if (!localData.formValues.equipment) {
       errors.equipment = autocompleteTextFieldMessage;
     }
 
@@ -228,7 +323,7 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
     //measuringTools
     if (!localData.formValues.measuringTools) {
       errors.measuringTools = autocompleteTextFieldMessage;
-    }
+    }*/
 
     //обновляем ошибки
     setLocalData((prev) => ({
@@ -237,289 +332,37 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
     }));
     //
     if (Object.keys(errors).length > 0) {
-      onUpdate({ ...localData, formValues: {...localData.formValues}, formErrors: errors });
+      onUpdate(
+        { 
+          ...localData, 
+          formValues: {...localData.formValues}, 
+          formErrors: errors,
+          changedValues: { ...localData.changedValues},
+        }
+      );
     }
     return Object.keys(errors).length === 0;
-  };
-
-  //textField
-  /* handleInputChange = (e) => {
-    //dispatch(setUnsavedChanges(true));
-  };*/
+  }, [content]);
 
   useEffect(() => {
     setValidateForm(() => validateForm);
-  }, [setValidateForm]);
-
+  }, [setValidateForm, validateForm]);
+  //
   return (
     <>
-     <Typography variant="h6" gutterBottom>Параметры</Typography>
-     <Divider />
-      <form>       
-        <Grid container spacing={2} columns={{xs:5}} sx={{paddingTop: '1rem'}}>
-          {/* Первая строка */}
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={2.4}>
-                <TextField                          
-                  fullWidth                          
-                  name='orderNumber'
-                  id="order-number-1"
-                  label="Номер операции"
-                  type="text"
-                  size="small"
-                  onChange={handleInputChange}
-                  error={!!localData.formErrors.orderNumber}
-                  helperText={localData.formErrors.orderNumber}
-                  value={localData.formValues.orderNumber || ''}
-                  slotProps={{
-                    formHelperText: {
-                      sx: { whiteSpace: 'nowrap' },
-                    },
-                    input: { readOnly: false }
-                  }}
-                >
-                </TextField>
-              </Grid>
-            </Grid>                    
-          </Grid>
-          {/* Вторая строка */}
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={4.8}>
-                <OperationsSearch props={{id: "operation-code-2", placeholder: "Код операции"}}
-                  id="operationCode" onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
-                  selectedValue={localData.formValues.operationCode} 
-                  errorValue={localData.formErrors.operationCode}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-          {/* Третья строка */}
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={2.4}>
-                <TextField
-                  required
-                  fullWidth
-                  name='shopNumber'
-                  id="shop-number-3"
-                  label="Номер цеха"
-                  type="text"
-                  size="small"
-                  onChange={handleInputChange}
-                  error={!!localData.formErrors.shopNumber}
-                  helperText={localData.formErrors.shopNumber}
-                  value={localData.formValues.shopNumber || ''}
-                  slotProps={{
-                    formHelperText: {
-                      sx: { whiteSpace: 'nowrap' },
-                    },
-                  }}
-                >
-                </TextField>
-              </Grid>
-              <Grid item xs={2.4}>
-                <TextField
-                  fullWidth
-                  name='areaNumber'
-                  id="area-number-4"
-                  label="Номер участка"
-                  type="text"
-                  size="small"
-                  onChange={handleInputChange}
-                  value={localData.formValues.areaNumber || ''}
-                >
-                </TextField>
-              </Grid>                      
-            </Grid>                    
-          </Grid>
-          {/* Четвертая строка */}
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={4.8}>
-                <TextField
-                  required
-                  fullWidth
-                  name='document'
-                  id="document-5"
-                  label="Обозначение документа"
-                  size="small"
-                  onChange={handleInputChange}
-                  error={!!localData.formErrors.document}
-                  helperText={localData.formErrors.document}
-                  value={localData.formValues.document || ''}
-                  slotProps={{
-                    formHelperText: {
-                      sx: { whiteSpace: 'nowrap' },
-                    },
-                  }}
-                >
-                </TextField>
-              </Grid>
-            </Grid>
-          </Grid>
-          {/* Пятая строка */}
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={4.8}>
-                <JobsSearch 
-                  id="job-code-6" 
-                  onOptionSelect={handleOptionSelect} 
-                  selectedValue={localData.formValues['jobCode']} 
-                  errorValue={localData.formErrors['jobCode']}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-          {/* Шестая строка */}
-          <Grid item xs={12}>
-                <Grid container spacing={2}>
-                  <Grid item xs={2.4}>
-                    <TextField
-                      required
-                      fullWidth
-                      name='grade'
-                      id="grade-7"
-                      label="Разряд"
-                      type="text"
-                      size="small"
-                      onChange={handleInputChange}
-                      error={!!localData.formErrors.grade}
-                      helperText={localData.formErrors.grade}
-                      value={localData.formValues.grade || ''}
-                      slotProps={{
-                        formHelperText: {
-                          sx: { whiteSpace: 'nowrap' },
-                        },
-                      }}
-                    >
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={2.4}>
-                    <TextField
-                      required
-                      fullWidth
-                      name='workingConditions'
-                      id="working-conditions-8"
-                      label="Условия труда"
-                      type="text"
-                      size="small"
-                      onChange={handleInputChange}
-                      error={!!localData.formErrors.workingConditions}
-                      helperText={localData.formErrors.workingConditions}
-                      value={localData.formValues.workingConditions || ''}
-                      slotProps={{
-                        formHelperText: {
-                          sx: { whiteSpace: 'nowrap' },
-                        },
-                      }}
-                    >
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={2.4}>
-                    <TextField
-                      required
-                      fullWidth
-                      name='numberOfWorkers'
-                      id="number-of-workers-9"
-                      label="Кол-во работающих"
-                      type="text"
-                      size="small"
-                      onChange={handleInputChange}
-                      error={!!localData.formErrors.numberOfWorkers}
-                      helperText={localData.formErrors.numberOfWorkers}
-                      value={localData.formValues.numberOfWorkers || ''}
-                      slotProps={{
-                        formHelperText: {
-                          sx: { whiteSpace: 'nowrap' },
-                        },
-                      }}
-                    >
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={4.8}>
-                    <TextField
-                      required
-                      fullWidth
-                      name='numberOfProcessedParts'
-                      id="number-of-processed-parts-10"
-                      label="Кол-во одновременно обрабатываемых деталей"
-                      type="text"
-                      size="small"
-                      onChange={handleInputChange}
-                      error={!!localData.formErrors.numberOfProcessedParts}
-                      helperText={localData.formErrors.numberOfProcessedParts}
-                      value={localData.formValues.numberOfProcessedParts || ''}
-                      slotProps={{
-                        formHelperText: {
-                          sx: { whiteSpace: 'nowrap' },
-                        },
-                      }}
-                    >
-                    </TextField>
-                  </Grid>
-                </Grid>
-          </Grid>
-          {/* Седьмая строка */}
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={2.4}>
-                <TextField
-                  required
-                  fullWidth
-                  name='laborEffort'
-                  id="labor-effort-11"
-                  label="Трудоемкость"
-                  type="text"
-                  size="small"
-                  onChange={handleInputChange}
-                  error={!!localData.formErrors.laborEffort}
-                  helperText={localData.formErrors.laborEffort}
-                  value={localData.formValues.laborEffort || ''}
-                  slotProps={{
-                    formHelperText: {
-                      sx: { whiteSpace: 'nowrap' },
-                    },
-                  }}
-                >
-                </TextField>                       
-              </Grid>
-            </Grid>
-          </Grid>
-          {/* Восьмая строка */}
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={4.8}>
-                <TextField                          
-                  multiline
-                  fullWidth
-                  minRows={8}
-                  maxRows={100}
-                  name='operationDescription'
-                  id="operation-description-12"
-                  label="Описание операции"
-                  size='small'                      
-                  /*sx={{ resize: 'both', overflow: 'auto' }}*/
-                />                  
-              </Grid>
-            </Grid>
-          </Grid>                                                    
-        </Grid>
-      </form>
-
+    {/*console.log(localData)*/}
       {/* Параметры */}
-      <Accordion defaultExpanded 
-        expanded={localData.expandedPanels['parameters'] || false} 
+      <Accordion defaultExpanded
+        expanded={localData.expandedPanels['parameters'] || false}
         onChange={handleAccordionChange('parameters')} 
-        elevation={3} 
+        elevation={2}
         sx={{ bgcolor: 'primary.secondary', color: 'primary.secondary', width: '100%', height: 'auto', overflow: 'hidden' }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
           aria-controls="panel1-content"
           id="panel1-header"
-          sx={{ backgroundColor: 'primary.secondary', color: 'black' }}
+          sx={{ backgroundColor: '#eaeff1', color: 'black' }}
         >
           <Typography component="span">Параметры</Typography>
         </AccordionSummary>
@@ -556,11 +399,13 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <OperationsSearch props={{id: "operation-code-2", placeholder: "Код операции"}}
-                      id="operationCode" onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
-                      selectedValue={localData.formValues.operationCode} 
+                    {<OperationsSearch props={{id: "operation-code-2", placeholder: "Код операции"}}
+                      id="operationCode"
+                      selectedValue={localData.formValues.operationCode}
+                      options={autocompleteOptions.operations || null}
+                      onChange={handleOptionSelect}
                       errorValue={localData.formErrors.operationCode}
-                    />
+                    />}
                   </Grid>
                 </Grid>
               </Grid>
@@ -632,12 +477,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <JobsSearch 
+                    {/*<JobsSearch 
                       id="job-code-6" 
                       onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues['jobCode']} 
-                      errorValue={localData.formErrors['jobCode']}
-                    />
+                      selectedValue={localData.formValues['job']} 
+                      errorValue={localData.formErrors['job']}
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -768,9 +613,42 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
                       name='operationDescription'
                       id="operation-description-12"
                       label="Описание операции"
-                      size='small'                      
+                      size='small'
+                      onChange={handleInputChange}
+                      value={localData.formValues.operationDescription || ''}
                       /*sx={{ resize: 'both', overflow: 'auto' }}*/
                     />                  
+                  </Grid>
+                </Grid>
+              </Grid>                                                    
+              {/* Девятая строка */}
+              <Grid item xs={12}>
+                <Grid container spacing={2}>
+                  <Grid item xs={4.8}>
+                    {localData.isDeleted
+                      ? (
+                          <Button 
+                            variant='contained'
+                            color='error'
+                            onClick={(e) => {
+                              //e.stopPropagation();
+                              handleDeleteTab(e);
+                            }}
+                          >
+                            Восстановить операцию
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant='contained'
+                            onClick={(e) => {
+                              //e.stopPropagation();
+                              handleDeleteTab(e);
+                            }}
+                          >
+                            Удалить операцию
+                          </Button>
+                          )
+                    }                                  
                   </Grid>
                 </Grid>
               </Grid>                                                    
@@ -783,14 +661,14 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
       <Accordion defaultExpanded 
         expanded={localData.expandedPanels['equipment'] || false} 
         onChange={handleAccordionChange('equipment')} 
-        elevation={3} 
+        elevation={2} 
         sx={{ bgcolor: 'primary.secondary', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
           aria-controls="panel1-content"
           id="panel1-header"
-          sx={{ backgroundColor: 'primary.secondary', color: 'black' }}
+          sx={{ backgroundColor: '#eaeff1', color: 'black' }}
         >
           <Typography component="span">Оборудование</Typography>
         </AccordionSummary>
@@ -801,12 +679,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <EquipmentSearch 
+                    {/*<EquipmentSearch 
                       id="equipment" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.equipment}
                       errorValue={localData.formErrors.equipment}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -819,14 +697,14 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
       <Accordion defaultExpanded 
         expanded={localData.expandedPanels['components'] || false} 
         onChange={handleAccordionChange('components')} 
-        elevation={3} 
+        elevation={2} 
         sx={{ bgcolor: 'primary.secondary', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
           aria-controls="panel1-content"
           id="panel1-header"
-          sx={{ backgroundColor: 'primary.secondary', color: 'black' }}
+          sx={{ backgroundColor: '#eaeff1', color: 'black' }}
         >
           <Typography component="span">Комплектующие</Typography>
         </AccordionSummary>
@@ -837,12 +715,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <ComponentsSearch 
+                    {/*<ComponentsSearch 
                       id="components" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.components}
                       errorValue={localData.formErrors.components}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -855,14 +733,14 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
       <Accordion defaultExpanded 
         expanded={localData.expandedPanels['materials'] || false} 
         onChange={handleAccordionChange('materials')} 
-        elevation={3} 
+        elevation={2} 
         sx={{ bgcolor: 'primary.secondary', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
           aria-controls="panel1-content"
           id="panel1-header"
-          sx={{ backgroundColor: 'primary.secondary', color: 'black' }}
+          sx={{ backgroundColor: '#eaeff1', color: 'black' }}
         >
           <Typography component="span">Материалы</Typography>
         </AccordionSummary>
@@ -873,12 +751,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <MaterialsSearch 
+                    {/*<MaterialsSearch 
                       id="materials" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.materials}
                       errorValue={localData.formErrors.materials}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -891,14 +769,14 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
       <Accordion defaultExpanded 
         expanded={localData.expandedPanels['tooling'] || false} 
         onChange={handleAccordionChange('tooling')} 
-        elevation={3} 
+        elevation={2} 
         sx={{ bgcolor: 'primary.secondary', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
           aria-controls="panel1-content"
           id="panel1-header"
-          sx={{ backgroundColor: 'primary.secondary', color: 'black' }}
+          sx={{ backgroundColor: '#eaeff1', color: 'black' }}
         >
           <Typography component="span">Оснастка</Typography>
         </AccordionSummary>
@@ -909,12 +787,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <ToolingSearch
+                    {/*<ToolingSearch
                       id="tooling" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.tooling}
                       errorValue={localData.formErrors.tooling}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -927,14 +805,14 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
       <Accordion defaultExpanded 
         expanded={localData.expandedPanels['measuringTools'] || false} 
         onChange={handleAccordionChange('measuringTools')} 
-        elevation={3} 
+        elevation={2} 
         sx={{ bgcolor: 'primary.secondary', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
           aria-controls="panel1-content"
           id="panel1-header"
-          sx={{ backgroundColor: 'primary.secondary', color: 'black' }}
+          sx={{ backgroundColor: '#eaeff1', color: 'black' }}
         >
           <Typography component="span">Измерительный инструмент</Typography>
         </AccordionSummary>
@@ -945,12 +823,12 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <MeasuringToolsSearch 
-                      id="measuringTools13" 
+                    {/*<MeasuringToolsSearch
+                      id="measuringTools"
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.measuringTools}
                       errorValue={localData.formErrors.measuringTools}
-                    />
+                    />*/}
                   </Grid>
                 </Grid>
               </Grid>
@@ -960,6 +838,11 @@ const OperationCard = ({content, onUpdate, setValidateForm}) => {
       </Accordion>
     </>
   );
-};
+}/*, (prevProps, nextProps) => {
+  return JSON.stringify(prevProps.content) === JSON.stringify(nextProps.content) &&
+    JSON.stringify(prevProps.autocompleteOptions) === JSON.stringify(nextProps.autocompleteOptions) &&
+    prevProps.setValidateForm === nextProps.setValidateForm &&
+    prevProps.onUpdate === nextProps.onUpdate;
+}*/);
 
 export {OperationCard};

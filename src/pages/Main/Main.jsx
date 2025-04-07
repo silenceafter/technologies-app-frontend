@@ -5,25 +5,25 @@ import SortableTree from 'react-sortable-tree';
 import 'react-sortable-tree/style.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Navigator from '../components/Navigator';
-import { Content } from '../components/Content';
-import { Header } from '../components/Header';
+import Navigator from '../../components/Navigator';
+import { Content } from '../../components/Content';
+import { Header } from '../../components/Header';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import theme from '../theme';
+import theme from '../../theme';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { authenticate, setTokens } from '../store/slices/usersSlice';
+import { authenticate, setTokens } from '../../store/slices/usersSlice';
 import { use } from 'react';
 
 import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Tooltip from '@mui/material/Tooltip';
-import { HeaderSearchT } from '../components/HeaderSearchT';
+import { HeaderSearchT } from '../../components/HeaderSearchT';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
-import ProtectedRoute from '../ProtectedRoute';
+import ProtectedRoute from '../../ProtectedRoute';
 
 function Copyright() {
   return (
@@ -37,7 +37,7 @@ function Copyright() {
   );
 }
 
-function MainPage() {
+function Main() {
   //константы
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
 
@@ -133,4 +133,4 @@ function MainPage() {
   );
 }
 
-export {MainPage};
+export {Main};

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { 
     Autocomplete, 
-    Box,
+    Box, 
     Chip,
     CircularProgress, 
     ListItem, 
@@ -9,22 +9,25 @@ import {
     TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/materialsSlice';
+import { fetchData, setSearch, setPage } from '../../../store/slices/technologiesSlice';
 import { debounce } from 'lodash';
 
-function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
+function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const dispatch = useDispatch();
 
   //TextField
   const [inputValue, setInputValue] = useState('');
   
   //запросы
-  const search = useSelector(selectSearch);
-  const limit = useSelector(selectLimit);
-  const page = useSelector(selectPage);
+  const search = useSelector((state) => state.technologies.search);
+  const limit = useSelector((state) => state.technologies.limit);
+  const page = useSelector((state) => state.technologies.page);
 
   //запросы для прокрутки списка
-  const { items, loading, error, hasMore } = useSelector((state) => state.materials);
+  const items = useSelector((state) => state.technologies.searchedItems);
+  const loading = useSelector((state) => state.technologies.searchedLoading);
+  const error = useSelector((state) => state.technologies.searchingError);
+  const hasMore = useSelector((state) => state.technologies.searchingHasMore);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
@@ -120,10 +123,10 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
                 {...params}
                 required
                 fullWidth
-                id="materials-16"
+                id="technologies"
                 error={!!errorValue}
                 helperText={errorValue}
-                placeholder="Материалы"
+                placeholder="Технология"
                 variant="outlined"
                 sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                 size='small'
@@ -139,6 +142,7 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
             ))
           }
           sx={{
+              width: '100%',
               '& .MuiAutocomplete-listbox': {
               backgroundColor: '#fff',
               boxShadow: 2
@@ -148,9 +152,9 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
               },
           }}
           value={selectedValue}
-            />
+        />
     </>
   );
 }
 
-export { MaterialsSearch };
+export { TechnologySearch };
