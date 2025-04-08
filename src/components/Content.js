@@ -62,8 +62,7 @@ function Content() {
   //селекторы
   //const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
   const user = useSelector((state) => state.users.user);
-
-  const { tabs } = useSelector((state) => state.operationsTabs);
+  const { tabs, loadedTabs } = useSelector((state) => state.operationsTabs);
   
   //события
   const handleAccordeonChange = useCallback((panel) => (event, newExpanded) => {
@@ -88,6 +87,8 @@ function Content() {
           //dispatch(productsSetItems());
           dispatch(technologiesSetItems()); //очистить компонент технологий
           //dispatch(productsFetchData({limit: 50, page: 1}));
+          
+          //dispatch(resetTabs());
           dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
           
 
@@ -123,7 +124,7 @@ function Content() {
   //вывод
   return (
     <>
-      {console.log(tabs)}
+      {console.log(loadedTabs)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

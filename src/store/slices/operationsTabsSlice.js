@@ -2,14 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 //данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {
-  tabs: [
-    /*{ 
-      id: "1", 
-      title: "Вкладка 1", 
-      content: { formValues: {}, formErrors: {}, expandedPanels: {} },
-      validateForm: () => true,
-    }*/
-  ],
+  tabs: [],
   tabValue: 0,
   tabCnt: 1,
   validateForm: false,
@@ -22,7 +15,8 @@ const initialState = {
     materials: true,
     tooling: true,
     measuringTools: true
-  }
+  },
+  loadedTabs: [],
 };
 
 //сохранить введенные данные
@@ -246,13 +240,14 @@ const operationsTabsSlice = createSlice({
       })
       .addCase(setData.fulfilled, (state, action) => {
         state.loading = false;
-        state.tabs = state.tabs.map((tab) => ({
+        state.tabs = []; /*state.tabs.map((tab) => ({
           ...tab,
           content: {
             ...tab.content,
             changedValues: tab.content.changedValues ? [] : tab.content.changedValues,
           },
-        }));
+        }));*/
+        state.loadedTabs = action.payload;
       })
       .addCase(setData.rejected, (state, action) => {
         state.loading = false;

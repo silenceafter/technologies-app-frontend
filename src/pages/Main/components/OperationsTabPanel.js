@@ -156,7 +156,7 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
   //стейт вкладок/карточек
   useEffect(() => {
     try {
-      if (!technologiesLoading && technologiesItems.length > 0 && drawingExternalCode.length > 0) {
+      if (/*!technologiesLoading && technologiesItems.length > 0 &&*/ drawingExternalCode.length > 0) {
         if (tabs.length === 0 && !isUserClosedAllTabs) {
           //изначально вкладки создаются из technologiesItems 
           const newTabs = technologiesItems[0].children
@@ -181,6 +181,7 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
                 laborEffort: operation.jobs.laborEffort,
                 job: { code: operation.jobs.jobCode, name: operation.jobs.jobName },
               };
+              console.log(data);
               //
               return {
                 id: operation.orderNumber,
@@ -222,7 +223,7 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
-  }, [technologiesLoading, technologiesItems, drawingExternalCode, tabs, isUserClosedAllTabs]);
+  }, [technologiesLoading, technologiesItems, /*drawingExternalCode, tabs, isUserClosedAllTabs*/]);
 
   //очистить стейт вкладок/карточек
   useEffect(() => {
