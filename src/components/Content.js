@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
   Accordion, 
@@ -6,6 +6,7 @@ import {
   AccordionSummary, 
   AccordionDetails, 
   AppBar, 
+  Backdrop,
   Box, 
   Button, 
   ButtonGroup, 
@@ -40,7 +41,7 @@ import {
 } from '../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology, selectOperation } from '../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../store/slices/operationsSlice';
-import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setData } from '../store/slices/operationsTabsSlice';
+import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setData, setShouldReloadTabs } from '../store/slices/operationsTabsSlice';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -48,7 +49,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-function Content() {
+function Content({ setSmartBackdropActive, showLoading }) {
   const dispatch = useDispatch();
   //объекты
   //стейты  
@@ -57,12 +58,11 @@ function Content() {
   const [open, setOpen] = useState(false);
   const [requestStatus, setRequestStatus] = useState(false);
   const [loading, setLoading] = useState({ save: false });
-  const [loadingTimer, setLoadingTimer] = useState(false);
   
   //селекторы
   //const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
   const user = useSelector((state) => state.users.user);
-  const { tabs, loadedTabs } = useSelector((state) => state.operationsTabs);
+  const { tabs } = useSelector((state) => state.operationsTabs);
   
   //события
   const handleAccordeonChange = useCallback((panel) => (event, newExpanded) => {
@@ -78,11 +78,16 @@ function Content() {
   
   const handleSave = async () => {
     //сохранение
+    setSmartBackdropActive(true);
     setLoading((prev) => ({ ...prev, save: true }));  
     await new Promise((resolve) => setTimeout(async () => {      
       if (validateForm()) {
         try {
           //обновление
+          /*setTimeout(() => {
+            setLoadingTimer(false);
+          }, 1000);*/
+
           await dispatch(setData({ user: user, tabs: tabs })).unwrap();
           //dispatch(productsSetItems());
           dispatch(technologiesSetItems()); //очистить компонент технологий
@@ -90,16 +95,13 @@ function Content() {
           
           //dispatch(resetTabs());
           dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
-          
+          dispatch(setShouldReloadTabs(true));
 
           handleClose();
           setRequestStatus('success');
           showSnackbar();
 
-          setLoadingTimer(true);
-          setTimeout(() => {
-            setLoadingTimer(false);
-          }, 500);
+          
           
         } catch (error) {
           handleClose();
@@ -112,7 +114,7 @@ function Content() {
         showSnackbar();
       }
       setLoading((prev) => ({ ...prev, save: false }));        
-    }, 500));
+    }, 0));
   };
 
   const showSnackbar = useCallback(() => {
@@ -124,7 +126,6 @@ function Content() {
   //вывод
   return (
     <>
-      {console.log(loadedTabs)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -195,9 +196,9 @@ function Content() {
         height: '100%',
         }}
       >
-        <OperationsTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} loadingTimer={loadingTimer} setLoadingTimer={setLoadingTimer} />
+        <OperationsTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />
         <Box>
-          <ButtonGroupPanel handleSave={handleSave} loading={loading} requestStatus={requestStatus} />
+          <ButtonGroupPanel handleSave={handleSave} loading={showLoading} requestStatus={requestStatus} />
         </Box>             
       </Box>
     </>

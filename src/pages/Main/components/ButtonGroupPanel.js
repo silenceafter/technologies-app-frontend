@@ -9,7 +9,7 @@ function ButtonGroupPanel({ handleSave, loading }) {
   return (
     <>
       <ButtonGroup variant="contained" aria-label="Loading button group">
-        <LoadingButton loading={loading.save} onClick={handleSave}>Сохранить</LoadingButton>
+        <LoadingButton loading={loading} onClick={handleSave}>Сохранить</LoadingButton>
         <Button>Предварительный просмотр</Button>
         <Button>Печать</Button>
         <LoadingButton>Экспорт в CSV</LoadingButton>

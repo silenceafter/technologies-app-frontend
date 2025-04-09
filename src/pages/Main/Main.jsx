@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Grid, Paper, AppBar, Toolbar, Tabs, Tab, TextField, InputAdornment, Box, Typography, Button, Link, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SortableTree from 'react-sortable-tree';
@@ -11,7 +12,6 @@ import { Header } from '../../components/Header';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import theme from '../../theme';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { authenticate, setTokens } from '../../store/slices/usersSlice';
 import { use } from 'react';
 
@@ -24,6 +24,8 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
 import ProtectedRoute from '../../ProtectedRoute';
+import Backdrop from '@mui/material/Backdrop';
+import { selectLoading } from '../../store/slices/technologiesSlice';
 
 function Copyright() {
   return (
@@ -47,7 +49,7 @@ function Main() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  
   //стейты
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -57,6 +59,40 @@ function Main() {
   const error = useSelector((state) => state.users.error);
   const isCrud = useSelector((state) => state.users.isCrud);
   const drawing = useSelector((state) => state.drawings.drawing);
+  const technologiesLoading = useSelector(selectLoading);
+  const [loadingTimer, setLoadingTimer] = useState(false);
+  const [backdropVisible, setBackdropVisible] = useState(false);
+  const [smartBackdropActive, setSmartBackdropActive] = useState(false);
+  const { tabs, tabValue } = useSelector((state) => state.operationsTabs);
+
+  //переменные
+  const showLoading = useMemo(() => {
+    return technologiesLoading || loadingTimer;
+  }, [technologiesLoading, loadingTimer]); 
+
+  //эффекты
+  useEffect(() => {
+    if (!smartBackdropActive) return;
+    setBackdropVisible(true);
+    const startTime = Date.now();
+    let timeoutId;
+    //
+    const checkDone = () => {
+      const now = Date.now();
+      const minTimePassed = now - startTime >= 1000;
+      const isStillLoading = technologiesLoading || tabs.length === 0 || !tabs[tabValue];
+      //
+      if (!isStillLoading && minTimePassed) {
+        setBackdropVisible(false);
+        setSmartBackdropActive(false);
+      } else {
+        timeoutId = setTimeout(checkDone, 300);
+      }
+    };
+    //
+    checkDone();
+    return () => clearTimeout(timeoutId);
+  }, [smartBackdropActive]);
   
   //main
   return (
@@ -66,7 +102,7 @@ function Main() {
         <ThemeProvider theme={theme}>
           <Box sx={{ display: 'flex', minHeight: '100vh' }}>          
             <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-              <Header onDrawerToggle={handleDrawerToggle} />
+              <Header onDrawerToggle={handleDrawerToggle} />              
               <Box component="main" sx={{ flex: 1, py: 2, px: 2, bgcolor: '#eaeff1' }}>
                 <Box sx={{
                   display: 'flex',
@@ -80,46 +116,7 @@ function Main() {
                   height: '46rem', /*735px*/
                   overflow: 'hidden',                
                 }}>
-                  <Content />
-                  {/*<Grid container spacing={2} sx={{ alignItems: 'center', width: '100%', height: '100%' }}>
-                    <Grid item sx={{ width: '100%'}}>
-                      <Paper sx={{ width: '30%', margin: 'auto', overflow: 'hidden' }}>
-                        <AppBar
-                          position="static"
-                          color="default"
-                          elevation={0}
-                          sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
-                        >
-                          <Toolbar>
-                            <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-                              <Grid item>
-                                <SearchIcon color="inherit" sx={{ display: 'block' }} />
-                              </Grid>
-                              <Grid item xs>
-                                <HeaderSearchT />
-                              </Grid>
-                              <Grid item>                            
-                                <Tooltip title="Reload">
-                                  <IconButton>
-                                    <RefreshIcon color="inherit" sx={{ display: 'block' }} />
-                                  </IconButton>
-                                </Tooltip>
-                              </Grid>
-                            </Grid>
-                          </Toolbar>
-                        </AppBar>
-                        
-                        <Typography align="center" sx={{ color: 'text.secondary', my: 5, mx: 2 }}></Typography>
-                      </Paper>
-                    </Grid>
-                    <Grid item></Grid>
-                  </Grid>*/}
-                  
-              
-              
-                  
-                          
-                      
+                  <Content setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
                 </Box>            
               </Box>
               <Box component="footer" sx={{ paddingLeft: 1, paddingRight: 1, paddingBottom: 1, bgcolor: '#eaeff1' }}>
@@ -129,6 +126,21 @@ function Main() {
           </Box>
         </ThemeProvider>
       </ProtectedRoute>
+
+      <Backdrop
+        sx={{
+          color: '#fff',
+          position: 'fixed', // Закрепляем на весь экран
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1300, // Обеспечиваем, чтобы он был поверх всех других элементов
+        }}
+        open={backdropVisible} // Показываем только когда нужно
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       </>
   );
 }

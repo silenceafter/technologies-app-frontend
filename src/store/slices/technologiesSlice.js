@@ -355,10 +355,7 @@ const technologiesSlice = createSlice({
       })
       .addCase(getSavedData.fulfilled, (state, action) => {
         state.loading = false;
-        const newItems = action.payload.filter(newItem => 
-          !state.items.some(existingItem => existingItem.id === newItem.id)
-        );
-        state.items = newItems; //[...state.items, ...newItems];
+        state.items = action.payload;
       })
       .addCase(getSavedData.rejected, (state, action) => {
         state.loading = false;

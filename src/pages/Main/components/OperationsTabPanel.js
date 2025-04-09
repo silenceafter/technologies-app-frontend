@@ -1,30 +1,32 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
     AppBar,
+    Backdrop,
     Box,
     CircularProgress,
     Paper,
     IconButton,
+    Skeleton,
     Typography
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from "@mui/icons-material/Close";
-import { Notifications } from '../components/Notifications'; //'../pages/Main/components/Notifications';
-import { OperationCard } from '../components/OperationCard'; //'../pages/Main/components/OperationCard';
-import { MemoizedTabPanel as TabPanel } from '../components/TabPanel'; //'../pages/Main/components/TabPanel';
-import { TechnologyBreadcrumbs } from '../components/TechnologyBreadcrumbs'; //'../pages/Main/components/TechnologyBreadcrumbs';
-import { MemoizedTabs } from '../components/MemoizedTabs'; //'../pages/Main/components/MemoizedTabs';
+import { Notifications } from '../components/Notifications';
+import { OperationCard } from '../components/OperationCard';
+import { MemoizedTabPanel as TabPanel } from '../components/TabPanel';
+import { TechnologyBreadcrumbs } from '../components/TechnologyBreadcrumbs';
+import { MemoizedTabs } from '../components/MemoizedTabs';
 
-import { setTabs, addTab, removeTab, updateTab, setTabValue, setData } from '../../../store/slices/operationsTabsSlice'; //'../store/slices/operationsTabsSlice';
+import { setTabs, addTab, removeTab, updateTab, setTabValue, setData, setShouldReloadTabs } from '../../../store/slices/operationsTabsSlice';
 import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading
-} from '../../../store/slices/technologiesSlice'; //'../store/slices/technologiesSlice';
-import { selectDrawingExternalCode, selectTechnology, setTechnology, selectOperation } from '../../../store/slices/drawingsSlice'; //'../store/slices/drawingsSlice';
-import { selectOperations, fetchData } from '../../../store/slices/operationsSlice'; //'../store/slices/operationsSlice';
+} from '../../../store/slices/technologiesSlice';
+import { selectDrawingExternalCode, selectTechnology, setTechnology, selectOperation } from '../../../store/slices/drawingsSlice';
+import { selectOperations, fetchData } from '../../../store/slices/operationsSlice';
 
-function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, setLoadingTimer }) {
+function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const dispatch = useDispatch();
 
   //стейты
@@ -32,17 +34,21 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
   const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
   const [isUserClosedAllTabs, setIsUserClosedAllTabs] = useState(false);
   const [validateForm, setValidateForm] = useState(() => () => true);
+  const [loadingTimer, setLoadingTimer] = useState(false);
 
   //селекторы
   const currentTechnology = useSelector(selectTechnology);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
-  const { tabs, tabValue, tabCnt, expandedPanelsDefault } = useSelector((state) => state.operationsTabs);
+  const { tabs, tabValue, tabCnt, expandedPanelsDefault, shouldReloadTabs } = useSelector((state) => state.operationsTabs);
   const technologiesItems = useSelector(technologiesSelectItems);
   const technologiesLoading = useSelector(technologiesSelectLoading);
   const operationsSelectors = useSelector(selectOperations);
   const operationsItems = operationsSelectors?.items;
   const operationsLoading = operationsSelectors?.loading;
-  
+
+  /*const showLoading = useMemo(() => {
+    return loadingTimer || technologiesLoading;
+  }, [loadingTimer, technologiesLoading]);*/
 
   //события
   const handleAddTab = useCallback(() => {
@@ -135,7 +141,7 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
       setLoadingTimer(true);
       setTimeout(() => {
         setLoadingTimer(false);
-      }, 500); 
+      }, 1000); 
     }
   }, [drawingExternalCode]);
 
@@ -156,8 +162,8 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
   //стейт вкладок/карточек
   useEffect(() => {
     try {
-      if (/*!technologiesLoading && technologiesItems.length > 0 &&*/ drawingExternalCode.length > 0) {
-        if (tabs.length === 0 && !isUserClosedAllTabs) {
+      if (!technologiesLoading && (tabs.length === 0 && !isUserClosedAllTabs || shouldReloadTabs) 
+        && technologiesItems.length > 0 && drawingExternalCode.length > 0) {
           //изначально вкладки создаются из technologiesItems 
           const newTabs = technologiesItems[0].children
             .filter(operation => operation.orderNumber)
@@ -181,7 +187,6 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
                 laborEffort: operation.jobs.laborEffort,
                 job: { code: operation.jobs.jobCode, name: operation.jobs.jobName },
               };
-              console.log(data);
               //
               return {
                 id: operation.orderNumber,
@@ -215,15 +220,15 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
           //
           dispatch(setTabs(newTabs));
           dispatch(setTabValue(0)); //первая вкладка активна по умолчанию
-        }
       }
   
       //устанавливаем текущую выбранную технологию
       dispatch(setTechnology(technologiesItems[0]));
+      dispatch(setShouldReloadTabs(false));
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
-  }, [technologiesLoading, technologiesItems, /*drawingExternalCode, tabs, isUserClosedAllTabs*/]);
+  }, [technologiesLoading, technologiesItems, drawingExternalCode, /*tabs, isUserClosedAllTabs,*/ shouldReloadTabs]);
 
   //очистить стейт вкладок/карточек
   useEffect(() => {
@@ -242,6 +247,10 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
   //
   return (
     <>
+    {console.log(`showLoading ${showLoading}`)}
+    {console.log(`isAutocompleteLoaded ${isAutocompleteLoaded}`)}
+    {console.log(tabs.length)}
+    {console.log(tabs[tabValue])}
       <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
         <Box sx={{ overflow: 'hidden' }}>
           <AppBar
@@ -255,7 +264,7 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
               tabValue={tabValue}
               handleRemoveTab={handleRemoveTab}
               setTabValue={(newValue) => dispatch(setTabValue(newValue))}
-              loadingTimer={loadingTimer}
+              loadingTimer={showLoading}
             />                
             <IconButton 
               onClick={handleAddTab}
@@ -268,17 +277,17 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
               <AddIcon sx={{ color: 'white' }} />
             </IconButton>
           </AppBar>
-        </Box>            
+        </Box>        
         <Box sx={{           
           height: '91%',
-          overflowY: 'auto',
+          overflowY: 'auto'
         }}>
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 2, paddingTop: 2 }}>
-            {drawingExternalCode && !loadingTimer && tabs.length > 0 && tabs[tabValue] && (
+            {drawingExternalCode && !showLoading && tabs.length > 0 && tabs[tabValue] && (
               <TechnologyBreadcrumbs operationLabel={tabs[tabValue].label} />             
             )}                
           </Box>
-          {!isAutocompleteLoaded || loadingTimer ? (
+          {!isAutocompleteLoaded || showLoading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', height: '100%', alignItems: 'center', py: 5 }}>
                 <CircularProgress size={40} />
               </Box>
@@ -305,7 +314,7 @@ function OperationsTabPanel({ handleClose, open, requestStatus, loadingTimer, se
           }          
           <Notifications handleClose={handleClose} open={open} requestStatus={requestStatus} />
         </Box>
-        </Paper>
+      </Paper>      
     </>
   );
 }

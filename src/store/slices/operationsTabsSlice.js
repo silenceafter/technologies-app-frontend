@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { selectItems as items, selectLoading as itemsLoading } from './technologiesSlice';
 
 //данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {
@@ -16,7 +17,7 @@ const initialState = {
     tooling: true,
     measuringTools: true
   },
-  loadedTabs: [],
+  shouldReloadTabs: false,
 };
 
 //сохранить введенные данные
@@ -231,6 +232,12 @@ const operationsTabsSlice = createSlice({
         tabValue: state.tabValue + 1,
       };
     },
+    setShouldReloadTabs: (state, action) => {
+      return {
+        ...state,
+        shouldReloadTabs: action.payload
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -247,7 +254,10 @@ const operationsTabsSlice = createSlice({
             changedValues: tab.content.changedValues ? [] : tab.content.changedValues,
           },
         }));*/
-        state.loadedTabs = action.payload;
+        
+        if (!itemsLoading) {
+          let hh = 1;
+        }
       })
       .addCase(setData.rejected, (state, action) => {
         state.loading = false;
@@ -279,5 +289,5 @@ export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 
 export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation } = drawingsSlice.actions;*/
-export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice, incrementTabCnt, decrementTabCnt, incrementTabValue } = operationsTabsSlice.actions;
+export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, toggleValidateFormInSlice, incrementTabCnt, decrementTabCnt, incrementTabValue, setShouldReloadTabs } = operationsTabsSlice.actions;
 export default operationsTabsSlice.reducer;
