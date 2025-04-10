@@ -7,6 +7,7 @@ const initialState = {
   items: [], /* основные элементы дерева */
   selectedItems: [], /* выделенные элементы */
   disabledItems: [], /* помеченные на удаление */
+  editedItems: [], /* редактируемые элементы */
   selectedItemId: null,
   loading: LOADING_DEFAULT,
   error: null,
@@ -334,6 +335,14 @@ const technologiesSlice = createSlice({
         disabledItems: state.disabledItems.filter(itemId => !itemsToRestore.includes(itemId)),
       };
     },
+    addEditedItems: (state, action) => {
+      return {
+        ...state,
+        editedItems: state.editedItems.includes(action.payload)
+          ? state.editedItems
+          : [...state.editedItems, action.payload] 
+      };
+    },
     setSearch: (state, action) => {
       state.search = action.payload;
       state.page = 1;
@@ -392,6 +401,7 @@ export const {
   setSelectedItems, addSelectedItems, deleteSelectedItems,
   setSelectedItemId,
   setDisabledItems, restoreItems,
+  addEditedItems, /*removeEditedItems,*/
   setSearch, setLimit, setPage
 } = technologiesSlice.actions;
 

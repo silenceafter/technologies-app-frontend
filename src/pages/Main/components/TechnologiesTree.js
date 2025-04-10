@@ -35,7 +35,7 @@ import {
   setTechnology, 
   selectTechnology, 
   selectOperation 
-} from '../../../store/slices/drawingsSlice'; //'../store/slices/drawingsSlice';
+} from '../../../store/slices/drawingsSlice';
 import { 
   fetchData, 
   setItems, 
@@ -45,10 +45,11 @@ import {
   addSelectedItems, 
   deleteSelectedItems, 
   setDisabledItems, 
-  restoreItems, 
+  restoreItems,
+  addEditedItems,
   deleteSavedData
-} from '../../../store/slices/technologiesSlice'; //'../store/slices/technologiesSlice';
-import { TechnologySearch } from '../components/TechnologySearch'; //'./TechnologySearch';
+} from '../../../store/slices/technologiesSlice';
+import { TechnologySearch } from '../components/TechnologySearch';
 import AdjustIcon from '@mui/icons-material/Adjust';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
@@ -80,19 +81,13 @@ function getItemDescendantsIds(item) {
   return ids;
 }
 
-export default function TechnologiesTree() {
-  const MIN_LOADING_TIME = 500;
-
+const TechnologiesTree = () => {
   //стейты
-  const [loadedItems, setLoadedItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState([]);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
-  const [editedItems, setEditedItems] = useState([]);
-  const [developedTechnologies, setDevelopedTechnologies] = useState([]);
-  const [anchorPopover, setAnchorPopover] = useState(null);
+  //const [editedItems, setEditedItems] = useState([]);
   const [loadingTimer, setLoadingTimer] = useState(false);
-  const [focusedItem, setFocusedItem] = useState([]);
 
   //селекторы
   const dispatch = useDispatch();
@@ -101,14 +96,13 @@ export default function TechnologiesTree() {
   const error = useSelector((state) => state.technologies.error);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const technologySelector = useSelector(selectTechnology);
-  const selectedItems = useSelector((state) => state.technologies.selectedItems);
-  const disabledItems = useSelector((state) => state.technologies.disabledItems);
-  const selectedItemId = useSelector((state) => state.technologies.selectedItemId);
+  const { selectedItems, disabledItems, editedItems } = useSelector((state) => state.technologies);
 
   //refs
   const itemRef = useRef(null);
   const toggledItemRef = React.useRef({});
   const apiRef = useTreeViewApiRef();
+  const bbRef = useRef(null);
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -149,28 +143,49 @@ export default function TechnologiesTree() {
     })
   }));
 
+  /*const handleOptionSelect = useCallback((id, option) => {
+    // Обновляем значение поля
+    if (option !== newTechnology) {
+      setNewTechnology(option);
+    }        
+  }, [newTechnology]);*/
+
   function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel, type, labelRef, focused, pp }) {
-    const [isEditing, setIsEditing] = useState(edited);
+    //стейты
+    const [isEditing, setIsEditing] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const [value, setValue] = useState(customLabel);  
+
+    //эффекты
+    useEffect(() => {
+      setIsEditing(edited);
+    }, [edited]);
+
+    //события
+    const handleSave = () => {};
+    const handleCancel = () => {};
     //
     return (
       <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }} ref={labelRef}>
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ width: '800%', display: 'flex', flexDirection: 'column' }}>
           {isEditing ? (
             <>
               <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                <TechnologySearch 
-                  props={{id: "operation-code-2", placeholder: "Код операции"}}
-                  id="operationCode">
+                <TechnologySearch props={{id: "technology-code", placeholder: "Код технологии"}}
+                  id="technologyCode"
+                  
+                  selectedValue={/*localData.formValues.operationCode*/ ''}
+                  onOptionSelect={bbRef}
+                  errorValue={/*localData.formErrors.operationCode*/ ''}
+                >
                 </TechnologySearch>
                 <IconButton
                   color="success"
                   size="small"
-                  /*onClick={(event) => {
-                    handleSaveItemLabel(event, `${nameValue.firstName} ${nameValue.lastName}`);
-                    save();
-                  }}*/
+                  onClick={(event) => {
+                    /*handleSaveItemLabel(event, `${nameValue.firstName} ${nameValue.lastName}`);
+                    save();*/
+                  }}
                 >
                   <CheckIcon fontSize="small" />
                 </IconButton>
@@ -178,7 +193,7 @@ export default function TechnologiesTree() {
                   color="error"
                   size="small"
                   onClick={(event) => {
-                    setIsEditing(false);
+                    //setIsEditing(false);
                   }}
                 >
                   <CloseRoundedIcon fontSize="small" />
@@ -188,9 +203,11 @@ export default function TechnologiesTree() {
           ) : (
             <Typography 
               onClick={(e) => { 
-                /*e.stopPropagation();*/
-                /*setIsEditing(true);*/
-                onLabelClick?.(e);                
+                e.stopPropagation();
+                
+                setIsEditing(true);
+                
+               // onLabelClick?.(e);                
               }}
             >
               {value}
@@ -198,9 +215,7 @@ export default function TechnologiesTree() {
           )}                    
           {secondaryLabel && (
             <div>
-              {isEditing ? (
-                <Typography />
-              ) : (
+              {!isEditing && (
                 <Typography
                   variant="caption" 
                   color="secondary" 
@@ -219,11 +234,11 @@ export default function TechnologiesTree() {
               <EditOutlinedIcon color="success" />
             </TreeItem2IconContainer>
           )}        
-            {type == 'technology' && focused && (
+            {/*type == 'technology' && focused && (
               <TreeItem2IconContainer>
                 <AdjustIcon color="primary" />
             </TreeItem2IconContainer>
-            )}
+            )*/}
         </div>}
       </div>
     );
@@ -236,7 +251,7 @@ export default function TechnologiesTree() {
       children: props.children,
     });
     const {
-      status: { focused /*, editable, editing*/ },
+      status: { focused , editable, editing }, 
     } = useTreeItem2(props);
     const item = publicAPI.getItem(props.itemId);
 
@@ -251,10 +266,7 @@ export default function TechnologiesTree() {
     const [anchorPopover, setAnchorPopover] = useState(null);
 
     //рефы
-    const timerRef = useRef(null);
     const labelRef = useRef(null);
-
-
 
     //эффекты
     useEffect(() => {
@@ -269,8 +281,14 @@ export default function TechnologiesTree() {
     const handleRootClick = (e) => {
       //записать выбранную технологию
       handleCustomTreeItemClick(e, props.itemId);//
-      dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
+      //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
       const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
+      //?
+      if (!editedItems.includes(props.itemId)) {
+        dispatch(addEditedItems(props.itemId));
+        let kk = edited;
+      }
+
       //
       if (isIconClick) {
         e.stopPropagation();
@@ -324,8 +342,9 @@ export default function TechnologiesTree() {
         slotProps={{
           label: { 
             secondaryLabel: item?.secondaryLabel || '',
+            editable: true,
             edited: edited,
-            onLabelClick: (e) => <TextField>111</TextField>,
+            onLabelClick: (e) => console.log('onLabelClick'),
             onSecondaryLabelClick: (e) => console.log('onSecondaryLabelClick'),
             customLabel: item?.label || '',
             type: item?.type,
@@ -446,26 +465,27 @@ export default function TechnologiesTree() {
 
   //эффекты
   //анимация загрузки вкладки
-  useEffect(() => {
+  /*useEffect(() => {
     if (drawingExternalCode != '') {
       setLoadingTimer(true);
       setTimeout(() => {
         setLoadingTimer(false);
       }, 500); 
     }
-  }, [drawingExternalCode]);
+  }, [drawingExternalCode]);*/
 
-  useEffect(() => {
+/*useEffect(() => {
     //для expandedItems
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
-  }, [items]);
+  }, [items]);*/
 
   //на данный момент считаем, что все технологии наши
   useEffect(() => {
     const allItemIds = items.map(item => item.id);
-    setDevelopedTechnologies(allItemIds);
-  }, items);
+    setExpandedItems(allItemIds);
+    //setDevelopedTechnologies(allItemIds);
+  }, [items]);
 
   //chip для выбранной технологии
   const handleDelete = () => {
@@ -475,6 +495,10 @@ export default function TechnologiesTree() {
   /*useEffect(() => {
     setTechnologyChip(`${technologySelector.name}: ${technologySelector.code}`);
   }, [technologySelector]);*/
+
+  useEffect(() => {
+    dispatch(fetchData({search: '', limit: 50, page: 1}));
+  }, [dispatch]);
 
   const technologyChip = useMemo(() => {
     return '111';//return `${technologySelector.name}: ${technologySelector.code}`;
@@ -530,13 +554,16 @@ export default function TechnologiesTree() {
   };
 
   const handleContextMenuItemRename = (node) => {
-    if (!editedItems.includes(node)) {
-      setEditedItems(prev => {
+    /*if (!editedItems.includes(node)) {
+      addEditedItems(prev => {
         if (!prev.includes(node)) {
           return [...prev, node];
         }
         return prev;
       });  
+    }*/
+    if (!editedItems.includes(node)) {
+      dispatch(addEditedItems(node));
     }
     handleContextMenuClose();
   }
@@ -582,6 +609,10 @@ export default function TechnologiesTree() {
         selectedItems={selectedItems}
         onSelectedItemsChange={handleSelectedItemsChange}
         onItemSelectionToggle={handleItemSelectionToggle}
+        isItemEditable={(item) => editedItems.includes(item.id)}
+        experimentalFeatures={{
+          labelEditing: true,
+        }}
       />                        
       <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
         {
@@ -639,7 +670,7 @@ export default function TechnologiesTree() {
         <MenuItem onClick={() => handleContextMenuItemDelete(selectedNode)}>Удалить</MenuItem>
         <MenuItem onClick={() => handleContextMenuItemRename(selectedNode)}>Переименовать</MenuItem>
       </Menu>
-      <Dialog
+      {/*<Dialog
         open={open}
         onClose={handleClose}
         slotProps={{
@@ -667,14 +698,16 @@ export default function TechnologiesTree() {
               id="operationCode" /*onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
               selectedValue={localData.formValues.operationCode} 
               errorValue={localData.formErrors.operationCode}*/
-            />
+    /*        />
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Отмена</Button>
           <Button type="submit">Подтвердить</Button>
         </DialogActions>
-      </Dialog>
+      </Dialog>*/}
     </>
   );
-}
+};
+
+export default React.memo(TechnologiesTree);

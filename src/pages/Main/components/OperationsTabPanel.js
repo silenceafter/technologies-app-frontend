@@ -247,10 +247,6 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   //
   return (
     <>
-    {console.log(`showLoading ${showLoading}`)}
-    {console.log(`isAutocompleteLoaded ${isAutocompleteLoaded}`)}
-    {console.log(tabs.length)}
-    {console.log(tabs[tabValue])}
       <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
         <Box sx={{ overflow: 'hidden' }}>
           <AppBar

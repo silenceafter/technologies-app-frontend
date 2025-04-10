@@ -12,29 +12,35 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage } from '../../../store/slices/technologiesSlice';
 import { debounce } from 'lodash';
 
-function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
+const TechnologySearch = React.memo(({ props, id, selectedValue, onOptionSelect, errorValue = '' }) => {
   const dispatch = useDispatch();
 
-  //TextField
+  //стейты
   const [inputValue, setInputValue] = useState('');
+  const [selectedOption, setSelectedOption] = useState(selectedValue || null);
   
   //запросы
   const search = useSelector((state) => state.technologies.search);
   const limit = useSelector((state) => state.technologies.limit);
   const page = useSelector((state) => state.technologies.page);
 
-  //запросы для прокрутки списка
   const items = useSelector((state) => state.technologies.searchedItems);
   const loading = useSelector((state) => state.technologies.searchedLoading);
   const error = useSelector((state) => state.technologies.searchingError);
   const hasMore = useSelector((state) => state.technologies.searchingHasMore);
-  const listRef = useRef(null);
+
+  //эффекты
+  /*useEffect(() => {
+      setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
+      setSelectedOption(selectedValue || null);
+      //dispatch(setOperation(selectedValue ? { code: selectedValue.code, name: selectedValue.name } : { code: '', name: `Новая операция ${tabs ? tabs.length : ''}` }));
+    }, [selectedValue, dispatch]);*/
 
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
   }, 1);
 
-  useEffect(() => {
+  /*useEffect(() => {
     //загрузка данных при пустом поисковом запросе
     if (!search) {
       dispatch(fetchData({ search: '', limit, page: 1 }));
@@ -47,9 +53,9 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
       dispatch(setSearch(inputValue));
       debouncedFetchData();
     }
-  }, [inputValue, search, debouncedFetchData, dispatch]);
+  }, [inputValue, search, debouncedFetchData, dispatch]);*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);//чистим обработчик при размонтировании
   }, [loading, hasMore]);
@@ -62,33 +68,39 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
         dispatch(fetchData({ search, limit, page: page + 1 }));
       }
     }
-  };
+  };*/
   return (
     <>
-        <Autocomplete
-          multiple
+    {console.log(selectedOption)}
+        <Autocomplete          
           options={items || []}
-          getOptionLabel={(option) => `${option.code} ${option.name}`}
+          getOptionLabel={(option) => option == null || option == undefined ? '' : `${option.code} ${option.name}`}
+          getOptionSelected={(option, value) => option.code === value.code && option.name === value.name}
           filterOptions={(options, state) => {
-              const { inputValue } = state;
-              return options.filter(option =>
+            const { inputValue } = state;
+            return options.filter(option =>
               option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
               option.name.toLowerCase().includes(inputValue.toLowerCase())
-              );
+            );
           }}
           onInputChange={(event, newInputValue) => {
               setInputValue(newInputValue);
           }}
           onChange={(event, newValue) => {
-              onOptionSelect(id, newValue);
+            setSelectedOption(newValue);
+            //dispatch(setOperation({ code: !newValue ? '' : newValue.code, name: !newValue ? '' : newValue.name }));
+            //
+            if (onOptionSelect) {
+              onOptionSelect.current = newValue; //onOptionSelect('technologyCode', newValue);
+            }
           }}
           inputValue={inputValue}
           loadingText="поиск данных"
           noOptionsText="нет результатов"
           loading={loading}
           ListboxProps={{                  
-              onScroll: handleScroll,
-              ref: listRef,
+              /*onScroll: handleScroll,*/
+              /*ref: listRef,*/
               sx: {
               maxHeight: '48vh',
               overflowY: 'auto'
@@ -109,10 +121,10 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
               </div>
           )}
           renderOption={(props, option) => (
-              <ListItem {...props} key={`${option.code}-${option.name}`} style={{ padding: '8px 16px' }}>
+              <ListItem {...props} key={`${option?.code}-${option?.name}`} style={{ padding: '8px 16px' }}>
               <ListItemText
-                  primary={option.code}
-                  secondary={option.name}
+                  primary={option?.code}
+                  secondary={option?.name}
                   primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
                   secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
               />
@@ -123,13 +135,29 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
                 {...params}
                 required
                 fullWidth
-                id="technologies"
+                name='opeggggrationCode2'
+                id={props.id}
                 error={!!errorValue}
                 helperText={errorValue}
-                placeholder="Технология"
+                placeholder={props.placeholder}
                 variant="outlined"
                 sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                 size='small'
+                /*value={props.placeholder}*/
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                  if (e.key === 'Enter') {
+                    //handleSave();
+                  } else if (e.key === 'Escape') {
+                    //handleCancel();
+                  }
+                }}
+                onBlur={(e) => {
+                  if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) {
+                    // handleCancel(); или не делать ничего
+                  }
+                }}   
               />
           )}
           renderTags={(tagValue, getTagProps) =>
@@ -151,10 +179,10 @@ function TechnologySearch({ id, selectedValue, onOptionSelect, errorValue }) {
               padding: '8px 16px'
               },
           }}
-          value={selectedValue}
+          value={onOptionSelect.current || null}
         />
     </>
   );
-}
+});
 
 export { TechnologySearch };

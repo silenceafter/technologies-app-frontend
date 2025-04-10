@@ -130,14 +130,14 @@ function Main() {
       <Backdrop
         sx={{
           color: '#fff',
-          position: 'fixed', // Закрепляем на весь экран
+          position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          zIndex: 1300, // Обеспечиваем, чтобы он был поверх всех других элементов
+          zIndex: 1300,
         }}
-        open={backdropVisible} // Показываем только когда нужно
+        open={smartBackdropActive}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

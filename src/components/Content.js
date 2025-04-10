@@ -130,7 +130,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
-        width: '22%',/*24rem*/
+        width: '27%',/*22*/
         height: '705px',
         overflow: 'hidden',
       }}>
