@@ -86,8 +86,9 @@ const TechnologiesTree = () => {
   const [expandedItems, setExpandedItems] = useState([]);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
-  //const [editedItems, setEditedItems] = useState([]);
   const [loadingTimer, setLoadingTimer] = useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [newTechnology, setNewTechnology] = useState(null);
 
   //селекторы
   const dispatch = useDispatch();
@@ -96,13 +97,12 @@ const TechnologiesTree = () => {
   const error = useSelector((state) => state.technologies.error);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const technologySelector = useSelector(selectTechnology);
-  const { selectedItems, disabledItems, editedItems } = useSelector((state) => state.technologies);
+  const { selectedItems, disabledItems } = useSelector((state) => state.technologies);
 
   //refs
   const itemRef = useRef(null);
   const toggledItemRef = React.useRef({});
   const apiRef = useTreeViewApiRef();
-  const bbRef = useRef(null);
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -150,81 +150,33 @@ const TechnologiesTree = () => {
     }        
   }, [newTechnology]);*/
 
-  function CustomLabel({ children, className, secondaryLabel, edited, onLabelClick, onSecondaryLabelClick, customLabel, type, labelRef, focused, pp }) {
+  function CustomLabel({ children, className, secondaryLabel, onLabelClick, onSecondaryLabelClick, customLabel, type, labelRef, focused, pp }) {
     //стейты
-    const [isEditing, setIsEditing] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const [value, setValue] = useState(customLabel);  
-
-    //эффекты
-    useEffect(() => {
-      setIsEditing(edited);
-    }, [edited]);
-
-    //события
-    const handleSave = () => {};
-    const handleCancel = () => {};
     //
     return (
       <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }} ref={labelRef}>
-        <div style={{ width: '800%', display: 'flex', flexDirection: 'column' }}>
-          {isEditing ? (
-            <>
-              <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                <TechnologySearch props={{id: "technology-code", placeholder: "Код технологии"}}
-                  id="technologyCode"
-                  
-                  selectedValue={/*localData.formValues.operationCode*/ ''}
-                  onOptionSelect={bbRef}
-                  errorValue={/*localData.formErrors.operationCode*/ ''}
-                >
-                </TechnologySearch>
-                <IconButton
-                  color="success"
-                  size="small"
-                  onClick={(event) => {
-                    /*handleSaveItemLabel(event, `${nameValue.firstName} ${nameValue.lastName}`);
-                    save();*/
-                  }}
-                >
-                  <CheckIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  size="small"
-                  onClick={(event) => {
-                    //setIsEditing(false);
-                  }}
-                >
-                  <CloseRoundedIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </>
-          ) : (
-            <Typography 
-              onClick={(e) => { 
-                e.stopPropagation();
-                
-                setIsEditing(true);
-                
-               // onLabelClick?.(e);                
-              }}
-            >
-              {value}
-            </Typography>
-          )}                    
+        <div style={{ width: '800%', display: 'flex', flexDirection: 'column' }}>          
+          <Typography 
+            onClick={(e) => { 
+              e.stopPropagation();                
+              //setIsEditing(true);                
+              // onLabelClick?.(e);                
+            }}
+          >
+            {value}
+          </Typography>                    
           {secondaryLabel && (
-            <div>
-              {!isEditing && (
-                <Typography
-                  variant="caption" 
-                  color="secondary" 
-                  onClick={(e) => { 
-                  }}
-                >
-                  {secondaryLabel}
-                </Typography>
-              )}
+            <div>             
+              <Typography
+                variant="caption" 
+                color="secondary" 
+                onClick={(e) => { 
+                }}
+              >
+                {secondaryLabel}
+              </Typography>
             </div>
           )}          
         </div>
@@ -257,13 +209,11 @@ const TechnologiesTree = () => {
 
     //стейты
     const [isProcessing, setIsProcessing] = useState(false);
-    const [edited, setEdited] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const [selected, setSelected] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
-    const [anchorPopover, setAnchorPopover] = useState(null);
 
     //рефы
     const labelRef = useRef(null);
@@ -273,54 +223,26 @@ const TechnologiesTree = () => {
       setExpanded(expandedItems.includes(props.itemId));
       setDisabled(disabledItems.includes(props.itemId));
       setSelected(selectedItems.includes(props.itemId));
-      setEdited(editedItems.includes(props.itemId));
-      //setIsFocused(props.itemId == selectedItemId ? true : false);
-    }, [expandedItems, disabledItems, selectedItems, editedItems, props.itemId]);
+    }, [expandedItems, disabledItems, selectedItems, props.itemId]);
 
     //expanded
     const handleRootClick = (e) => {
       //записать выбранную технологию
-      handleCustomTreeItemClick(e, props.itemId);//
+      handleCustomTreeItemClick(e, props.itemId);
       //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
       const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
-      //?
-      if (!editedItems.includes(props.itemId)) {
-        dispatch(addEditedItems(props.itemId));
-        let kk = edited;
-      }
-
-      //
       if (isIconClick) {
         e.stopPropagation();
         setExpanded((prev) => !prev);
         handleItemExpansionToggle(null, props.itemId, !expanded);
         return; 
       }
-
-      //popover
-      /*if (labelRef.current) {
-        setAnchorPopover(labelRef.current);
-      }*/
     };
   
     const handleChildClick = (e) => {
       if (dataLoaded) return;
       e.stopPropagation();
-      
       handleCustomTreeItemClick(e, props.itemId);
-      //фокус, глобальное состояние
-      /*if (selected1) {
-        setFocusedItem(props.itemId);
-      }*/
-      
-      //popover
-      /*if (labelRef.current) {
-        setAnchorPopover(labelRef.current);
-      }*/
-    };
-
-    const handlePopoverClose = () => {
-      setAnchorPopover(null);
     };
 
     const classes = useStyles({ itemType: item.type});
@@ -342,8 +264,6 @@ const TechnologiesTree = () => {
         slotProps={{
           label: { 
             secondaryLabel: item?.secondaryLabel || '',
-            editable: true,
-            edited: edited,
             onLabelClick: (e) => console.log('onLabelClick'),
             onSecondaryLabelClick: (e) => console.log('onSecondaryLabelClick'),
             customLabel: item?.label || '',
@@ -374,25 +294,7 @@ const TechnologiesTree = () => {
         ) : (                
           props.children                             
         )}
-      </StyledTreeItem2>
-      {/*<Popover
-        open={Boolean(anchorPopover)}
-        anchorEl={anchorPopover}
-        onClose={handlePopoverClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-      >
-        <Paper sx={{ p: 2, width: 'auto' }}>
-        <Typography gutterBottom variant="h6" component="div">{item?.type == 'technology' ? 'Технология' : 'Операция'}</Typography>
-          <Typography gutterBottom variant="body1"><strong>Наименование:</strong> {item?.secondaryLabel || ''}</Typography>
-          <Typography gutterBottom variant="body1"><strong>Код:</strong> {item?.label || ''}</Typography>
-          <Typography gutterBottom variant="body1"><strong>Автор:</strong> ФИО</Typography>
-          <Typography gutterBottom variant="body1"><strong>Дата создания:</strong> дд.мм.гггг чч:мм:сс</Typography>
-          <Typography gutterBottom variant="body1"><strong>Последнее изменение:</strong> дд.мм.гггг чч:мм:сс</Typography>
-        </Paper>
-      </Popover>*/}
+      </StyledTreeItem2>      
       </>
     );
   });
@@ -409,7 +311,7 @@ const TechnologiesTree = () => {
         />
       );
     },
-    [itemRef, editedItems]
+    [itemRef]
   );
 
   const handleItemExpansionToggle = useCallback((event, nodeId, expanded) => {
@@ -454,31 +356,25 @@ const TechnologiesTree = () => {
 
   //selected, CustomTreeItem
   const handleCustomTreeItemClick = (event, itemId) => {
-    /*apiRef.current.selectItem({
-      event,
-      itemId,
-      keepExistingSelection: false,
-      shouldBeSelected: true,       
-    });*/
-    dispatch(setSelectedItemId(itemId));//setSelectedItemId(itemId);
+    dispatch(setSelectedItemId(itemId));
   };
 
   //эффекты
   //анимация загрузки вкладки
-  /*useEffect(() => {
+  useEffect(() => {
     if (drawingExternalCode != '') {
       setLoadingTimer(true);
       setTimeout(() => {
         setLoadingTimer(false);
       }, 500); 
     }
-  }, [drawingExternalCode]);*/
+  }, [drawingExternalCode]);
 
-/*useEffect(() => {
+  useEffect(() => {
     //для expandedItems
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
-  }, [items]);*/
+  }, [items]);
 
   //на данный момент считаем, что все технологии наши
   useEffect(() => {
@@ -500,9 +396,9 @@ const TechnologiesTree = () => {
     dispatch(fetchData({search: '', limit: 50, page: 1}));
   }, [dispatch]);
 
-  const technologyChip = useMemo(() => {
+  /*const technologyChip = useMemo(() => {
     return '111';//return `${technologySelector.name}: ${technologySelector.code}`;
-  }, [technologySelector]);
+  }, [technologySelector]);*/
 
   const handleSpeedDialActionClick = useCallback((action) => {
     switch(action.name) {
@@ -518,8 +414,8 @@ const TechnologiesTree = () => {
         break;
 
       case 'add-technology':
-        //handleClickOpen();
-        dispatch(addItems());
+        handleDialogOpen();
+        //dispatch(addItems());
         break;
     }
   }, [selectedItems, disabledItems]);
@@ -554,29 +450,21 @@ const TechnologiesTree = () => {
   };
 
   const handleContextMenuItemRename = (node) => {
-    /*if (!editedItems.includes(node)) {
-      addEditedItems(prev => {
-        if (!prev.includes(node)) {
-          return [...prev, node];
-        }
-        return prev;
-      });  
-    }*/
-    if (!editedItems.includes(node)) {
-      dispatch(addEditedItems(node));
-    }
     handleContextMenuClose();
   }
 
-  //добавить технологию
-  const [open, setOpen] = React.useState(false);
 
-  const handleClickOpen = () => {
+
+  const handleDialogOpen = () => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleDialogClose = () => {
     setOpen(false);
+  };
+
+  const handleDialogSubmit = () => {
+    handleDialogClose();
   };
   
   //вывод
@@ -609,52 +497,30 @@ const TechnologiesTree = () => {
         selectedItems={selectedItems}
         onSelectedItemsChange={handleSelectedItemsChange}
         onItemSelectionToggle={handleItemSelectionToggle}
-        isItemEditable={(item) => editedItems.includes(item.id)}
-        experimentalFeatures={{
-          labelEditing: true,
-        }}
       />                        
       <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
-        {
-          drawingExternalCode.trim() != ''
-            ? (
-              <>
-                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
-                {
-                  /*technologySelector.code.trim() != ''
-                    ? (                                            
-                      technologyChip && <Chip label={technologyChip} variant="outlined" onDelete={handleDelete} />
-                    )
-                    : ('')*/
-                }
-                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
-                    {/*<Fab size='small' color="primary" aria-label="add">
-                      <AddIcon />
-                    </Fab>*/}
-                    <SpeedDial
-                      ariaLabel="SpeedDial basic example"
-                      sx={{ position: 'absolute', bottom: 16, right: 16, transform: 'scale(0.85)', '& .MuiFab-primary': { width: 45, height: 45 } }}
-                      icon={<SpeedDialIcon />}
-                    >
-                      {actions.map((action) => (
-                        <SpeedDialAction
-                          key={action.name}
-                          icon={action.icon}
-                          tooltipTitle={action.title}
-                          onClick={() => handleSpeedDialActionClick(action)}
-                        />
-                      ))}
-                    </SpeedDial>
-                  </Box>
-                </Box>
-              </>
-            )
-            : (
-              <>
-                {/*заглушка*/}
-              </>
-            )
-        }
+        {drawingExternalCode && (
+          <>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
+                <SpeedDial
+                  ariaLabel="SpeedDial basic example"
+                  sx={{ position: 'absolute', bottom: 0, right: 30, transform: 'scale(0.85)', '& .MuiFab-primary': { width: 45, height: 45 } }}
+                  icon={<SpeedDialIcon />}
+                >
+                  {actions.map((action) => (
+                    <SpeedDialAction
+                      key={action.name}
+                      icon={action.icon}
+                      tooltipTitle={action.title}
+                      onClick={() => handleSpeedDialActionClick(action)}
+                    />
+                  ))}
+                </SpeedDial>
+              </Box>
+            </Box>
+          </>
+        )}
       </Stack>
       <Menu
         open={contextMenu !== null}
@@ -670,9 +536,9 @@ const TechnologiesTree = () => {
         <MenuItem onClick={() => handleContextMenuItemDelete(selectedNode)}>Удалить</MenuItem>
         <MenuItem onClick={() => handleContextMenuItemRename(selectedNode)}>Переименовать</MenuItem>
       </Menu>
-      {/*<Dialog
+      {<Dialog
         open={open}
-        onClose={handleClose}
+        onClose={handleDialogClose}
         slotProps={{
           paper: {
             component: 'form',
@@ -682,7 +548,7 @@ const TechnologiesTree = () => {
               const formJson = Object.fromEntries(formData.entries());
               const email = formJson.email;
               console.log(email);
-              handleClose();
+              handleDialogClose();
             },
           },
         }}        
@@ -693,19 +559,21 @@ const TechnologiesTree = () => {
             Выберите технологию из списка
           </DialogContentText>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 2, width: '500px' }}>
-            <TechnologySearch
-              props={{id: "operation-code-2", placeholder: "Код операции"}}
-              id="operationCode" /*onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
+            {<TechnologySearch
+              props={{id: "operation-code-2", name: "newTechnology", placeholder: "Код операции"}}              
+              selectedValue={newTechnology}
+              onChange={setNewTechnology}
+              /*onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
               selectedValue={localData.formValues.operationCode} 
               errorValue={localData.formErrors.operationCode}*/
-    /*        />
+            />}
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Отмена</Button>
-          <Button type="submit">Подтвердить</Button>
+          <Button onClick={handleDialogClose}>Отмена</Button>
+          <Button /*onClick={handleDialogSubmit}*/ type="submit">Подтвердить</Button>
         </DialogActions>
-      </Dialog>*/}
+      </Dialog>}
     </>
   );
 };

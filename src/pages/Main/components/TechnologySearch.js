@@ -12,12 +12,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage } from '../../../store/slices/technologiesSlice';
 import { debounce } from 'lodash';
 
-const TechnologySearch = React.memo(({ props, id, selectedValue, onOptionSelect, errorValue = '' }) => {
-  const dispatch = useDispatch();
+const TechnologySearch = React.memo(({ props, selectedValue, onChange}) => {
+  //const dispatch = useDispatch();
 
   //стейты
   const [inputValue, setInputValue] = useState('');
-  const [selectedOption, setSelectedOption] = useState(selectedValue || null);
+  //const [selectedOption, setSelectedOption] = useState(selectedValue || null);
   
   //запросы
   const search = useSelector((state) => state.technologies.search);
@@ -36,9 +36,9 @@ const TechnologySearch = React.memo(({ props, id, selectedValue, onOptionSelect,
       //dispatch(setOperation(selectedValue ? { code: selectedValue.code, name: selectedValue.name } : { code: '', name: `Новая операция ${tabs ? tabs.length : ''}` }));
     }, [selectedValue, dispatch]);*/
 
-  const debouncedFetchData = debounce(() => {
+  /*const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
-  }, 1);
+  }, 1);*/
 
   /*useEffect(() => {
     //загрузка данных при пустом поисковом запросе
@@ -71,41 +71,42 @@ const TechnologySearch = React.memo(({ props, id, selectedValue, onOptionSelect,
   };*/
   return (
     <>
-    {console.log(selectedOption)}
+    {console.log(selectedValue)}
         <Autocomplete          
           options={items || []}
           getOptionLabel={(option) => option == null || option == undefined ? '' : `${option.code} ${option.name}`}
-          getOptionSelected={(option, value) => option.code === value.code && option.name === value.name}
-          filterOptions={(options, state) => {
+          isOptionEqualToValue={(option, value) =>
+            option.code === value?.code && option.name === value?.name
+          }
+          //getOptionSelected={(option, value) => option.code === value.code && option.name === value.name}
+          /*filterOptions={(options, state) => {
             const { inputValue } = state;
             return options.filter(option =>
               option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
               option.name.toLowerCase().includes(inputValue.toLowerCase())
             );
-          }}
+          }}*/
           onInputChange={(event, newInputValue) => {
               setInputValue(newInputValue);
           }}
           onChange={(event, newValue) => {
-            setSelectedOption(newValue);
+            //setSelectedOption(newValue);
             //dispatch(setOperation({ code: !newValue ? '' : newValue.code, name: !newValue ? '' : newValue.name }));
             //
-            if (onOptionSelect) {
-              onOptionSelect.current = newValue; //onOptionSelect('technologyCode', newValue);
-            }
+              onChange(newValue); //onOptionSelect('technologyCode', newValue);
           }}
           inputValue={inputValue}
           loadingText="поиск данных"
           noOptionsText="нет результатов"
           loading={loading}
-          ListboxProps={{                  
+          /*ListboxProps={{                  
               /*onScroll: handleScroll,*/
               /*ref: listRef,*/
-              sx: {
+        /*      sx: {
               maxHeight: '48vh',
               overflowY: 'auto'
               }
-          }}
+          }}*/
           renderGroup={(params) => (
               <div key={params.key}>
               {params.children}
@@ -135,17 +136,17 @@ const TechnologySearch = React.memo(({ props, id, selectedValue, onOptionSelect,
                 {...params}
                 required
                 fullWidth
-                name='opeggggrationCode2'
+                name={props.name + 'Visible'}
                 id={props.id}
-                error={!!errorValue}
-                helperText={errorValue}
+                /*error={!!errorValue}
+                helperText={errorValue}*/
                 placeholder={props.placeholder}
                 variant="outlined"
                 sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                 size='small'
                 /*value={props.placeholder}*/
                 onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => {
+                /*onKeyDown={(e) => {
                   e.stopPropagation();
                   if (e.key === 'Enter') {
                     //handleSave();
@@ -157,7 +158,7 @@ const TechnologySearch = React.memo(({ props, id, selectedValue, onOptionSelect,
                   if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) {
                     // handleCancel(); или не делать ничего
                   }
-                }}   
+                }} */               
               />
           )}
           renderTags={(tagValue, getTagProps) =>
@@ -179,7 +180,17 @@ const TechnologySearch = React.memo(({ props, id, selectedValue, onOptionSelect,
               padding: '8px 16px'
               },
           }}
-          value={onOptionSelect.current || null}
+          value={selectedValue || null}
+        />
+        <input 
+          type='hidden'
+          name='newTechnologyCode'
+          value={selectedValue?.code || ''}
+        />
+        <input 
+          type='hidden'
+          name='newTechnologyName'
+          value={selectedValue?.name || ''}
         />
     </>
   );
