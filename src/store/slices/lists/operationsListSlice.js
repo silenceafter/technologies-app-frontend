@@ -6,15 +6,15 @@ const initialState = {
   error: null,
   hasMore: true,
   search: '',
-  limit: 100,
+  limit: 10,
   page: 1,
 };
 
 export const fetchData = createAsyncThunk(
-  'tooling/fetchData',
+  'operationsList/fetchData',
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getTooling.v0.php?search=${search}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getoperations.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -26,8 +26,8 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-const toolingSlice = createSlice({
-  name: 'tooling',
+const operationsListSlice = createSlice({
+  name: 'operationsList',
   initialState,
   reducers: {
     setSearch: (state, action) => {
@@ -72,9 +72,10 @@ const toolingSlice = createSlice({
 });
 
 //селекторы
-export const selectSearch = (state) => state.tooling.search;
-export const selectLimit = (state) => state.tooling.limit;
-export const selectPage = (state) => state.tooling.page;
+export const selectSearch = (state) => state.operationsList.search;
+export const selectLimit = (state) => state.operationsList.limit;
+export const selectPage = (state) => state.operationsList.page;
+export const selectOperations = (state) => state.operationsList;
 
-export const { setSearch, setLimit, setPage } = toolingSlice.actions;
-export default toolingSlice.reducer;
+export const { setSearch, setLimit, setPage } = operationsListSlice.actions;
+export default operationsListSlice.reducer;

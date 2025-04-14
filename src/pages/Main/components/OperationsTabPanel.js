@@ -18,13 +18,13 @@ import { MemoizedTabPanel as TabPanel } from '../components/TabPanel';
 import { TechnologyBreadcrumbs } from '../components/TechnologyBreadcrumbs';
 import { MemoizedTabs } from '../components/MemoizedTabs';
 
-import { setTabs, addTab, removeTab, updateTab, setTabValue, setData, setShouldReloadTabs } from '../../../store/slices/operationsTabsSlice';
+import { setTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs } from '../../../store/slices/operationsSlice';
 import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading
 } from '../../../store/slices/technologiesSlice';
-import { selectDrawingExternalCode, selectTechnology, setTechnology, selectOperation } from '../../../store/slices/drawingsSlice';
-import { selectOperations, fetchData } from '../../../store/slices/operationsSlice';
+import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
+import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
 
 function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const dispatch = useDispatch();
@@ -39,7 +39,7 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   //селекторы
   const currentTechnology = useSelector(selectTechnology);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
-  const { tabs, tabValue, tabCnt, expandedPanelsDefault, shouldReloadTabs } = useSelector((state) => state.operationsTabs);
+  const { tabs, tabValue, tabCnt, expandedPanelsDefault, shouldReloadTabs } = useSelector((state) => state.operations);
   const technologiesItems = useSelector(technologiesSelectItems);
   const technologiesLoading = useSelector(technologiesSelectLoading);
   const operationsSelectors = useSelector(selectOperations);
@@ -247,6 +247,7 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   //
   return (
     <>
+    {console.log(tabs)}
       <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
         <Box sx={{ overflow: 'hidden' }}>
           <AppBar

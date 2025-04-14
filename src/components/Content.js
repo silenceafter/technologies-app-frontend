@@ -33,15 +33,10 @@ import { MaterialsSearch } from '../pages/Main/components/MaterialsSearch';
 import { OperationsTabPanel } from '../pages/Main/components/OperationsTabPanel';
 
 import { 
-  getSavedData as technologiesFetchData, 
-  selectItems as technologiesSelectItems, 
-  selectLoading as technologiesSelectLoading, 
-  selectError as technologiesSelectError,
+  getSavedData as technologiesFetchData,
   clearItems as technologiesSetItems
 } from '../store/slices/technologiesSlice';
-import { selectDrawingExternalCode, selectTechnology, setTechnology, selectOperation } from '../store/slices/drawingsSlice';
-import { selectOperations, fetchData } from '../store/slices/operationsSlice';
-import { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setData, setShouldReloadTabs } from '../store/slices/operationsTabsSlice';
+import { setData, setShouldReloadTabs } from '../store/slices/operationsSlice';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -62,7 +57,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   //селекторы
   //const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
   const user = useSelector((state) => state.users.user);
-  const { tabs } = useSelector((state) => state.operationsTabs);
+  const { tabs } = useSelector((state) => state.operations);
   
   //события
   const handleAccordeonChange = useCallback((panel) => (event, newExpanded) => {
@@ -176,7 +171,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
           </AccordionSummary>
           <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px' }}>
             <Box sx={{ height: 'auto' }}>
-              <ProductsTree />
+              {/*<ProductsTree />*/}
             </Box>
           </AccordionDetails>          
         </Accordion>

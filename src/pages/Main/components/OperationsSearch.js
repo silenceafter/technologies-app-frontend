@@ -13,10 +13,9 @@ import {
     Toolbar
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../store/slices/operationsSlice'; //'../store/slices/operationsSlice';
+import { fetchData, setPage } from '../../../store/slices/lists/operationsListSlice';
 import { debounce } from 'lodash';
 import Skeleton from '@mui/material/Skeleton';
-import { selectDrawingExternalCode, selectTechnology, setTechnology, setOperation } from '../../../store/slices/drawingsSlice'; //'../store/slices/drawingsSlice';
 
 const OperationsSearch = React.memo(({props, id, selectedValue, options, onChange, errorValue }) => {
   const dispatch = useDispatch();
@@ -27,7 +26,7 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
   const [selectedOption, setSelectedOption] = useState(selectedValue || null);
 
   //селекторы
-  const tabs = useSelector((state) => state.operationsTabs.tabs);
+  const tabs = useSelector((state) => state.operations.tabs);
   
   //запросы
   /*const search = useSelector(selectSearch);

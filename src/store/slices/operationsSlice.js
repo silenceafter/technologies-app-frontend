@@ -1,25 +1,37 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { selectLoading as itemsLoading } from './technologiesSlice';
 
+//данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {
-  items: [],
+  tabs: [],
+  tabValue: 0,
+  tabCnt: 1,
+  validateForm: false,
   loading: false,
   error: null,
-  hasMore: true,
-  search: '',
-  limit: 10,
-  page: 1,
+  expandedPanelsDefault: { 
+    parameters: true,
+    equipment: true,
+    components: true,
+    materials: true,
+    tooling: true,
+    measuringTools: true
+  },
+  shouldReloadTabs: false,
 };
 
-export const fetchData = createAsyncThunk(
-  'operations/fetchData',
-  async ({ search, limit, page }, { rejectWithValue }) => {
+//сохранить введенные данные
+export const setData = createAsyncThunk(
+  'technologiesTree/setData',
+  async (payload, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getoperations.v0.php?search=${search}&&limit=${limit}&page=${page}`);
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Network response was not ok');
-      }
-      return data;
+      const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/UpdateOperation.v0.php', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        credentials: 'include'
+      });
+      if (!response.ok) throw new Error('Ошибка запроса');
+      return response.ok && response.status == '200' ? true : false;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -30,52 +42,207 @@ const operationsSlice = createSlice({
   name: 'operations',
   initialState,
   reducers: {
-    setSearch: (state, action) => {
-      state.search = action.payload;
-      state.page = 1;
-      state.items = [];
-      state.hasMore = true;
+    setTabs: (state, action) => {
+      return {
+        ...state,
+        tabs: action.payload,
+        tabCnt: action.payload.length + 1,
+        activeTabId: action.payload.length > 0 ? action.payload[0].id : null
+      };
     },
-    setLimit: (state, action) => {
-      state.limit = action.payload;      
+    resetTabs: (state) => {
+      return {
+        ...state,
+        tabs: [],
+        tabCnt: 1,
+      };
     },
-    setPage: (state, action) => {
-       state.page = action.payload;
-    }
+    addTab: (state, action) => {
+      return {
+        ...state,
+        tabs: [...state.tabs, action.payload],
+        tabCnt: state.tabCnt + 1,
+      };
+    },
+    removeTab: (state, action) => {
+      const updatedTabs = state.tabs.filter((tab) => tab.id !== action.payload);
+      return {
+        ...state,
+        tabs: updatedTabs,
+        /*tabValue: state.tabValue != 0 ? state.tabValue - 1 : 0,*/
+        /*tabValue: updatedTabs.length ? updatedTabs[0].id : null,*/
+      };
+    },
+    updateTab: (state, action) => {
+      //обновить вкладку
+      const { id, newContent, newValidateForm } = action.payload;
+
+      //orderNumber
+      //operationCode
+      let operationCode = { code: id, name: 'Новая операция' };
+
+      //если операция изменена
+      if (newContent.changedValues.hasOwnProperty('operationCode')) {
+        if (newContent.changedValues.operationCode) {
+          operationCode.code = newContent.changedValues.operationCode.code;
+          operationCode.name = newContent.changedValues.operationCode.name;
+        }
+      } else {
+        const tab = state.tabs.find(tab => tab.id === id);
+        if (tab.content.formValues.hasOwnProperty('operationCode')) {
+          operationCode = tab.content.formValues.operationCode;
+        }
+      }
+
+      //areaNumber
+      let areaNumber = null;
+      if (newContent.changedValues.hasOwnProperty('areaNumber')) {
+        if (newContent.changedValues.areaNumber) {
+          areaNumber = newContent.changedValues.areaNumber;
+        }
+      }
+
+      //document
+      let document = null;
+      if (newContent.changedValues.hasOwnProperty('document')) {
+        if (newContent.changedValues.document) {
+          document = newContent.changedValues.document;
+        }
+      }
+
+      //operationDescription
+      let operationDescription = null;
+      if (newContent.changedValues.hasOwnProperty('operationDescription')) {
+        if (newContent.changedValues.operationDescription) {
+          operationDescription = newContent.changedValues.operationDescription;
+        }
+      }
+
+      //grade
+      let grade = null;
+      if (newContent.changedValues.hasOwnProperty('grade')) {
+        if (newContent.changedValues.grade) {
+          grade = newContent.changedValues.grade;
+        }
+      }
+
+      //workingConditions
+      let workingConditions = null;
+      if (newContent.changedValues.hasOwnProperty('workingConditions')) {
+        if (newContent.changedValues.workingConditions) {
+          workingConditions = newContent.changedValues.workingConditions;
+        }
+      }
+
+      //numberOfWorkers
+      let numberOfWorkers = null;
+      if (newContent.changedValues.hasOwnProperty('numberOfWorkers')) {
+        if (newContent.changedValues.numberOfWorkers) {
+          numberOfWorkers = newContent.changedValues.numberOfWorkers;
+        }
+      }
+
+      //numberOfProcessedParts
+      let numberOfProcessedParts = null;
+      if (newContent.changedValues.hasOwnProperty('numberOfProcessedParts')) {
+        if (newContent.changedValues.numberOfProcessedParts) {
+          numberOfProcessedParts = newContent.changedValues.numberOfProcessedParts;
+        }
+      }
+
+      //laborEffort
+      let laborEffort = null;
+      if (newContent.changedValues.hasOwnProperty('laborEffort')) {
+        if (newContent.changedValues.laborEffort) {
+          laborEffort = newContent.changedValues.laborEffort;
+        }
+      }
+
+      //jobCode
+      //jobName
+      //
+      return {
+        ...state,
+        tabs: state.tabs.map((tab) =>
+          tab.id === id
+            ? {
+                ...tab,
+                content: {
+                  ...tab.content,
+                  formValues: newContent.formValues,
+                  formErrors: newContent.formErrors /*|| tab.content.formErrors*/,
+                  expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
+                  changedValues: newContent.changedValues,
+                  isDeleted: newContent.isDeleted /*|| tab.content.isDeleted*/,
+                },
+                operation: {
+                  ...tab.operation,
+                  code: operationCode.code,
+                  name: operationCode.name,
+                },
+                label: `${operationCode.name} (${operationCode.code})`,
+                validateForm: newValidateForm || tab.validateForm,
+              }
+            : tab
+        ),
+      };
+    },
+    setTabValue: (state, action) => {
+      return {
+        ...state,
+        tabValue: action.payload,
+      }
+    },
+    /*toggleValidateFormInSlice: (state) => {
+      state.validateForm = !state.validateForm;
+    },*/
+    /*incrementTabCnt: (state) => {
+      return {
+        ...state,
+        tabCnt: state.tabCnt + 1,
+      };
+    },
+    decrementTabCnt: (state) => {
+      return {
+        ...state,
+        tabCnt: state.tabCnt - 1,
+      }
+    },
+    incrementTabValue: (state) => {
+      return {
+        ...state,
+        tabValue: state.tabValue + 1,
+      };
+    },*/
+    setShouldReloadTabs: (state, action) => {
+      return {
+        ...state,
+        shouldReloadTabs: action.payload
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchData.pending, (state) => {
+      .addCase(setData.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchData.fulfilled, (state, action) => {
+      .addCase(setData.fulfilled, (state, action) => {
         state.loading = false;
-        const newItems = action.payload.data.filter(newItem => 
-          !state.items.some(existingItem => {
-            return `${existingItem.code}-${existingItem.name}` === 
-                `${newItem.code}-${newItem.name}`;
-            })
-        );
-        //
-        state.items = [...state.items, ...newItems];//добавляем только новые данные к существующему списку
-        if (newItems.length < state.limit) {
-          state.hasMore = false;//если меньше лимита, прекращаем подгрузку
-        }
+        state.tabs = []; /*state.tabs.map((tab) => ({
+          ...tab,
+          content: {
+            ...tab.content,
+            changedValues: tab.content.changedValues ? [] : tab.content.changedValues,
+          },
+        }));*/
       })
-      .addCase(fetchData.rejected, (state, action) => {
+      .addCase(setData.rejected, (state, action) => {
         state.loading = false;
-        state.hasMore = false;
         state.error = action.payload;
       });
-  },
+    },
 });
 
-//селекторы
-export const selectSearch = (state) => state.operations.search;
-export const selectLimit = (state) => state.operations.limit;
-export const selectPage = (state) => state.operations.page;
-export const selectOperations = (state) => state.operations;
-
-export const { setSearch, setLimit, setPage } = operationsSlice.actions;
+export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs } = operationsSlice.actions;
 export default operationsSlice.reducer;

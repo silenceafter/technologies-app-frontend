@@ -1,43 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import { Divider, Typography } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
-import SearchIcon from '@mui/icons-material/Search';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import Box from '@mui/material/Box';
-import { ButtonGroup, Tabs, Tab } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
-import TechnologiesTree from './TechnologiesTree'; //'../../../components/TechnologiesTree';
-import ProductsTree from './ProductsTree'; //'../../../components/ProductsTree';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import { OperationsSearch } from './OperationsSearch'; //'../../../components/OperationsSearch';
-import { JobsSearch } from './JobsSearch'; //'../../../components/JobsSearch';
-import { MeasuringToolsSearch } from './MeasuringToolsSearch'; //'../../../components/MeasuringToolsSearch';
-import { ToolingSearch } from './ToolingSearch'; //'../../../components/ToolingSearch';
-import { ComponentsSearch } from './ComponentsSearch'; //'../../../components/ComponentsSearch';
-import { MaterialsSearch } from './MaterialsSearch'; //'../../../components/MaterialsSearch';
-import { EquipmentSearch } from './EquipmentSearch'; //'../../../components/EquipmentSearch';
-import { Snackbar } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
-import { useDispatch, useSelector } from 'react-redux';
-//import { setUnsavedChanges } from '../../../store/slices/unsavedChangesSlice';
-
-import Accordion from '@mui/material/Accordion';
-import AccordionActions from '@mui/material/AccordionActions';
+import { Accordion, Button, Grid, TextField, Typography } from '@mui/material';
+import { OperationsSearch } from './OperationsSearch';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
 import _ from 'lodash';
 
 const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions}) => {

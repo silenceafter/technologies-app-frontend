@@ -1,42 +1,44 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-//import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
-import getRequestReducer from './reducers/getRequestReducer';
-import headerReducer from './slices/headerSlice';
-import operationsReducer from './slices/operationsSlice';
-import jobsReducer from './slices/jobsSlice';
-import measuringToolsReducer from './slices/measuringToolsSlice';
-import toolingReducer from './slices/toolingSlice';
-import componentsReducer from './slices/componentsSlice';
-import materialsReducer from './slices/materialsSlice';
-import unsavedChangesReducer from './slices/unsavedChangesSlice';
-import productsReducer from './slices/productsSlice';
-import drawingsReducer from './slices/drawingsSlice';
-import technologiesReducer from './slices/technologiesSlice';
-import equipmentReducer from './slices/equipmentSlice';
-import usersReducer from './slices/usersSlice';
-import operationsTabsReducer from './slices/operationsTabsSlice';
 import { combineReducers } from 'redux';
 import { thunk } from 'redux-thunk'; // Middleware для асинхронных действий
+//import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+import operationsListReducer from './slices/lists/operationsListSlice';
+import jobsListReducer from './slices/lists/jobsListSlice';
+import measuringToolsListReducer from './slices/lists/measuringToolsListSlice';
+import toolingListReducer from './slices/lists/toolingListSlice';
+import componentsListReducer from './slices/lists/componentsListSlice';
+import materialsListReducer from './slices/lists/materialsListSlice';
+import productsListReducer from './slices/lists/productsListSlice';
+import technologiesListReducer from './slices/lists/technologiesListSlice';
+import equipmentListReducer from './slices/lists/equipmentListSlice';
+import getRequestReducer from './reducers/getRequestReducer';
+import headerReducer from './slices/headerSlice';
+import drawingsReducer from './slices/drawingsSlice';
+import usersReducer from './slices/usersSlice';
+import technologiesReducer from './slices/technologiesSlice';
+import operationsReducer from './slices/operationsSlice';
+import unsavedChangesReducer from './slices/unsavedChangesSlice';
 
 //корневой редьюсер
-const rootReducer = combineReducers({
+const rootReducer = combineReducers({  
+  technologiesList: technologiesListReducer,
+  operationsList: operationsListReducer,
+  jobsList: jobsListReducer,
+  measuringToolsList: measuringToolsListReducer,
+  toolingList: toolingListReducer /* оснастка */,
+  componentsList: componentsListReducer,
+  materialsList: materialsListReducer,
+  productsList: productsListReducer,
+  equipmentList: equipmentListReducer,
+  unsavedChanges: unsavedChangesReducer,
   getRequest: getRequestReducer,
   header: headerReducer,
-  operations: operationsReducer,
-  jobs: jobsReducer,
-  measuringTools: measuringToolsReducer,
-  tooling: toolingReducer /* оснастка */,
-  components: componentsReducer,
-  materials: materialsReducer,
-  unsavedChanges: unsavedChangesReducer,  
   drawings: drawingsReducer,
   technologies: technologiesReducer,
-  products: productsReducer,
-  equipment: equipmentReducer,
-  users: usersReducer, /* храним обязательно */
-  operationsTabs: operationsTabsReducer,
+  operations: operationsReducer,
+  users: usersReducer, /* храним обязательно */  
 });
 
 //конфигурация persist

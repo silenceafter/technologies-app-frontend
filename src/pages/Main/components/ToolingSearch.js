@@ -17,7 +17,7 @@ import {
   selectSearch, 
   selectLimit, 
   selectPage 
-} from '../../../store/slices/toolingSlice'; //'../store/slices/toolingSlice';
+} from '../../../store/slices/lists/toolingListSlice'; //'../store/slices/toolingSlice';
 
 function ToolingSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const dispatch = useDispatch();

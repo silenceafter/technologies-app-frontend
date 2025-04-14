@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 //import { selectSearch } from './headerSlice';
-import { selectDrawingExternalCode } from './drawingsSlice';
+import { selectDrawingExternalCode } from '../drawingsSlice';
 
 const LIMIT_DEFAULT = 50;
 const PAGE_DEFAULT = 1;
@@ -19,13 +19,13 @@ const initialState = {
 
 //загрузка списка изделий (корневые элементы)
 export const fetchData = createAsyncThunk(
-  'products/fetchData',
+  'productsList/fetchData',
   async ({ limit, page }, { getState, rejectWithValue }) => {
     try {
       const state = getState();
       const externalCode = selectDrawingExternalCode(state);//const search = selectSearch(state);
       //
-      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateProductsDataTree.v0.php?search=${externalCode}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/CreateproductsListDataTree.v0.php?search=${externalCode}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -48,7 +48,7 @@ export const fetchData = createAsyncThunk(
 
 //загрузка элементов списка (вложенные элементы; загрузка только новых элементов)
 export const fetchItemDetails = createAsyncThunk(
-  'products/fetchItemDetails',
+  'productsList/fetchItemDetails',
   async (payload) => {
     try {
       const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/GetProductsDataTreeItem.v0.php`, {
@@ -64,8 +64,8 @@ export const fetchItemDetails = createAsyncThunk(
   }
 );
 
-const productsSlice = createSlice({
-  name: 'products',
+const productsListSlice = createSlice({
+  name: 'productsList',
   initialState,
   reducers: {
     setItems: (state) => {
@@ -140,6 +140,6 @@ const productsSlice = createSlice({
   },
 });
 
-export const { setItems, setPage } = productsSlice.actions;
-export const selectItems = (state) => state.productsSlice.items || [];
-export default productsSlice.reducer;
+export const { setItems, setPage } = productsListSlice.actions;
+export const selectItems = (state) => state.productsListSlice.items || [];
+export default productsListSlice.reducer;

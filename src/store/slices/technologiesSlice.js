@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { selectDrawingExternalCode, setTechnology } from './drawingsSlice';
-import { act } from 'react';
+import { selectDrawingExternalCode } from './drawingsSlice';
 
 const LOADING_DEFAULT = false;
 const initialState = {
@@ -12,14 +11,6 @@ const initialState = {
   loading: LOADING_DEFAULT,
   error: null,
   newItemCnt: 1,
-  //
-  searchedItems: [],
-  searchedLoading: false,
-  searchedError: null,
-  searchedHasMore: true,
-  search: '',
-  limit: 100,
-  page: 1,
 };
 
 const generateUUID = () => {
@@ -64,7 +55,7 @@ export const getSavedData = createAsyncThunk(
 );
 
 //удалить технологии и/или операции
-export const deleteSavedData = createAsyncThunk(
+/*export const deleteSavedData = createAsyncThunk(
   'technologiesTree/deleteSavedData',
   async ({}, { getState, rejectWithValue }) => {
     try {
@@ -108,24 +99,7 @@ export const deleteSavedData = createAsyncThunk(
       return rejectWithValue(error.message);
     }
   }
-);
-
-//поиск технологии
-export const fetchData = createAsyncThunk(
-  'technologiesTree/fetchData',
-  async ({ search, limit, page }, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/gettechnologies.v2.php?search=${search}&&limit=${limit}&page=${page}`);
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Network response was not ok');
-      }
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
+);*/
 
 const technologiesSlice = createSlice({
   name: 'technologies',
@@ -138,7 +112,7 @@ const technologiesSlice = createSlice({
         loading: LOADING_DEFAULT
       }
     },
-    setItems: (state, action) => {
+    /*setItems: (state, action) => {
       switch(action.payload.type) {
         case 'delete':
           return {
@@ -156,7 +130,7 @@ const technologiesSlice = createSlice({
         default:
           return state;
       }        
-    },
+    },*/
     setSelectedItems: (state, action) => {
       return {
         ...state,
@@ -169,21 +143,21 @@ const technologiesSlice = createSlice({
         selectedItemId: action.payload,
       };
     },
-    addItems: (state) => {
+    addItems: (state, action) => {
       return {
         ...state,
         newItemCnt: state.newItemCnt + 1,
-        items: [...state.items, { id: generateUUID(), label: `Новая технология ${state.newItemCnt}`, secondaryLabel: 'Описание', children: [], parentId: null, type: 'technology' }]
+        items: [...state.items, { id: generateUUID(), label: action.payload.code, secondaryLabel: action.payload.name, children: [], parentId: null, type: 'technology' }]
       };
     },
-    addSelectedItems: (state, action) => {
+    /*addSelectedItems: (state, action) => {
       return {
         ...state,
         selectedItems: state.selectedItems.includes(action.payload)
           ? state.selectedItems
           : [...state.selectedItems, action.payload]
       };
-    },
+    },*/
     deleteSelectedItems: (state, action) => {
       const targetItemIds = Array.isArray(action.payload) ? action.payload : [action.payload];
 
@@ -285,12 +259,12 @@ const technologiesSlice = createSlice({
         }))
       };*/
     },
-    setDisabledItems: (state, action) => {
+    /*setDisabledItems: (state, action) => {
       return {
         ...state,
         disabledItems: action.payload
       };
-    },
+    },*/
     restoreItems: (state, action) => {
       const targetItemIds = Array.isArray(action.payload) ? action.payload : [action.payload]; //если передан один itemId, преобразуем его в массив
       let parentId = null;
@@ -335,15 +309,15 @@ const technologiesSlice = createSlice({
         disabledItems: state.disabledItems.filter(itemId => !itemsToRestore.includes(itemId)),
       };
     },
-    addEditedItems: (state, action) => {
+    /*addEditedItems: (state, action) => {
       return {
         ...state,
         editedItems: state.editedItems.includes(action.payload)
           ? state.editedItems
           : [...state.editedItems, action.payload] 
       };
-    },
-    setSearch: (state, action) => {
+    },*/
+    /*setSearch: (state, action) => {
       state.search = action.payload;
       state.page = 1;
       state.searchedItems = [];
@@ -354,7 +328,7 @@ const technologiesSlice = createSlice({
     },
     setPage: (state, action) => {
        state.page = action.payload;
-    }
+    }*/
   },
   extraReducers: (builder) => {
     builder
@@ -369,47 +343,20 @@ const technologiesSlice = createSlice({
       .addCase(getSavedData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-      .addCase(fetchData.pending, (state) => {
-        state.searchedLoading = true;
-        state.searchedError = null;
-      })
-      .addCase(fetchData.fulfilled, (state, action) => {
-        state.searchedLoading = false;
-        const newItems = action.payload.data.filter(newItem => 
-          !state.searchedItems.some(existingItem => {
-            return `${existingItem.code}-${existingItem.name}` === 
-                `${newItem.code}-${newItem.name}`;
-            })
-        );
-        //
-        state.searchedItems = [...state.searchedItems, ...newItems];//добавляем только новые данные к существующему списку
-        if (newItems.length < state.limit) {
-          state.searchedHasMore = false;//если меньше лимита, прекращаем подгрузку
-        }
-      })
-      .addCase(fetchData.rejected, (state, action) => {
-        state.searchedLoading = false;
-        state.searchedHasMore = false;
-        state.searchedError = action.payload;
-      });                    
+      });      
   },
 });
 
 export const { 
-  clearItems, setItems, addItems,
-  setSelectedItems, addSelectedItems, deleteSelectedItems,
+  clearItems, addItems,
+  setSelectedItems, deleteSelectedItems,
   setSelectedItemId,
-  setDisabledItems, restoreItems,
-  addEditedItems, /*removeEditedItems,*/
-  setSearch, setLimit, setPage
+  restoreItems
 } = technologiesSlice.actions;
 
 //селекторы
 export const selectItems = (state) => state.technologies.items || [];
 export const selectSelectedItems = (state) => state.technologies.selectedItems || [];
-export const selectSearchedItems = (state) => state.technologies.searchedItems || [];
 export const selectLoading = (state) => state.technologies.loading;
-export const selectError = (state) => state.header.error;
 
 export default technologiesSlice.reducer;

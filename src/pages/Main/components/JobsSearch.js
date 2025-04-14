@@ -13,7 +13,7 @@ import {
     Toolbar
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../store/slices/jobsSlice';
+import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../store/slices/lists/jobsListSlice';
 import { debounce } from 'lodash';
 
 function JobsSearch({ id, selectedValue, onOptionSelect, errorValue }) {

@@ -9,7 +9,7 @@ import {
     TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../store/slices/measuringToolsSlice';
+import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../store/slices/lists/measuringToolsListSlice';
 import { debounce } from 'lodash';
 
 function MeasuringToolsSearch({ id, selectedValue, onOptionSelect, errorValue }) {

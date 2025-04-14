@@ -63,7 +63,7 @@ function Main() {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [backdropVisible, setBackdropVisible] = useState(false);
   const [smartBackdropActive, setSmartBackdropActive] = useState(false);
-  const { tabs, tabValue } = useSelector((state) => state.operationsTabs);
+  const { tabs, tabValue } = useSelector((state) => state.operations);
 
   //переменные
   const showLoading = useMemo(() => {

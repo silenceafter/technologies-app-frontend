@@ -31,24 +31,18 @@ import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import { 
-  selectDrawingExternalCode, 
-  setTechnology, 
-  selectTechnology, 
-  selectOperation 
+  selectDrawingExternalCode,
+  selectTechnology 
 } from '../../../store/slices/drawingsSlice';
-import { 
-  fetchData, 
-  setItems, 
-  addItems, 
+import {  
+  addItems,
   setSelectedItems, 
-  setSelectedItemId, 
-  addSelectedItems, 
-  deleteSelectedItems, 
-  setDisabledItems, 
-  restoreItems,
-  addEditedItems,
-  deleteSavedData
+  setSelectedItemId,
+  deleteSelectedItems,
+  restoreItems
 } from '../../../store/slices/technologiesSlice';
+import { fetchData } from '../../../store/slices/lists/technologiesListSlice';
+import { resetTabs } from '../../../store/slices/operationsSlice';
 import { TechnologySearch } from '../components/TechnologySearch';
 import AdjustIcon from '@mui/icons-material/Adjust';
 import CheckIcon from '@mui/icons-material/Check';
@@ -142,13 +136,6 @@ const TechnologiesTree = () => {
       },
     })
   }));
-
-  /*const handleOptionSelect = useCallback((id, option) => {
-    // Обновляем значение поля
-    if (option !== newTechnology) {
-      setNewTechnology(option);
-    }        
-  }, [newTechnology]);*/
 
   function CustomLabel({ children, className, secondaryLabel, onLabelClick, onSecondaryLabelClick, customLabel, type, labelRef, focused, pp }) {
     //стейты
@@ -538,21 +525,29 @@ const TechnologiesTree = () => {
       </Menu>
       {<Dialog
         open={open}
-        onClose={handleDialogClose}
-        slotProps={{
+        onClose={handleDialogClose}        
+        /*slotProps={{
           paper: {
             component: 'form',
             onSubmit: (event) => {
-              event.preventDefault();
-              const formData = new FormData(event.currentTarget);
-              const formJson = Object.fromEntries(formData.entries());
-              const email = formJson.email;
-              console.log(email);
-              handleDialogClose();
+              
             },
           },
-        }}        
+        }}*/        
       >
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const formJson = Object.fromEntries(formData.entries());
+            const newTechnologyCode = formJson.newTechnologyCode;
+            const newTechnologyName = formJson.newTechnologyName;
+            //
+            dispatch(addItems({ code: newTechnologyCode, name: newTechnologyName }));
+            dispatch(resetTabs());
+            handleDialogClose();
+          }}
+        >
         <DialogTitle>Новая технология</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -560,19 +555,20 @@ const TechnologiesTree = () => {
           </DialogContentText>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 2, width: '500px' }}>
             {<TechnologySearch
-              props={{id: "operation-code-2", name: "newTechnology", placeholder: "Код операции"}}              
+              props={{id: "technology-code", name: "newTechnology", placeholder: "Технология"}}
               selectedValue={newTechnology}
               onChange={setNewTechnology}
               /*onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
-              selectedValue={localData.formValues.operationCode} 
+              selectedValue={localData.formValues.operationCode}
               errorValue={localData.formErrors.operationCode}*/
             />}
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>Отмена</Button>
-          <Button /*onClick={handleDialogSubmit}*/ type="submit">Подтвердить</Button>
+          <Button type="submit">Подтвердить</Button>
         </DialogActions>
+        </form>
       </Dialog>}
     </>
   );

@@ -20,12 +20,10 @@ import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, fetchItemDetails, setItems, setPage, setSearch, selectItems } from '../../../store/slices/productsSlice'; //'../store/slices/productsSlice';
-//import { selectDrawing as drawingHeader } from '../store/slices/headerSlice';
-import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice'; //'../store/slices/drawingsSlice';
+import { fetchData, fetchItemDetails, setItems, setPage, setSearch, selectItems } from '../../../store/slices/lists/productsListSlice';
+import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import { split } from 'lodash';
 import CircularProgress from '@mui/material/CircularProgress';
-//import ShowCircularProgress from './ShowCircularProgress';
 import Skeleton from '@mui/material/Skeleton';
 import { current } from '@reduxjs/toolkit';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -331,33 +329,12 @@ export default function ProductsTree() {
   }, [searchHeader, search, dispatch]);*/
 
   return (
-    <>
-      {/*<AppBar
-          position="static"
-          color="primary"
-          elevation={0}
-          sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
-      >
-          <Toolbar>
-              <Typography color="inherit">
-                  Изделия
-              </Typography>
-          </Toolbar>
-      </AppBar>*/}
-      
-        <RichTreeView
-          slots={{ 
-            item: renderCustomTreeItem
-          }}
-          
-          items={memoizedItems}            
-          /*onItemExpansionToggle={handleItemExpansionToggle}*/
-        />
-          {
-            download && (             
-              <CircularProgress size={50} />             
-            )
-          }
+    <>      
+      <RichTreeView
+        slots={{item: renderCustomTreeItem}}          
+        items={memoizedItems}            
+      />
+        {download && (<CircularProgress size={50} />)}
     </>
   );
 }

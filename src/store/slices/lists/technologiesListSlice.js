@@ -10,11 +10,12 @@ const initialState = {
   page: 1,
 };
 
+//поиск технологии
 export const fetchData = createAsyncThunk(
-  'components/fetchData',
+  'technologiesTree/fetchData',
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getcomponents.v0.php?search=${search}&&limit=${limit}&page=${page}`);
+      const response = await fetch('http://localhost/ivc/ogt/executescripts/gettechnologies.v2.php?search=&&limit=50&page=1');
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -26,23 +27,9 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-const componentsSlice = createSlice({
-  name: 'components',
+const technologiesListSlice = createSlice({
+  name: 'technologiesList',
   initialState,
-  reducers: {
-    setSearch: (state, action) => {
-      state.search = action.payload;
-      state.page = 1;
-      state.items = [];
-      state.hasMore = true;
-    },
-    setLimit: (state, action) => {
-      state.limit = action.payload;      
-    },
-    setPage: (state, action) => {
-       state.page = action.payload;
-    }
-  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchData.pending, (state) => {
@@ -67,14 +54,13 @@ const componentsSlice = createSlice({
         state.loading = false;
         state.hasMore = false;
         state.error = action.payload;
-      });
+      });                    
   },
 });
 
 //селекторы
-export const selectSearch = (state) => state.components.search;
-export const selectLimit = (state) => state.components.limit;
-export const selectPage = (state) => state.components.page;
+export const selectItems = (state) => state.technologiesList.items || [];
+export const selectLoading = (state) => state.technologiesList.loading;
+export const selectError = (state) => state.technologiesList.error;
 
-export const { setSearch, setLimit, setPage } = componentsSlice.actions;
-export default componentsSlice.reducer;
+export default technologiesListSlice.reducer;

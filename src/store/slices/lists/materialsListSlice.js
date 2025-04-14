@@ -11,10 +11,10 @@ const initialState = {
 };
 
 export const fetchData = createAsyncThunk(
-  'measuringTools/fetchData',
+  'materialsList/fetchData',
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getmeasuringtools.v0.php?search=${search}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getmaterials.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -26,8 +26,8 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-const measuringToolsSlice = createSlice({
-  name: 'measuringTools',
+const materialsListSlice = createSlice({
+  name: 'materialsList',
   initialState,
   reducers: {
     setSearch: (state, action) => {
@@ -72,9 +72,9 @@ const measuringToolsSlice = createSlice({
 });
 
 //селекторы
-export const selectSearch = (state) => state.measuringTools.search;
-export const selectLimit = (state) => state.measuringTools.limit;
-export const selectPage = (state) => state.measuringTools.page;
+export const selectSearch = (state) => state.materialsList.search;
+export const selectLimit = (state) => state.materialsList.limit;
+export const selectPage = (state) => state.materialsList.page;
 
-export const { setSearch, setLimit, setPage } = measuringToolsSlice.actions;
-export default measuringToolsSlice.reducer;
+export const { setSearch, setLimit, setPage } = materialsListSlice.actions;
+export default materialsListSlice.reducer;

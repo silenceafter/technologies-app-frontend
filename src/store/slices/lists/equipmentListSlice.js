@@ -11,10 +11,10 @@ const initialState = {
 };
 
 export const fetchData = createAsyncThunk(
-  'jobs/fetchData',
+  'equipmentList/fetchData',
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getjobs.v0.php?search=${search}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getEquipment.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -26,8 +26,8 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-const jobsSlice = createSlice({
-  name: 'jobs',
+const equipmentListSlice = createSlice({
+  name: 'equipmentList',
   initialState,
   reducers: {
     setSearch: (state, action) => {
@@ -53,8 +53,8 @@ const jobsSlice = createSlice({
         state.loading = false;
         const newItems = action.payload.data.filter(newItem => 
           !state.items.some(existingItem => {
-            return `${existingItem.code}-${existingItem.name}` === 
-                `${newItem.code}-${newItem.name}`;
+            return `${existingItem.name}-${existingItem.type}` === 
+                `${newItem.name}-${newItem.type}`;
             })
         );
         //
@@ -72,9 +72,9 @@ const jobsSlice = createSlice({
 });
 
 //селекторы
-export const selectSearch = (state) => state.jobs.search;
-export const selectLimit = (state) => state.jobs.limit;
-export const selectPage = (state) => state.jobs.page;
+export const selectSearch = (state) => state.equipmentList.search;
+export const selectLimit = (state) => state.equipmentList.limit;
+export const selectPage = (state) => state.equipmentList.page;
 
-export const { setSearch, setLimit, setPage } = jobsSlice.actions;
-export default jobsSlice.reducer;
+export const { setSearch, setLimit, setPage } = equipmentListSlice.actions;
+export default equipmentListSlice.reducer;

@@ -29,6 +29,8 @@ const TechnologySearch = React.memo(({ props, selectedValue, onChange}) => {
   const error = useSelector((state) => state.technologies.searchingError);
   const hasMore = useSelector((state) => state.technologies.searchingHasMore);
 
+  const bb = useSelector((state) => state.technologies.items);
+
   //эффекты
   /*useEffect(() => {
       setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
@@ -71,7 +73,7 @@ const TechnologySearch = React.memo(({ props, selectedValue, onChange}) => {
   };*/
   return (
     <>
-    {console.log(selectedValue)}
+    {console.log(items)}
         <Autocomplete          
           options={items || []}
           getOptionLabel={(option) => option == null || option == undefined ? '' : `${option.code} ${option.name}`}

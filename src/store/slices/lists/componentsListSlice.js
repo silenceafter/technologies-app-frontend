@@ -11,10 +11,10 @@ const initialState = {
 };
 
 export const fetchData = createAsyncThunk(
-  'equipment/fetchData',
+  'componentsList/fetchData',
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getEquipment.v0.php?search=${search}&&limit=${limit}&page=${page}`);
+      const response = await fetch(`http://localhost/ivc/ogt/executescripts/getcomponents.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -26,8 +26,8 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-const equipmentSlice = createSlice({
-  name: 'equipment',
+const componentsListSlice = createSlice({
+  name: 'componentsList',
   initialState,
   reducers: {
     setSearch: (state, action) => {
@@ -53,8 +53,8 @@ const equipmentSlice = createSlice({
         state.loading = false;
         const newItems = action.payload.data.filter(newItem => 
           !state.items.some(existingItem => {
-            return `${existingItem.name}-${existingItem.type}` === 
-                `${newItem.name}-${newItem.type}`;
+            return `${existingItem.code}-${existingItem.name}` === 
+                `${newItem.code}-${newItem.name}`;
             })
         );
         //
@@ -72,9 +72,9 @@ const equipmentSlice = createSlice({
 });
 
 //селекторы
-export const selectSearch = (state) => state.equipment.search;
-export const selectLimit = (state) => state.equipment.limit;
-export const selectPage = (state) => state.equipment.page;
+export const selectSearch = (state) => state.componentsList.search;
+export const selectLimit = (state) => state.componentsList.limit;
+export const selectPage = (state) => state.componentsList.page;
 
-export const { setSearch, setLimit, setPage } = equipmentSlice.actions;
-export default equipmentSlice.reducer;
+export const { setSearch, setLimit, setPage } = componentsListSlice.actions;
+export default componentsListSlice.reducer;
