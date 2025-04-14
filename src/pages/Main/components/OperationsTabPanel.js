@@ -18,10 +18,11 @@ import { MemoizedTabPanel as TabPanel } from '../components/TabPanel';
 import { TechnologyBreadcrumbs } from '../components/TechnologyBreadcrumbs';
 import { MemoizedTabs } from '../components/MemoizedTabs';
 
-import { setTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs } from '../../../store/slices/operationsSlice';
+//import { setTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs } from '../../../store/slices/operationsSlice';
 import {
   selectItems as technologiesSelectItems, 
-  selectLoading as technologiesSelectLoading
+  selectLoading as technologiesSelectLoading,
+  setTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs
 } from '../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
@@ -39,16 +40,12 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   //селекторы
   const currentTechnology = useSelector(selectTechnology);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
-  const { tabs, tabValue, tabCnt, expandedPanelsDefault, shouldReloadTabs } = useSelector((state) => state.operations);
+  const { tabs, tabValue, tabCnt, expandedPanelsDefault, shouldReloadTabs } = useSelector((state) => state.technologies);
   const technologiesItems = useSelector(technologiesSelectItems);
   const technologiesLoading = useSelector(technologiesSelectLoading);
   const operationsSelectors = useSelector(selectOperations);
   const operationsItems = operationsSelectors?.items;
   const operationsLoading = operationsSelectors?.loading;
-
-  /*const showLoading = useMemo(() => {
-    return loadingTimer || technologiesLoading;
-  }, [loadingTimer, technologiesLoading]);*/
 
   //события
   const handleAddTab = useCallback(() => {
@@ -160,36 +157,36 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   }, [operationsItems, operationsLoading]);
   
   //стейт вкладок/карточек
-  useEffect(() => {
+  /*useEffect(() => {
     try {
       if (!technologiesLoading && (tabs.length === 0 && !isUserClosedAllTabs || shouldReloadTabs) 
         && technologiesItems.length > 0 && drawingExternalCode.length > 0) {
           //изначально вкладки создаются из technologiesItems 
           const newTabs = technologiesItems[0].children
-            .filter(operation => operation.orderNumber)
+            .filter(operation => operation.content.dbValues.orderNumber)
             .map(operation => {
               // Ищем существующую вкладку, чтобы сохранить ошибки и состояние панелей
-              const existingTab = tabs.find(tab => tab.id === operation.orderNumber);
+              const existingTab = tabs.find(tab => tab.id === operation.content.dbValues.orderNumber);
               const data = {                
                 //parameters
-                orderNumber: operation.orderNumber,
-                operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.proxyOId },                
-                shopNumber: operation.parameters.shopNumber,
-                areaNumber: operation.parameters.areaNumber,
-                document: operation.parameters.document,
-                operationDescription: operation.parameters.operationDescription,
+                orderNumber: operation.content.dbValues.orderNumber,
+                operationCode: { code: operation.label, name: operation.secondaryLabel, cnt: operation.proxy.proxyOId },                
+                shopNumber: operation.content.dbValues.shopNumber,
+                areaNumber: operation.content.dbValues.areaNumber,
+                document: operation.content.dbValues.document,
+                operationDescription: operation.content.dbValues.operationDescription,
               
                 //jobs  
-                grade: operation.jobs.grade,
-                workingConditions: operation.jobs.workingConditions,
-                numberOfWorkers: operation.jobs.numberOfWorkers,
-                numberOfProcessedParts: operation.jobs.numberOfProcessedParts,
-                laborEffort: operation.jobs.laborEffort,
-                job: { code: operation.jobs.jobCode, name: operation.jobs.jobName },
+                grade: operation.content.dbValues.grade,
+                workingConditions: operation.content.dbValues.workingConditions,
+                numberOfWorkers: operation.content.dbValues.numberOfWorkers,
+                numberOfProcessedParts: operation.content.dbValues.numberOfProcessedParts,
+                laborEffort: operation.content.dbValues.laborEffort,
+                job: { code: operation.content.dbValues.jobCode, name: operation.content.dbValues.jobName },
               };
               //
               return {
-                id: operation.orderNumber,
+                id: operation.content.dbValues.orderNumber,
                 label: `${operation.secondaryLabel} (${operation.label})`,                
                 operation: { code: operation.label, name: operation.secondaryLabel },
                 technology: {
@@ -209,8 +206,8 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
                   isDeleted: false,
                 },
                 proxy: {
-                  proxyDTId: operation.proxyDTId,
-                  proxyTOId: operation.proxyTOId,
+                  proxyDTId: operation.proxy.proxyDTId,
+                  proxyTOId: operation.proxy.proxyTOId,
                   keyHex: technologiesItems[0].keyHex,
                   ivHex: technologiesItems[0].ivHex
                 }
@@ -228,7 +225,7 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
     } catch (error) {
       console.error("Ошибка при обработке технологий:", error);
     }
-  }, [technologiesLoading, technologiesItems, drawingExternalCode, /*tabs, isUserClosedAllTabs,*/ shouldReloadTabs]);
+  }, [technologiesLoading, technologiesItems, drawingExternalCode, shouldReloadTabs]);*/
 
   //очистить стейт вкладок/карточек
   useEffect(() => {

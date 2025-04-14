@@ -11,6 +11,14 @@ const initialState = {
   loading: LOADING_DEFAULT,
   error: null,
   newItemCnt: 1,
+  //
+  tabs: [],
+  tabValue: 0,
+  tabCnt: 1,
+  validateForm: false,
+  loadingTabs: false,
+  errorTabs: null,
+  shouldReloadTabs: false,
 };
 
 const generateUUID = () => {
@@ -105,44 +113,6 @@ const technologiesSlice = createSlice({
   name: 'technologies',
   initialState,
   reducers: {
-    clearItems: (state) => {
-      return {
-        ...state,
-        items: [],
-        loading: LOADING_DEFAULT
-      }
-    },
-    /*setItems: (state, action) => {
-      switch(action.payload.type) {
-        case 'delete':
-          return {
-            ...state,
-            items: state.items
-              .filter(item => !action.payload.selectedItems.includes(item.id))
-              .map(item => ({
-                ...item,
-                children: item.children
-                  ? item.children.filter(child => !action.payload.selectedItems.includes(child.id))
-                  : item.children
-              }))
-          };
-
-        default:
-          return state;
-      }        
-    },*/
-    setSelectedItems: (state, action) => {
-      return {
-        ...state,
-        selectedItems: action.payload
-      };
-    },
-    setSelectedItemId: (state, action) => {
-      return {
-        ...state,
-        selectedItemId: action.payload,
-      };
-    },
     addItems: (state, action) => {
       return {
         ...state,
@@ -150,14 +120,63 @@ const technologiesSlice = createSlice({
         items: [...state.items, { id: generateUUID(), label: action.payload.code, secondaryLabel: action.payload.name, children: [], parentId: null, type: 'technology' }]
       };
     },
-    /*addSelectedItems: (state, action) => {
+    clearItems: (state) => {
       return {
         ...state,
-        selectedItems: state.selectedItems.includes(action.payload)
-          ? state.selectedItems
-          : [...state.selectedItems, action.payload]
+        items: [],
+        loading: LOADING_DEFAULT
+      }
+    },
+    restoreItems: (state, action) => {
+      const targetItemIds = Array.isArray(action.payload) ? action.payload : [action.payload]; //если передан один itemId, преобразуем его в массив
+      let parentId = null;
+      let foundItem = null;
+
+      //поиск элемента и его родителя
+      const findItemAndParent = (items, parent = null) => {
+        for (const item of items) {
+          if (targetItemIds.includes(item.id)) {  //проверяем, что itemId есть в targetItemIds
+            foundItem = item;
+            parentId = parent ? parent.id : null;
+            return;
+          }
+          if (item.children) {
+            findItemAndParent(item.children, item);
+          }
+        }
       };
-    },*/
+
+      //запускаем поиск по всей структуре items
+      targetItemIds.forEach(itemId => {
+        if (!foundItem) {
+          findItemAndParent(state.items); //ищем каждый itemId из payload
+        }
+      });
+
+      //если элемент не найден — ничего не делаем
+      if (!foundItem) return state;
+
+      //получаем id всех детей, если это родительский элемент
+      const childrenIds = foundItem.children?.map(child => child.id) || [];
+
+      //собираем все id, которые нужно восстановить (элемент + его дети + родитель, если есть)
+      const itemsToRestore = [...targetItemIds, ...childrenIds];
+      if (parentId) {
+        itemsToRestore.push(parentId);
+      }
+
+      return {
+        ...state,
+        //убираем эти id из disabledItems
+        disabledItems: state.disabledItems.filter(itemId => !itemsToRestore.includes(itemId)),
+      };
+    },
+    setSelectedItems: (state, action) => {
+      return {
+        ...state,
+        selectedItems: action.payload
+      };
+    },
     deleteSelectedItems: (state, action) => {
       const targetItemIds = Array.isArray(action.payload) ? action.payload : [action.payload];
 
@@ -259,76 +278,167 @@ const technologiesSlice = createSlice({
         }))
       };*/
     },
-    /*setDisabledItems: (state, action) => {
+    setSelectedItemId: (state, action) => {
       return {
         ...state,
-        disabledItems: action.payload
+        selectedItemId: action.payload,
       };
-    },*/
-    restoreItems: (state, action) => {
-      const targetItemIds = Array.isArray(action.payload) ? action.payload : [action.payload]; //если передан один itemId, преобразуем его в массив
-      let parentId = null;
-      let foundItem = null;
-
-      //поиск элемента и его родителя
-      const findItemAndParent = (items, parent = null) => {
-        for (const item of items) {
-          if (targetItemIds.includes(item.id)) {  //проверяем, что itemId есть в targetItemIds
-            foundItem = item;
-            parentId = parent ? parent.id : null;
-            return;
-          }
-          if (item.children) {
-            findItemAndParent(item.children, item);
-          }
-        }
+    },
+    setTabs: (state, action) => {
+      return {
+        ...state,
+        tabs: action.payload,
+        tabCnt: action.payload.length + 1,
+        activeTabId: action.payload.length > 0 ? action.payload[0].id : null
       };
+    },
+    resetTabs: (state) => {
+      return {
+        ...state,
+        tabs: [],
+        tabCnt: 1,
+      };
+    },
+    addTab: (state, action) => {
+      return {
+        ...state,
+        tabs: [...state.tabs, action.payload],
+        tabCnt: state.tabCnt + 1,
+      };
+    },
+    removeTab: (state, action) => {
+      const updatedTabs = state.tabs.filter((tab) => tab.id !== action.payload);
+      return {
+        ...state,
+        tabs: updatedTabs,
+      };
+    },
+    updateTab: (state, action) => {
+      //обновить вкладку
+      const { id, newContent, newValidateForm } = action.payload;
 
-      //запускаем поиск по всей структуре items
-      targetItemIds.forEach(itemId => {
-        if (!foundItem) {
-          findItemAndParent(state.items); //ищем каждый itemId из payload
+      //orderNumber
+      //operationCode
+      let operationCode = { code: id, name: 'Новая операция' };
+
+      //если операция изменена
+      if (newContent.changedValues.hasOwnProperty('operationCode')) {
+        if (newContent.changedValues.operationCode) {
+          operationCode.code = newContent.changedValues.operationCode.code;
+          operationCode.name = newContent.changedValues.operationCode.name;
         }
-      });
-
-      //если элемент не найден — ничего не делаем
-      if (!foundItem) return state;
-
-      //получаем id всех детей, если это родительский элемент
-      const childrenIds = foundItem.children?.map(child => child.id) || [];
-
-      //собираем все id, которые нужно восстановить (элемент + его дети + родитель, если есть)
-      const itemsToRestore = [...targetItemIds, ...childrenIds];
-      if (parentId) {
-        itemsToRestore.push(parentId);
+      } else {
+        const tab = state.tabs.find(tab => tab.id === id);
+        if (tab.content.formValues.hasOwnProperty('operationCode')) {
+          operationCode = tab.content.formValues.operationCode;
+        }
       }
 
+      //areaNumber
+      let areaNumber = null;
+      if (newContent.changedValues.hasOwnProperty('areaNumber')) {
+        if (newContent.changedValues.areaNumber) {
+          areaNumber = newContent.changedValues.areaNumber;
+        }
+      }
+
+      //document
+      let document = null;
+      if (newContent.changedValues.hasOwnProperty('document')) {
+        if (newContent.changedValues.document) {
+          document = newContent.changedValues.document;
+        }
+      }
+
+      //operationDescription
+      let operationDescription = null;
+      if (newContent.changedValues.hasOwnProperty('operationDescription')) {
+        if (newContent.changedValues.operationDescription) {
+          operationDescription = newContent.changedValues.operationDescription;
+        }
+      }
+
+      //grade
+      let grade = null;
+      if (newContent.changedValues.hasOwnProperty('grade')) {
+        if (newContent.changedValues.grade) {
+          grade = newContent.changedValues.grade;
+        }
+      }
+
+      //workingConditions
+      let workingConditions = null;
+      if (newContent.changedValues.hasOwnProperty('workingConditions')) {
+        if (newContent.changedValues.workingConditions) {
+          workingConditions = newContent.changedValues.workingConditions;
+        }
+      }
+
+      //numberOfWorkers
+      let numberOfWorkers = null;
+      if (newContent.changedValues.hasOwnProperty('numberOfWorkers')) {
+        if (newContent.changedValues.numberOfWorkers) {
+          numberOfWorkers = newContent.changedValues.numberOfWorkers;
+        }
+      }
+
+      //numberOfProcessedParts
+      let numberOfProcessedParts = null;
+      if (newContent.changedValues.hasOwnProperty('numberOfProcessedParts')) {
+        if (newContent.changedValues.numberOfProcessedParts) {
+          numberOfProcessedParts = newContent.changedValues.numberOfProcessedParts;
+        }
+      }
+
+      //laborEffort
+      let laborEffort = null;
+      if (newContent.changedValues.hasOwnProperty('laborEffort')) {
+        if (newContent.changedValues.laborEffort) {
+          laborEffort = newContent.changedValues.laborEffort;
+        }
+      }
+
+      //jobCode
+      //jobName
+      //
       return {
         ...state,
-        //убираем эти id из disabledItems
-        disabledItems: state.disabledItems.filter(itemId => !itemsToRestore.includes(itemId)),
+        tabs: state.tabs.map((tab) =>
+          tab.id === id
+            ? {
+                ...tab,
+                content: {
+                  ...tab.content,
+                  formValues: newContent.formValues,
+                  formErrors: newContent.formErrors /*|| tab.content.formErrors*/,
+                  expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
+                  changedValues: newContent.changedValues,
+                  isDeleted: newContent.isDeleted /*|| tab.content.isDeleted*/,
+                },
+                operation: {
+                  ...tab.operation,
+                  code: operationCode.code,
+                  name: operationCode.name,
+                },
+                label: `${operationCode.name} (${operationCode.code})`,
+                validateForm: newValidateForm || tab.validateForm,
+              }
+            : tab
+        ),
       };
     },
-    /*addEditedItems: (state, action) => {
+    setTabValue: (state, action) => {
       return {
         ...state,
-        editedItems: state.editedItems.includes(action.payload)
-          ? state.editedItems
-          : [...state.editedItems, action.payload] 
+        tabValue: action.payload,
+      }
+    },
+    setShouldReloadTabs: (state, action) => {
+      return {
+        ...state,
+        shouldReloadTabs: action.payload
       };
-    },*/
-    /*setSearch: (state, action) => {
-      state.search = action.payload;
-      state.page = 1;
-      state.searchedItems = [];
-      state.searchedHasMore = true;
     },
-    setLimit: (state, action) => {
-      state.limit = action.payload;      
-    },
-    setPage: (state, action) => {
-       state.page = action.payload;
-    }*/
   },
   extraReducers: (builder) => {
     builder
@@ -351,7 +461,8 @@ export const {
   clearItems, addItems,
   setSelectedItems, deleteSelectedItems,
   setSelectedItemId,
-  restoreItems
+  restoreItems,
+  setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs
 } = technologiesSlice.actions;
 
 //селекторы

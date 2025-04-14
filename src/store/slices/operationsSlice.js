@@ -193,27 +193,6 @@ const operationsSlice = createSlice({
         tabValue: action.payload,
       }
     },
-    /*toggleValidateFormInSlice: (state) => {
-      state.validateForm = !state.validateForm;
-    },*/
-    /*incrementTabCnt: (state) => {
-      return {
-        ...state,
-        tabCnt: state.tabCnt + 1,
-      };
-    },
-    decrementTabCnt: (state) => {
-      return {
-        ...state,
-        tabCnt: state.tabCnt - 1,
-      }
-    },
-    incrementTabValue: (state) => {
-      return {
-        ...state,
-        tabValue: state.tabValue + 1,
-      };
-    },*/
     setShouldReloadTabs: (state, action) => {
       return {
         ...state,

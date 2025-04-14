@@ -83,6 +83,7 @@ const TechnologiesTree = () => {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [newTechnology, setNewTechnology] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
 
   //селекторы
   const dispatch = useDispatch();
@@ -125,6 +126,10 @@ const TechnologiesTree = () => {
       paddingLeft: 18,
       borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
     },
+    /*[`&[data-selected="true"] .${treeItemClasses.content}`]: {
+      backgroundColor: theme.palette.primary.light,
+      color: theme.palette.primary.contrastText,
+    },*/
     ...theme.applyStyles('light', {
       color: theme.palette.grey[800],
     }),
@@ -170,7 +175,8 @@ const TechnologiesTree = () => {
         {<div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
           {type == 'technology' && (
             <TreeItem2IconContainer>
-              <EditOutlinedIcon color="success" />
+              {/*<EditOutlinedIcon color="success" />*/}
+              <AdjustIcon color="primary" />
             </TreeItem2IconContainer>
           )}        
             {/*type == 'technology' && focused && (
@@ -214,8 +220,8 @@ const TechnologiesTree = () => {
 
     //expanded
     const handleRootClick = (e) => {
-      //записать выбранную технологию
-      handleCustomTreeItemClick(e, props.itemId);
+      setSelectedId(props.itemId);      
+      handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию      
       //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
       const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
       if (isIconClick) {
@@ -235,7 +241,11 @@ const TechnologiesTree = () => {
     const classes = useStyles({ itemType: item.type});
     //дополнительный код
     const additionalItem = (
-      <Box className={classes.technologyCustomClass} key={props.itemId} sx={{ display: 'flex', alignItems: 'center', width: '100%'}} /*onDoubleClick={handleDoubleClick}*/>
+      <Box 
+        className={classes.technologyCustomClass} 
+        key={props.itemId} 
+        sx={{ display: 'flex', alignItems: 'center', width: '100%'}}
+      >
         <span>{props.label}</span>
       </Box>
     );    
@@ -244,7 +254,6 @@ const TechnologiesTree = () => {
       <>
       <StyledTreeItem2
         {...props}
-        ref={ref}
         slots={{
           label: CustomLabel
         }}
@@ -257,13 +266,16 @@ const TechnologiesTree = () => {
             type: item?.type,
             labelRef: labelRef,
             focused: isFocused,
-            pp: props.itemId,
+            pp: props.itemId
           },
         }}
-        id={`StyledTreeItem2-${props.itemId}`}
-        onClick={item.type === 'technology' ? handleRootClick : handleChildClick}
+        id={`StyledTreeItem2-${props.itemId}`}        
         label={additionalItem}
         expanded={expanded}
+        ref={ref}
+        data-component-type={item.type}
+        data-selected={selectedId === props.itemId}
+        onClick={item.type === 'technology' ? handleRootClick : handleChildClick}
       >
         { isProcessing && !dataLoaded ? (
           <Box
@@ -367,7 +379,6 @@ const TechnologiesTree = () => {
   useEffect(() => {
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
-    //setDevelopedTechnologies(allItemIds);
   }, [items]);
 
   //chip для выбранной технологии
@@ -449,10 +460,6 @@ const TechnologiesTree = () => {
   const handleDialogClose = () => {
     setOpen(false);
   };
-
-  const handleDialogSubmit = () => {
-    handleDialogClose();
-  };
   
   //вывод
   if (loadingTimer) {
@@ -472,18 +479,18 @@ const TechnologiesTree = () => {
       <MemoizedRichTreeView
         checkboxSelection
         multiSelect
+        apiRef={apiRef}
         slots={{ item: renderCustomTreeItem }}
         items={items}
-        expandedItems={expandedItems}
-        onItemExpansionToggle={handleItemExpansionToggle}
         disabledItems={disabledItems}
-        disabledItemsFocusable={true}        
-        isItemDisabled={(item) => disabledItems.includes(item.id)}
-        expansionTrigger='iconContainer'                
-        apiRef={apiRef}
+        expandedItems={expandedItems}
         selectedItems={selectedItems}
+        onItemExpansionToggle={handleItemExpansionToggle}
         onSelectedItemsChange={handleSelectedItemsChange}
         onItemSelectionToggle={handleItemSelectionToggle}
+        isItemDisabled={(item) => disabledItems.includes(item.id)}
+        disabledItemsFocusable={true}                        
+        expansionTrigger='iconContainer'                                   
       />                        
       <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
         {drawingExternalCode && (
