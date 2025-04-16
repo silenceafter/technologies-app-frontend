@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { 
   Box, 
   Button, 
-  Chip, 
+  Chip,
+  Checkbox,
   CircularProgress, 
   Dialog, 
   DialogActions, 
@@ -37,9 +38,10 @@ import {
 import {  
   addItems,
   setSelectedItems, 
-  setSelectedItemId,
+  setSelectedId,
   deleteSelectedItems,
-  restoreItems
+  restoreItems, 
+  setCheckedItems
 } from '../../../store/slices/technologiesSlice';
 import { fetchData } from '../../../store/slices/lists/technologiesListSlice';
 import { resetTabs } from '../../../store/slices/operationsSlice';
@@ -83,7 +85,6 @@ const TechnologiesTree = () => {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [newTechnology, setNewTechnology] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
 
   //селекторы
   const dispatch = useDispatch();
@@ -92,7 +93,7 @@ const TechnologiesTree = () => {
   const error = useSelector((state) => state.technologies.error);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const technologySelector = useSelector(selectTechnology);
-  const { selectedItems, disabledItems } = useSelector((state) => state.technologies);
+  const { /*selectedItems,*/ disabledItems, checkedItems, selectedId } = useSelector((state) => state.technologies);
 
   //refs
   const itemRef = useRef(null);
@@ -126,10 +127,12 @@ const TechnologiesTree = () => {
       paddingLeft: 18,
       borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
     },
-    /*[`&[data-selected="true"] .${treeItemClasses.content}`]: {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.primary.contrastText,
-    },*/
+    [`&[data-component-type="technology"] .${treeItemClasses.content}`]: {
+      cursor: 'pointer',
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.primary.main, 0.1),
+      },
+    },
     ...theme.applyStyles('light', {
       color: theme.palette.grey[800],
     }),
@@ -142,21 +145,25 @@ const TechnologiesTree = () => {
     })
   }));
 
-  function CustomLabel({ children, className, secondaryLabel, onLabelClick, onSecondaryLabelClick, customLabel, type, labelRef, focused, pp }) {
+  function CustomLabel({ className, secondaryLabel, customLabel, type, labelRef, focused, pp }) {
+    const dispatch = useDispatch();
     //стейты
-    const [isFocused, setIsFocused] = useState(false);
-    const [value, setValue] = useState(customLabel);  
+    const [value, setValue] = useState(customLabel);
+    //селекторы
+    const checkedItems = useSelector((state) => state.technologies.checkedItems);
     //
-    return (
+    return (<>
       <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }} ref={labelRef}>
-        <div style={{ width: '800%', display: 'flex', flexDirection: 'column' }}>          
-          <Typography 
-            onClick={(e) => { 
-              e.stopPropagation();                
-              //setIsEditing(true);                
-              // onLabelClick?.(e);                
-            }}
-          >
+        <Checkbox
+          checked={checkedItems.includes(pp)}
+          onClick={(e) => {
+            e.stopPropagation();
+            dispatch(setCheckedItems(pp));
+            dispatch(setSelectedId(pp));
+          }}
+        />
+        <div style={{ width: '800%', display: 'flex', flexDirection: 'column' }}>
+          <Typography>
             {value}
           </Typography>                    
           {secondaryLabel && (
@@ -164,8 +171,6 @@ const TechnologiesTree = () => {
               <Typography
                 variant="caption" 
                 color="secondary" 
-                onClick={(e) => { 
-                }}
               >
                 {secondaryLabel}
               </Typography>
@@ -173,23 +178,23 @@ const TechnologiesTree = () => {
           )}          
         </div>
         {<div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
-          {type == 'technology' && (
+          {/*bb && (
             <TreeItem2IconContainer>
-              {/*<EditOutlinedIcon color="success" />*/}
+              {/*<EditOutlinedIcon color="success" />*//*}
               <AdjustIcon color="primary" />
             </TreeItem2IconContainer>
-          )}        
+          )*/}        
             {/*type == 'technology' && focused && (
               <TreeItem2IconContainer>
                 <AdjustIcon color="primary" />
             </TreeItem2IconContainer>
             )*/}
         </div>}
-      </div>
+      </div></>
     );
   }
   
-  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ ...props }, ref) {
+  const CustomTreeItem = React.forwardRef(function CustomTreeItem({ onClick, ...props }, ref) {
     const dispatch = useDispatch();
     const { publicAPI } = useTreeItem2Utils({
       itemId: props.itemId,
@@ -215,21 +220,21 @@ const TechnologiesTree = () => {
     useEffect(() => {
       setExpanded(expandedItems.includes(props.itemId));
       setDisabled(disabledItems.includes(props.itemId));
-      setSelected(selectedItems.includes(props.itemId));
-    }, [expandedItems, disabledItems, selectedItems, props.itemId]);
+      /*setSelected(selectedItems.includes(props.itemId));*/
+    }, [expandedItems, disabledItems, /*selectedItems,*/, props.itemId]);
 
     //expanded
     const handleRootClick = (e) => {
-      setSelectedId(props.itemId);      
-      handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию      
+      //handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию  
       //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
-      const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
+      dispatch(setSelectedId(item.id));
+      /*const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
       if (isIconClick) {
         e.stopPropagation();
-        setExpanded((prev) => !prev);
+        setExpanded((prev) => !prev);           
         handleItemExpansionToggle(null, props.itemId, !expanded);
-        return; 
-      }
+        return;
+      }*/
     };
   
     const handleChildClick = (e) => {
@@ -238,9 +243,26 @@ const TechnologiesTree = () => {
       handleCustomTreeItemClick(e, props.itemId);
     };
 
+    const handleClick = (e) => {
+      e.stopPropagation();
+      //handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию  
+      //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
+      dispatch(setSelectedId(item.id));
+      /*const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
+      if (isIconClick) {
+        e.stopPropagation();
+        setExpanded((prev) => !prev);           
+        handleItemExpansionToggle(null, props.itemId, !expanded);
+        return;
+      }*/
+      if (onClick) {
+        onClick(e);
+      }
+    };
+
     const classes = useStyles({ itemType: item.type});
     //дополнительный код
-    const additionalItem = (
+    /*const additionalItem = (
       <Box 
         className={classes.technologyCustomClass} 
         key={props.itemId} 
@@ -248,7 +270,7 @@ const TechnologiesTree = () => {
       >
         <span>{props.label}</span>
       </Box>
-    );    
+    );*/    
     //
     return (
       <>
@@ -260,22 +282,20 @@ const TechnologiesTree = () => {
         slotProps={{
           label: { 
             secondaryLabel: item?.secondaryLabel || '',
-            onLabelClick: (e) => console.log('onLabelClick'),
-            onSecondaryLabelClick: (e) => console.log('onSecondaryLabelClick'),
+            /*onLabelClick: (e) => console.log('onLabelClick'),
+            onSecondaryLabelClick: (e) => console.log('onSecondaryLabelClick')*/
             customLabel: item?.label || '',
             type: item?.type,
             labelRef: labelRef,
-            focused: isFocused,
-            pp: props.itemId
+            pp: props.itemId,
           },
         }}
-        id={`StyledTreeItem2-${props.itemId}`}        
-        label={additionalItem}
+        id={`StyledTreeItem2-${props.itemId}`}
+        /*label={additionalItem}*/
         expanded={expanded}
         ref={ref}
         data-component-type={item.type}
-        data-selected={selectedId === props.itemId}
-        onClick={item.type === 'technology' ? handleRootClick : handleChildClick}
+        onClick={handleClick}        
       >
         { isProcessing && !dataLoaded ? (
           <Box
@@ -307,11 +327,12 @@ const TechnologiesTree = () => {
           key={props.itemId}
           ref={itemRef}
           onContextMenu={(event) => handleContextMenu(event, props.itemId)}
+          /*onClick={() => console.log('itemclick')}*/
         />
       );
     },
     [itemRef]
-  );
+  );  
 
   const handleItemExpansionToggle = useCallback((event, nodeId, expanded) => {
     setExpandedItems((prevExpanded) => {
@@ -327,12 +348,13 @@ const TechnologiesTree = () => {
     toggledItemRef.current[itemId] = isSelected;
   }, []);
 
-  const handleSelectedItemsChange = useCallback((event, newSelectedItems) => {
-    dispatch(setSelectedItems(newSelectedItems));//setSelectedItems(newSelectedItems);
+  /*const handleSelectedItemsChange = useCallback((event, newSelectedItems) => {
+    dispatch(setSelectedItems(newSelectedItems));
     const itemsToSelect = [];
     const itemsToUnSelect = {};
     Object.entries(toggledItemRef.current).forEach(([itemId, isSelected]) => {
       const item = apiRef.current.getItem(itemId);
+      //
       if (isSelected) {
         itemsToSelect.push(...getItemDescendantsIds(item));
       } else {
@@ -349,13 +371,13 @@ const TechnologiesTree = () => {
         ),
       ),
     );
-    dispatch(setSelectedItems(newSelectedItemsWithChildren));//setSelectedItems(newSelectedItemsWithChildren);
+    dispatch(setSelectedItems(newSelectedItemsWithChildren));
     toggledItemRef.current = {};
-  }, [apiRef, dispatch, getItemDescendantsIds]);
+  }, [apiRef, dispatch, getItemDescendantsIds]);*/
 
   //selected, CustomTreeItem
   const handleCustomTreeItemClick = (event, itemId) => {
-    dispatch(setSelectedItemId(itemId));
+    //dispatch(setSelectedId(itemId));
   };
 
   //эффекты
@@ -369,7 +391,7 @@ const TechnologiesTree = () => {
     }
   }, [drawingExternalCode]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     //для expandedItems
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
@@ -379,7 +401,7 @@ const TechnologiesTree = () => {
   useEffect(() => {
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
-  }, [items]);
+  }, [items]);*/
 
   //chip для выбранной технологии
   const handleDelete = () => {
@@ -394,6 +416,13 @@ const TechnologiesTree = () => {
     dispatch(fetchData({search: '', limit: 50, page: 1}));
   }, [dispatch]);
 
+  /*useEffect(() => {
+    if (items.length > 0) {
+      setSelectedId(items[0].id);
+      dispatch(setSelectedItems([items[0].id]));
+    }
+  }, [items, dispatch]);*/
+
   /*const technologyChip = useMemo(() => {
     return '111';//return `${technologySelector.name}: ${technologySelector.code}`;
   }, [technologySelector]);*/
@@ -401,7 +430,7 @@ const TechnologiesTree = () => {
   const handleSpeedDialActionClick = useCallback((action) => {
     switch(action.name) {
       case 'delete':
-        dispatch(deleteSelectedItems(selectedItems));
+        //dispatch(deleteSelectedItems(selectedItems));
         break;
 
       case 'restoreAll':
@@ -416,7 +445,7 @@ const TechnologiesTree = () => {
         //dispatch(addItems());
         break;
     }
-  }, [selectedItems, disabledItems]);
+  }, [/*selectedItems,*/ disabledItems]);
 
   //контекстное меню
   const handleContextMenu = (event, nodeId) => {
@@ -443,8 +472,8 @@ const TechnologiesTree = () => {
   };
 
   const handleContextMenuItemDelete = (node) => {
-    dispatch(deleteSelectedItems(node));
-    handleContextMenuClose();
+    /*dispatch(deleteSelectedItems(node));
+    handleContextMenuClose();*/
   };
 
   const handleContextMenuItemRename = (node) => {
@@ -477,20 +506,19 @@ const TechnologiesTree = () => {
   return (
     <>
       <MemoizedRichTreeView
-        checkboxSelection
         multiSelect
         apiRef={apiRef}
         slots={{ item: renderCustomTreeItem }}
         items={items}
         disabledItems={disabledItems}
         expandedItems={expandedItems}
-        selectedItems={selectedItems}
+        /*selectedItems={selectedItems}*/
         onItemExpansionToggle={handleItemExpansionToggle}
-        onSelectedItemsChange={handleSelectedItemsChange}
+        /*onSelectedItemsChange={handleSelectedItemsChange}*/
         onItemSelectionToggle={handleItemSelectionToggle}
         isItemDisabled={(item) => disabledItems.includes(item.id)}
         disabledItemsFocusable={true}                        
-        expansionTrigger='iconContainer'                                   
+        /*expansionTrigger='iconContainer'*/        
       />                        
       <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
         {drawingExternalCode && (

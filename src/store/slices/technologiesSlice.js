@@ -5,9 +5,10 @@ const LOADING_DEFAULT = false;
 const initialState = {
   items: [], /* основные элементы дерева */
   selectedItems: [], /* выделенные элементы */
+  checkedItems: [], /* чекбоксы */
   disabledItems: [], /* помеченные на удаление */
   editedItems: [], /* редактируемые элементы */
-  selectedItemId: null,
+  selectedId: null,
   loading: LOADING_DEFAULT,
   error: null,
   newItemCnt: 1,
@@ -278,10 +279,10 @@ const technologiesSlice = createSlice({
         }))
       };*/
     },
-    setSelectedItemId: (state, action) => {
+    setSelectedId: (state, action) => {
       return {
         ...state,
-        selectedItemId: action.payload,
+        selectedId: action.payload,
       };
     },
     setTabs: (state, action) => {
@@ -439,6 +440,52 @@ const technologiesSlice = createSlice({
         shouldReloadTabs: action.payload
       };
     },
+    setCheckedItems: (state, action) => {
+      const id = action.payload;
+      const updatedCheckedItems = new Set(state.checkedItems);
+      const item = state.items.find(el => el.id === id);
+      const isParent = item?.children?.length > 0;
+      //
+      if (isParent) {
+        const childrenIds = item.children.map(child => child.id);
+        const allSelected = [id, ...childrenIds].every(childId => updatedCheckedItems.has(childId));
+        //
+        if (allSelected) {
+          //если все выбраны — снимаем выбор у всех
+          updatedCheckedItems.delete(id);
+          childrenIds.forEach(childId => updatedCheckedItems.delete(childId));
+        } else {
+          //добавляем всех (родителя и детей)
+          updatedCheckedItems.add(id);
+          childrenIds.forEach(childId => updatedCheckedItems.add(childId));
+        }
+      } else {
+        const isChecked = updatedCheckedItems.has(id);
+        //
+        if (isChecked) {
+          updatedCheckedItems.delete(id);
+        } else {
+          updatedCheckedItems.add(id);
+        }
+    
+        //проверяем, остались ли еще выбраны все дети — если да, включаем родителя, иначе — убираем
+        state.items.forEach(parent => {
+          if (parent.children?.some(child => child.id === id)) {
+            const allChildrenSelected = parent.children.every(child => updatedCheckedItems.has(child.id));
+            if (allChildrenSelected) {
+              updatedCheckedItems.add(parent.id);
+            } else {
+              updatedCheckedItems.delete(parent.id);
+            }
+          }
+        });
+      }
+      //
+      return {
+        ...state,
+        checkedItems: Array.from(updatedCheckedItems),
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -460,9 +507,9 @@ const technologiesSlice = createSlice({
 export const { 
   clearItems, addItems,
   setSelectedItems, deleteSelectedItems,
-  setSelectedItemId,
+  setSelectedId,
   restoreItems,
-  setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs
+  setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs, setCheckedItems
 } = technologiesSlice.actions;
 
 //селекторы

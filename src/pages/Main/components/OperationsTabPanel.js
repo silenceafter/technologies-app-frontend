@@ -244,7 +244,6 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   //
   return (
     <>
-    {console.log(tabs)}
       <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
         <Box sx={{ overflow: 'hidden' }}>
           <AppBar
