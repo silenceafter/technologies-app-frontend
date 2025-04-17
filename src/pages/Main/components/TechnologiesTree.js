@@ -133,6 +133,9 @@ const TechnologiesTree = () => {
         backgroundColor: alpha(theme.palette.primary.main, 0.1),
       },
     },
+    [`& .CustomTreeItemSelected`]: {
+      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+    },
     ...theme.applyStyles('light', {
       color: theme.palette.grey[800],
     }),
@@ -145,52 +148,64 @@ const TechnologiesTree = () => {
     })
   }));
 
-  function CustomLabel({ className, secondaryLabel, customLabel, type, labelRef, focused, pp }) {
+  function CustomLabel({ className, secondaryLabel, customLabel, type, labelRef, pp }) {
     const dispatch = useDispatch();
     //стейты
     const [value, setValue] = useState(customLabel);
     //селекторы
     const checkedItems = useSelector((state) => state.technologies.checkedItems);
+    const selectedId = useSelector((state) => state.technologies.selectedId);
     //
-    return (<>
-      <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }} ref={labelRef}>
-        <Checkbox
-          checked={checkedItems.includes(pp)}
-          onClick={(e) => {
-            e.stopPropagation();
-            dispatch(setCheckedItems(pp));
-            dispatch(setSelectedId(pp));
-          }}
-        />
-        <div style={{ width: '800%', display: 'flex', flexDirection: 'column' }}>
-          <Typography>
-            {value}
-          </Typography>                    
-          {secondaryLabel && (
-            <div>             
-              <Typography
-                variant="caption" 
-                color="secondary" 
-              >
-                {secondaryLabel}
-              </Typography>
-            </div>
-          )}          
-        </div>
-        {<div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
-          {/*bb && (
-            <TreeItem2IconContainer>
-              {/*<EditOutlinedIcon color="success" />*//*}
-              <AdjustIcon color="primary" />
-            </TreeItem2IconContainer>
-          )*/}        
-            {/*type == 'technology' && focused && (
+    return (
+      <>
+        <div 
+          className={selectedId.includes(pp) && type == 'technology' ? `${className} CustomTreeItemSelected` : className}
+          style={{
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            width: '100%'
+          }} 
+          ref={labelRef}
+        >
+          <Checkbox
+            checked={checkedItems.includes(pp)}
+            onClick={(e) => {
+              e.stopPropagation();
+              dispatch(setCheckedItems(pp));
+              dispatch(setSelectedId(pp));
+            }}
+          />
+          <div style={{ width: '800%', display: 'flex', flexDirection: 'column' }}>
+            <Typography>
+              {value}
+            </Typography>                    
+            {secondaryLabel && (
+              <div>             
+                <Typography
+                  variant="caption" 
+                  color="secondary" 
+                >
+                  {secondaryLabel}
+                </Typography>
+              </div>
+            )}          
+          </div>
+          {<div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
+            {/*bb && (
               <TreeItem2IconContainer>
+                {/*<EditOutlinedIcon color="success" />*//*}
                 <AdjustIcon color="primary" />
-            </TreeItem2IconContainer>
-            )*/}
-        </div>}
-      </div></>
+              </TreeItem2IconContainer>
+            )*/}        
+              {/*type == 'technology' && focused && (
+                <TreeItem2IconContainer>
+                  <AdjustIcon color="primary" />
+              </TreeItem2IconContainer>
+              )*/}
+          </div>}
+        </div>
+      </>
     );
   }
   
@@ -244,20 +259,21 @@ const TechnologiesTree = () => {
     };
 
     const handleClick = (e) => {
-      e.stopPropagation();
+      //e.stopPropagation();
       //handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию  
       //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
-      dispatch(setSelectedId(item.id));
+      
       /*const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
       if (isIconClick) {
         e.stopPropagation();
         setExpanded((prev) => !prev);           
-        handleItemExpansionToggle(null, props.itemId, !expanded);
+        handleItemExpansionToggle(null, props.itemId, !expanded);                
         return;
       }*/
+      dispatch(setSelectedId(item.id));
       if (onClick) {
         onClick(e);
-      }
+      }      
     };
 
     const classes = useStyles({ itemType: item.type});
@@ -391,7 +407,7 @@ const TechnologiesTree = () => {
     }
   }, [drawingExternalCode]);
 
-  /*useEffect(() => {
+  useEffect(() => {
     //для expandedItems
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
@@ -401,7 +417,7 @@ const TechnologiesTree = () => {
   useEffect(() => {
     const allItemIds = items.map(item => item.id);
     setExpandedItems(allItemIds);
-  }, [items]);*/
+  }, [items]);
 
   //chip для выбранной технологии
   const handleDelete = () => {
@@ -416,12 +432,11 @@ const TechnologiesTree = () => {
     dispatch(fetchData({search: '', limit: 50, page: 1}));
   }, [dispatch]);
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (items.length > 0) {
-      setSelectedId(items[0].id);
-      dispatch(setSelectedItems([items[0].id]));
+      dispatch(setSelectedId([items[0].id]));
     }
-  }, [items, dispatch]);*/
+  }, [items, dispatch]);
 
   /*const technologyChip = useMemo(() => {
     return '111';//return `${technologySelector.name}: ${technologySelector.code}`;
@@ -505,6 +520,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
+    {console.log(selectedId)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}
@@ -515,10 +531,10 @@ const TechnologiesTree = () => {
         /*selectedItems={selectedItems}*/
         onItemExpansionToggle={handleItemExpansionToggle}
         /*onSelectedItemsChange={handleSelectedItemsChange}*/
-        onItemSelectionToggle={handleItemSelectionToggle}
+        /*onItemSelectionToggle={handleItemSelectionToggle}*/
         isItemDisabled={(item) => disabledItems.includes(item.id)}
         disabledItemsFocusable={true}                        
-        /*expansionTrigger='iconContainer'*/        
+        expansionTrigger='iconContainer'
       />                        
       <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
         {drawingExternalCode && (
