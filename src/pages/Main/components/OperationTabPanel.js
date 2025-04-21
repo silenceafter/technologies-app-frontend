@@ -4,6 +4,7 @@ import {
     AppBar,
     Backdrop,
     Box,
+    Breadcrumbs,
     CircularProgress,
     Paper,
     IconButton,
@@ -17,6 +18,7 @@ import { OperationCard } from '../components/OperationCard';
 import { MemoizedTabPanel as TabPanel } from '../components/TabPanel';
 import { TechnologyBreadcrumbs } from '../components/TechnologyBreadcrumbs';
 import { MemoizedTabs } from '../components/MemoizedTabs';
+import Toolbar from '@mui/material/Toolbar';
 
 //import { setTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs } from '../../../store/slices/operationsSlice';
 import {
@@ -27,7 +29,7 @@ import {
 import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
 
-function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
+function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const dispatch = useDispatch();
 
   //стейты
@@ -36,9 +38,11 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const [isUserClosedAllTabs, setIsUserClosedAllTabs] = useState(false);
   const [validateForm, setValidateForm] = useState(() => () => true);
   const [loadingTimer, setLoadingTimer] = useState(false);
+  const [currentTechnology, setCurrentTechnology] = useState(null);
+  const [currentOperation, setCurrentOperation] = useState(null);
 
   //селекторы
-  const currentTechnology = useSelector(selectTechnology);
+  //const currentTechnology = useSelector(selectTechnology);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const { tabs, tabValue, tabCnt, expandedPanelsDefault, shouldReloadTabs } = useSelector((state) => state.technologies);
   const technologiesItems = useSelector(technologiesSelectItems);
@@ -46,69 +50,9 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const operationsSelectors = useSelector(selectOperations);
   const operationsItems = operationsSelectors?.items;
   const operationsLoading = operationsSelectors?.loading;
+  const selectedIds = useSelector((state) => state.technologies.selectedId);
 
   //события
-  const handleAddTab = useCallback(() => {
-    if (!currentTechnology) {
-      return;
-    }
-    //
-    const newTab = {
-      id: tabCnt,
-      label: `Новая операция ${tabCnt}`,
-      content: {
-        dbValues: {},
-        formValues: {},
-        formErrors: {},
-        changedValues: {},
-        expandedPanels: expandedPanelsDefault,
-        isDeleted: false,
-      },
-      drawing: { code: drawingExternalCode },
-      operation: null,
-      technology: {
-        code: technologiesItems[0].label, 
-        name: technologiesItems[0].secondaryLabel,
-        userId: technologiesItems[0].userId,
-        creationDate: technologiesItems[0].creationDate,
-        lastModified: technologiesItems[0].lastModified
-      },
-      proxy: {
-        proxyDTId: currentTechnology.proxyId,
-        ivHex: currentTechnology.ivHex,
-        keyHex: currentTechnology.keyHex,
-      },
-    };
-    //
-    dispatch(addTab(newTab));
-    dispatch(setTabValue(tabs.length));
-    //dispatch(setOperation({name: '', code: ''}));
-  }, [dispatch, tabCnt, tabs]);
-
-  const handleRemoveTab = useCallback(
-    (id) => {
-      const removedIndex = tabs.findIndex(tab => tab.id === id);
-      dispatch(removeTab(id));
-      //
-      let newTabValue = tabValue;    
-      if (removedIndex === tabValue) {
-        //если удалили активную вкладку:
-        if (removedIndex === tabs.length - 1) {          
-          newTabValue = Math.max(0, removedIndex - 1);//удалили последнюю вкладку — выбрать предыдущую
-        } else {          
-          newTabValue = removedIndex;//выбрать следующую вкладку
-        }
-      }
-      //      
-      if (tabs.length === 1) {
-        newTabValue = 0;//если после удаления вкладок остался 0, установить tabValue в 0 (или null)
-        setIsUserClosedAllTabs(true);//флаг
-      } 
-      dispatch(setTabValue(newTabValue)); 
-    },
-    [dispatch, tabs, tabValue, setIsUserClosedAllTabs]
-  );
-  
   const handleUpdateTabContent = useCallback(
     (tabId, newContent, newValidateForm) => {
       dispatch(updateTab({ id: tabId, newContent: newContent, newValidateForm: newValidateForm }));
@@ -118,12 +62,12 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
 
   const handleOperationUpdate = useCallback(
     (newData) => {
-      const currentTab = tabs[tabValue];
-      if (currentTab && currentTab.id) {
-        handleUpdateTabContent(currentTab.id, newData, newData.validateForm);
+      //const currentTab = tabs[tabValue];
+      if (/*currentTab && currentTab.id*/ currentOperation.id) {
+        handleUpdateTabContent(/*currentTab.id*/ currentOperation.id, newData, newData.validateForm);
       }
     },
-    [handleUpdateTabContent, tabValue, tabs/*, validateForm*/]
+    [handleUpdateTabContent, currentOperation]
   );
 
   const setValidateFormStable = useCallback(
@@ -235,15 +179,36 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
     }
   }, [drawingExternalCode]);
 
-  //корректируем tabValue для того, чтобы сохранялась активная вкладка при удалении других вкладок
-  useEffect(() => {
-    if (tabValue >= tabs.length) {
-      dispatch(setTabValue(tabs.length - 1));
+  const findNodeById = (items, targetId) => {
+    for (let item of items) {
+      if (item.id === targetId) {
+        return item; //нашли элемент
+      }
+      
+      //рекурсия для детей
+      if (item.children && item.children.length > 0) {
+        let foundInChildren = findNodeById(item.children, targetId);        
+        if (foundInChildren !== undefined) {
+          return foundInChildren; //вернули найденный элемент из потомков
+        }
+      }
     }
-  }, [tabs, tabValue, dispatch]);
+    return undefined; //ничего не нашли
+  }
+
+  useEffect(() => {
+    if (selectedIds == null) { return; }
+    if (selectedIds[1] == null) { return; }
+    if (!(!technologiesLoading && technologiesItems.length > 0 && drawingExternalCode.length > 0)) { return; }
+    //
+    setCurrentTechnology(findNodeById(technologiesItems, selectedIds[0]));
+    setCurrentOperation(findNodeById(technologiesItems, selectedIds[1]));
+  }, [technologiesItems, selectedIds]);
+
   //
   return (
     <>
+    {console.log(technologiesItems)}
       <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
         <Box sx={{ overflow: 'hidden' }}>
           <AppBar
@@ -252,23 +217,13 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
             elevation={0}
             sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}
           >
-            <MemoizedTabs
-              tabs={tabs}
-              tabValue={tabValue}
-              handleRemoveTab={handleRemoveTab}
-              setTabValue={(newValue) => dispatch(setTabValue(newValue))}
-              loadingTimer={showLoading}
-            />                
-            <IconButton 
-              onClick={handleAddTab}
-              size="small" 
-              sx={{ 
-                ml: 1, 
-                '&:hover': { background: 'transparent'} 
-              }}
-            >
-              <AddIcon sx={{ color: 'white' }} />
-            </IconButton>
+            <Toolbar>
+              {currentOperation ? (
+                <Typography>Операция: {currentOperation.secondaryLabel} ({currentOperation.label})</Typography>
+                ) : (
+                <Typography>Операция</Typography>
+                )}
+            </Toolbar>
           </AppBar>
         </Box>        
         <Box sx={{           
@@ -276,8 +231,17 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
           overflowY: 'auto'
         }}>
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 2, paddingTop: 2 }}>
-            {drawingExternalCode && !showLoading && tabs.length > 0 && tabs[tabValue] && (
-              <TechnologyBreadcrumbs operationLabel={tabs[tabValue].label} />
+            {drawingExternalCode && !showLoading && currentTechnology && currentOperation && /*tabs.length > 0 && tabs[tabValue] &&*/ (
+            <>
+              <Breadcrumbs aria-label="breadcrumb">
+                <Typography color="inherit">Чертежи</Typography>
+                <Typography color="inherit">{drawingExternalCode}</Typography>
+                <Typography color="inherit">Технологии</Typography>
+                <Typography color="inherit">{currentTechnology.secondaryLabel} ({currentTechnology.label})</Typography>
+                <Typography color="inherit">Операции</Typography>                  
+                <Typography sx={{ color: 'text.primary' }}>{currentOperation.secondaryLabel} ({currentOperation.label})</Typography>
+              </Breadcrumbs>
+            </>
             )}                
           </Box>
           {!isAutocompleteLoaded || showLoading ? (
@@ -285,25 +249,22 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
                 <CircularProgress size={40} />
               </Box>
             ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              {tabs.length > 0 && tabs[tabValue] ? (
-                <TabPanel key={tabs[tabValue].id} value={tabValue} index={tabValue}>
-                  <OperationCard
-                    content={tabs[tabValue]?.content}
-                    onUpdate={handleOperationUpdate}
-                    setValidateForm={setValidateFormStable}
-                    autocompleteOptions={autocompleteOptions}
-                  />
-                </TabPanel>
-              ) : null}                  
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', margin: 2/*, height: '90%'*/ }}>
+              {currentOperation && (
+                <OperationCard
+                  content={currentOperation.content}
+                  onUpdate={handleOperationUpdate}
+                  setValidateForm={setValidateFormStable}
+                  autocompleteOptions={autocompleteOptions}
+                />)}
             </Box>
             )
           }
-          {tabs.length == 0 && (
+          {/*tabs.length == 0 && (
               <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', margin: 2, height: '90%' }}>
               <Typography>Нет открытых вкладок</Typography>
               </Box>
-            )
+            )*/
           }          
           <Notifications handleClose={handleClose} open={open} requestStatus={requestStatus} />
         </Box>
@@ -312,4 +273,4 @@ function OperationsTabPanel({ handleClose, open, requestStatus, showLoading }) {
   );
 }
 
-export { OperationsTabPanel };
+export { OperationTabPanel };

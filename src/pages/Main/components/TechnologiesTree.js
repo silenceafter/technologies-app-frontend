@@ -151,7 +151,7 @@ const TechnologiesTree = () => {
     })
   }));
 
-  function CustomLabel({ className, secondaryLabel, customLabel, type, labelRef, pp }) {
+  function CustomLabel({ className, secondaryLabel, customLabel, type, labelRef, pp, item }) {
     const dispatch = useDispatch();
     //стейты
     const [value, setValue] = useState(customLabel);
@@ -185,7 +185,14 @@ const TechnologiesTree = () => {
             onClick={(e) => {
               e.stopPropagation();
               dispatch(setCheckedItems(pp));
-              dispatch(setSelectedId(pp));
+
+              if (type == 'technology') {
+                dispatch(setSelectedId([pp, item.children.length > 0 ? item.children[0].id : null]));
+              } else if (type == 'operation') {
+                dispatch(setSelectedId([item.parentId, pp ]));
+              }//dispatch(setSelectedId(pp));
+
+              
             }}
           />
           <div style={{ width: '800%', display: 'flex', flexDirection: 'column' }}>
@@ -251,23 +258,23 @@ const TechnologiesTree = () => {
     }, [expandedItems, disabledItems, /*selectedItems,*/, props.itemId]);
 
     //expanded
-    const handleRootClick = (e) => {
-      //handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию  
-      //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
-      /*const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
+    /*const handleRootClick = (e) => {
+      handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию  
+      //dispatch(setTechnology({ name: item.label, code: item.secondaryLabel } item));
+      const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
       if (isIconClick) {
         e.stopPropagation();
         setExpanded((prev) => !prev);           
         handleItemExpansionToggle(null, props.itemId, !expanded);
         return;
-      }*/
+      }
     };
   
     const handleChildClick = (e) => {
       if (dataLoaded) return;
       e.stopPropagation();
-      //handleCustomTreeItemClick(e, props.itemId);
-    };
+      handleCustomTreeItemClick(e, props.itemId);
+    };*/
 
     const handleClick = (e) => {
       e.stopPropagation();
@@ -281,7 +288,13 @@ const TechnologiesTree = () => {
         handleItemExpansionToggle(null, props.itemId, !expanded);                
         return;
       }*/
-      dispatch(setSelectedId(item.id));
+
+      if (item.type == "technology") {
+        dispatch(setSelectedId([item.id, item.children.length > 0 ? item.children[0].id : null]));
+      } else if (item.type == "operation") {
+        dispatch(setSelectedId([item.parentId, item.id]));
+      }
+
       /*if (onClick) {
         onClick(e);
       }*/     
@@ -315,6 +328,7 @@ const TechnologiesTree = () => {
             type: item?.type,
             labelRef: labelRef,
             pp: props.itemId,
+            item: item,
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
@@ -444,7 +458,7 @@ const TechnologiesTree = () => {
 
   useEffect(() => {
     if (items.length > 0) {
-      dispatch(setSelectedId([items[0].id]));
+      dispatch(setSelectedId([items[0].id, items[0].children.length > 0 ? items[0].children[0].id : null]));
     }
   }, [items, dispatch]);
 
@@ -530,7 +544,6 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(selectedId)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}

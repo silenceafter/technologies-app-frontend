@@ -318,6 +318,28 @@ const technologiesSlice = createSlice({
       //обновить вкладку
       const { id, newContent, newValidateForm } = action.payload;
 
+      //поиск по дереву state.items
+      const findNodeById = (items, targetId) => {
+        for (let item of items) {
+          if (item.id === targetId) {
+            return item; //нашли элемент
+          }
+          
+          //рекурсия для детей
+          if (item.children && item.children.length > 0) {
+            let foundInChildren = findNodeById(item.children, targetId);        
+            if (foundInChildren !== undefined) {
+              return foundInChildren; //вернули найденный элемент из потомков
+            }
+          }
+        }
+        return undefined; //ничего не нашли
+      }
+      
+      //найти технологию и операцию в state.items
+      const operation = findNodeById(state.items, id);
+      const technology = findNodeById(state.items, operation.parentId);
+
       //orderNumber
       //operationCode
       let operationCode = { code: id, name: 'Новая операция' };
@@ -327,11 +349,6 @@ const technologiesSlice = createSlice({
         if (newContent.changedValues.operationCode) {
           operationCode.code = newContent.changedValues.operationCode.code;
           operationCode.name = newContent.changedValues.operationCode.name;
-        }
-      } else {
-        const tab = state.tabs.find(tab => tab.id === id);
-        if (tab.content.formValues.hasOwnProperty('operationCode')) {
-          operationCode = tab.content.formValues.operationCode;
         }
       }
 
@@ -404,28 +421,29 @@ const technologiesSlice = createSlice({
       //
       return {
         ...state,
-        tabs: state.tabs.map((tab) =>
-          tab.id === id
+        items: state.items.map((item) =>
+          item.id === technology.id
             ? {
-                ...tab,
-                content: {
-                  ...tab.content,
-                  formValues: newContent.formValues,
-                  formErrors: newContent.formErrors /*|| tab.content.formErrors*/,
-                  expandedPanels: newContent.expandedPanels || tab.content.expandedPanels,
-                  changedValues: newContent.changedValues,
-                  isDeleted: newContent.isDeleted /*|| tab.content.isDeleted*/,
-                },
-                operation: {
-                  ...tab.operation,
-                  code: operationCode.code,
-                  name: operationCode.name,
-                },
-                label: `${operationCode.name} (${operationCode.code})`,
-                validateForm: newValidateForm || tab.validateForm,
+                ...item,
+                children: item.children.map((child) =>
+                  child.id === operation.id
+                    ? {
+                        ...child,
+                        content: {
+                          ...child.content,
+                          formValues: newContent.formValues,
+                          formErrors: newContent.formErrors,
+                          expandedPanels: newContent.expandedPanels,
+                          changedValues: newContent.changedValues,
+                          isDeleted: newContent.isDeleted,
+                          validateForm: newValidateForm
+                        }                        
+                      }
+                    : child                
+                ),                
               }
-            : tab
-        ),
+            : item
+        )
       };
     },
     setTabValue: (state, action) => {

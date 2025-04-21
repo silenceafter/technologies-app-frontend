@@ -31,6 +31,7 @@ import { ToolingSearch } from '../pages/Main/components/ToolingSearch';
 import { ComponentsSearch } from '../pages/Main/components/ComponentsSearch';
 import { MaterialsSearch } from '../pages/Main/components/MaterialsSearch';
 import { OperationsTabPanel } from '../pages/Main/components/OperationsTabPanel';
+import { OperationTabPanel } from '../pages/Main/components/OperationTabPanel';
 
 import { 
   getSavedData as technologiesFetchData,
@@ -191,7 +192,8 @@ function Content({ setSmartBackdropActive, showLoading }) {
         height: '100%',
         }}
       >
-        <OperationsTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />
+        {/*<OperationsTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />*/}
+        {<OperationTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />}
         <Box>
           <ButtonGroupPanel handleSave={handleSave} loading={showLoading} requestStatus={requestStatus} />
         </Box>             
