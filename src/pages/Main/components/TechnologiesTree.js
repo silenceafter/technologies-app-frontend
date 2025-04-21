@@ -133,8 +133,11 @@ const TechnologiesTree = () => {
         backgroundColor: alpha(theme.palette.primary.main, 0.1),
       },
     },
-    [`& .CustomTreeItemSelected`]: {
+    [`& .TechnologySelected`]: {
       backgroundColor: alpha(theme.palette.primary.main, 0.2),
+    },
+    [`& .OperationSelected`]: {
+      backgroundColor: alpha(theme.palette.secondary.main, 0.2),
     },
     ...theme.applyStyles('light', {
       color: theme.palette.grey[800],
@@ -155,11 +158,20 @@ const TechnologiesTree = () => {
     //селекторы
     const checkedItems = useSelector((state) => state.technologies.checkedItems);
     const selectedId = useSelector((state) => state.technologies.selectedId);
+    let customClassName;
+    //
+    if (selectedId.includes(pp) && type == 'technology') {
+      customClassName = `${className} TechnologySelected`;
+    } else if (selectedId.includes(pp) && type == 'operation') {
+      customClassName = `${className} OperationSelected`;
+    } else {
+      customClassName = className;
+    }
     //
     return (
       <>
         <div 
-          className={selectedId.includes(pp) && type == 'technology' ? `${className} CustomTreeItemSelected` : className}
+          className={customClassName}
           style={{
             display: 'flex', 
             alignItems: 'center', 
@@ -242,7 +254,6 @@ const TechnologiesTree = () => {
     const handleRootClick = (e) => {
       //handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию  
       //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
-      dispatch(setSelectedId(item.id));
       /*const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
       if (isIconClick) {
         e.stopPropagation();
@@ -255,11 +266,11 @@ const TechnologiesTree = () => {
     const handleChildClick = (e) => {
       if (dataLoaded) return;
       e.stopPropagation();
-      handleCustomTreeItemClick(e, props.itemId);
+      //handleCustomTreeItemClick(e, props.itemId);
     };
 
     const handleClick = (e) => {
-      //e.stopPropagation();
+      e.stopPropagation();
       //handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию  
       //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
       
@@ -271,9 +282,9 @@ const TechnologiesTree = () => {
         return;
       }*/
       dispatch(setSelectedId(item.id));
-      if (onClick) {
+      /*if (onClick) {
         onClick(e);
-      }      
+      }*/     
     };
 
     const classes = useStyles({ itemType: item.type});
@@ -393,7 +404,6 @@ const TechnologiesTree = () => {
 
   //selected, CustomTreeItem
   const handleCustomTreeItemClick = (event, itemId) => {
-    //dispatch(setSelectedId(itemId));
   };
 
   //эффекты
