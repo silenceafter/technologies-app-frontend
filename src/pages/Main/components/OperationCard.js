@@ -6,10 +6,9 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import _ from 'lodash';
 
-const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions}) => {
+const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions, hasUnsavedChanges}) => {
   //стейты
-  const [localData, setLocalData] = useState(
-    content || { 
+  const [localData, setLocalData] = useState({ 
       dbValues: { orderNumber: 1 },
       formValues: { orderNumber: 1 },
       formErrors: {}, 
@@ -103,18 +102,6 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
 
   const handleOptionSelect = useCallback((id, option) => {
     // Обновляем значение поля
-    /*setLocalData((prev) => ({
-      ...prev,
-      formValues: {
-        ...prev.formValues,
-        [id]: option || null,
-      },
-      changedValues: {
-        ...prev.changedValues,
-        [id]: option || null,
-      },
-    }));*/
-
     setLocalData((prev) => {
       const prevOption = prev.dbValues[id];
       //проверяем изменения
@@ -204,11 +191,6 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
       onUpdate({...localData, isDeleted: !localData.isDeleted});
     }
   }, [localData, setLocalData, onUpdate]);
-  
-  //textField
-  /* handleInputChange = (e) => {
-    //dispatch(setUnsavedChanges(true));
-  };*/
 
   //проверка формы
   const validateForm = useCallback(() => {
@@ -313,6 +295,10 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   useEffect(() => {
     setValidateForm(() => validateForm);
   }, [setValidateForm, validateForm]);
+
+  useEffect(() => {
+      setLocalData(content);
+  }, [content]);
   //
   return (
     <>

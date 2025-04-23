@@ -12,6 +12,7 @@ const initialState = {
   loading: LOADING_DEFAULT,
   error: null,
   newItemCnt: 1,
+  hasUnsavedChanges: false,
   //
   tabs: [],
   tabValue: 0,
@@ -421,6 +422,7 @@ const technologiesSlice = createSlice({
       //
       return {
         ...state,
+        hasUnsavedChanges: true,
         items: state.items.map((item) =>
           item.id === technology.id
             ? {
@@ -504,6 +506,12 @@ const technologiesSlice = createSlice({
         checkedItems: Array.from(updatedCheckedItems),
       };
     },
+    /*setUnsavedChanges: (state, action) => {
+      return {
+        ...state,
+        hasUnsavedChanges: action.payload,
+      };
+    },*/
   },
   extraReducers: (builder) => {
     builder
@@ -527,6 +535,7 @@ export const {
   setSelectedItems, deleteSelectedItems,
   setSelectedId,
   restoreItems,
+  //setUnsavedChanges,
   setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs, setCheckedItems
 } = technologiesSlice.actions;
 

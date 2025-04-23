@@ -24,7 +24,7 @@ import Toolbar from '@mui/material/Toolbar';
 import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading,
-  setTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs
+  setTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs,
 } from '../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
@@ -51,6 +51,7 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const operationsItems = operationsSelectors?.items;
   const operationsLoading = operationsSelectors?.loading;
   const selectedIds = useSelector((state) => state.technologies.selectedId);
+  const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
 
   //события
   const handleUpdateTabContent = useCallback(
@@ -256,6 +257,7 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
                   onUpdate={handleOperationUpdate}
                   setValidateForm={setValidateFormStable}
                   autocompleteOptions={autocompleteOptions}
+                  hasUnsavedChanges={hasUnsavedChanges}
                 />)}
             </Box>
             )

@@ -93,7 +93,7 @@ const TechnologiesTree = () => {
   const error = useSelector((state) => state.technologies.error);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const technologySelector = useSelector(selectTechnology);
-  const { /*selectedItems,*/ disabledItems, checkedItems, selectedId } = useSelector((state) => state.technologies);
+  const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
 
   //refs
   const itemRef = useRef(null);
@@ -295,9 +295,7 @@ const TechnologiesTree = () => {
         dispatch(setSelectedId([item.parentId, item.id]));
       }
 
-      /*if (onClick) {
-        onClick(e);
-      }*/     
+        
     };
 
     const classes = useStyles({ itemType: item.type});
@@ -457,7 +455,7 @@ const TechnologiesTree = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (items.length > 0) {
+    if (items.length > 0 && !hasUnsavedChanges) {
       dispatch(setSelectedId([items[0].id, items[0].children.length > 0 ? items[0].children[0].id : null]));
     }
   }, [items, dispatch]);
@@ -544,6 +542,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
+    {console.log(selectedId)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}
