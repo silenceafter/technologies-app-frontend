@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { selectDrawingExternalCode } from './drawingsSlice';
+import { isContentEditable } from '@testing-library/user-event/dist/utils';
 
 const LOADING_DEFAULT = false;
 const initialState = {
@@ -13,6 +14,14 @@ const initialState = {
   error: null,
   newItemCnt: 1,
   hasUnsavedChanges: false,
+  expandedPanelsDefault: { 
+    parameters: true,
+    equipment: true,
+    components: true,
+    materials: true,
+    tooling: true,
+    measuringTools: true
+  },
   //
   tabs: [],
   tabValue: 0,
@@ -302,11 +311,71 @@ const technologiesSlice = createSlice({
       };
     },
     addTab: (state, action) => {
+      //поиск по дереву state.items
+      const findNodeById = (items, targetId) => {
+        for (let item of items) {
+          if (item.id === targetId) {
+            return item; //нашли элемент
+          }
+          
+          //рекурсия для детей
+          if (item.children && item.children.length > 0) {
+            let foundInChildren = findNodeById(item.children, targetId);        
+            if (foundInChildren !== undefined) {
+              return foundInChildren; //вернули найденный элемент из потомков
+            }
+          }
+        }
+        return undefined; //ничего не нашли
+      };
+      const technology = findNodeById(state.items, action.payload[0]);
+      const maxItem = technology.children.reduce(
+        (maxItem, currentItem) => 
+          currentItem.content.dbValues.orderNumber > maxItem.content.dbValues.orderNumber 
+            ? currentItem 
+            : maxItem,
+        technology.children[0]
+      );
+
+      //id
+      const newOperationId = generateUUID();
+
+      //orderNumber
+      let newOrderNumber = 1;
+      if (maxItem) {
+        newOrderNumber =  maxItem.content.dbValues.orderNumber + 1;
+      }
+      //
       return {
         ...state,
-        tabs: [...state.tabs, action.payload],
-        tabCnt: state.tabCnt + 1,
-      };
+        selectedId: [ technology.id, newOperationId],
+        items: state.items.map((item) =>
+          item.id === technology.id
+            ? {
+                ...item,
+                children: [
+                  ...technology.children, 
+                  {
+                    id: newOperationId,
+                    parentId: technology.id,
+                    label: 'Код операции',
+                    secondaryLabel: `Новая операция ${newOrderNumber}`,
+                    proxy: {},
+                    type: 'operation',
+                    content: {
+                      dbValues: { orderNumber: newOrderNumber },
+                      formValues: { orderNumber: newOrderNumber },
+                      formErrors: {},
+                      expandedPanels: state.expandedPanelsDefault,
+                      changedValues: {},
+                      isDeleted: false,
+                    },
+                  }
+                ]                                                                                          
+              }
+            : item
+        )
+      };    
     },
     removeTab: (state, action) => {
       const updatedTabs = state.tabs.filter((tab) => tab.id !== action.payload);

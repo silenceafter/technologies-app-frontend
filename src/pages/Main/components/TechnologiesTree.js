@@ -41,7 +41,8 @@ import {
   setSelectedId,
   deleteSelectedItems,
   restoreItems, 
-  setCheckedItems
+  setCheckedItems,
+  addTab
 } from '../../../store/slices/technologiesSlice';
 import { fetchData } from '../../../store/slices/lists/technologiesListSlice';
 import { resetTabs } from '../../../store/slices/operationsSlice';
@@ -51,12 +52,14 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import AddIcon from '@mui/icons-material/Add';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RestoreIcon from '@mui/icons-material/Restore';
 
 //действия для SpeedDial
 const actions = [
-  { icon: <AddIcon />, name: 'add-technology', title: 'Добавить технологию' },
+  { icon: <AssignmentIcon />, name: 'add-technology', title: 'Добавить технологию' },
+  { icon: <FormatListNumberedIcon />, name: 'add-operation', title: 'Добавить операцию' },
   { icon: <DeleteIcon />, name: 'delete', title: 'Удалить' },
   { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление всех элементов' }
 ];
@@ -455,7 +458,7 @@ const TechnologiesTree = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (items.length > 0 && !hasUnsavedChanges) {
+    if (items.length > 0 && !selectedId /*&& !hasUnsavedChanges*/) {
       dispatch(setSelectedId([items[0].id, items[0].children.length > 0 ? items[0].children[0].id : null]));
     }
   }, [items, dispatch]);
@@ -481,8 +484,12 @@ const TechnologiesTree = () => {
         handleDialogOpen();
         //dispatch(addItems());
         break;
+
+      case 'add-operation':
+        dispatch(addTab(selectedId));      
+        break;
     }
-  }, [/*selectedItems,*/ disabledItems]);
+  }, [/*selectedItems,*/ disabledItems, selectedId]);
 
   //контекстное меню
   const handleContextMenu = (event, nodeId) => {
