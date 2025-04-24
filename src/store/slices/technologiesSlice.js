@@ -37,7 +37,24 @@ const generateUUID = () => {
     const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
-}
+};
+
+const findNodeById = (items, targetId) => {
+  for (let item of items) {
+    if (item.id === targetId) {
+      return item; //нашли элемент
+    }
+    
+    //рекурсия для детей
+    if (item.children && item.children.length > 0) {
+      let foundInChildren = findNodeById(item.children, targetId);        
+      if (foundInChildren !== undefined) {
+        return foundInChildren; //вернули найденный элемент из потомков
+      }
+    }
+  }
+  return undefined; //ничего не нашли
+};
 
 //загрузка технологий и операций по коду ДСЕ
 export const getSavedData = createAsyncThunk(
@@ -612,5 +629,13 @@ export const {
 export const selectItems = (state) => state.technologies.items || [];
 export const selectSelectedItems = (state) => state.technologies.selectedItems || [];
 export const selectLoading = (state) => state.technologies.loading;
+export const selectCurrentItems = (state) => {
+  if (state.technologies.items && state.technologies.selectedId) {
+    const technology = findNodeById(state.technologies.items, state.technologies.selectedId[0]);
+    const operation = findNodeById(state.technologies.items, state.technologies.selectedId[1]);
+    return [ technology, operation];
+  }
+  return [null, null];
+};
 
 export default technologiesSlice.reducer;

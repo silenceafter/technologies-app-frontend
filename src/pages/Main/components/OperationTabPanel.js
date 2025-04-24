@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
+    Accordion, 
+    AccordionActions, 
+    AccordionSummary, 
+    AccordionDetails, 
     AppBar,
     Backdrop,
     Box,
@@ -19,6 +23,7 @@ import { MemoizedTabPanel as TabPanel } from '../components/TabPanel';
 import { TechnologyBreadcrumbs } from '../components/TechnologyBreadcrumbs';
 import { MemoizedTabs } from '../components/MemoizedTabs';
 import Toolbar from '@mui/material/Toolbar';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 //import { setTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs } from '../../../store/slices/operationsSlice';
 import {
@@ -40,6 +45,7 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
+  const [expanded, setExpanded] = useState('panel1');
 
   //селекторы
   //const currentTechnology = useSelector(selectTechnology);
@@ -75,6 +81,10 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
     (newValidateForm) => setValidateForm(newValidateForm),
     [setValidateForm]
   );
+
+  const handleAccordeonChange = useCallback((panel) => (event, newExpanded) => {
+    setExpanded(newExpanded ? panel : false);
+  }, [setExpanded]);
 
   //эффекты
   //анимация загрузки вкладки
@@ -205,30 +215,12 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
     setCurrentTechnology(findNodeById(technologiesItems, selectedIds[0]));
     setCurrentOperation(findNodeById(technologiesItems, selectedIds[1]));
   }, [technologiesItems, selectedIds]);
-
   //
   return (
     <>
     {console.log(technologiesItems)}
-      <Paper elevation={3} sx={{ width: '100%', margin: 0, flexGrow: 1, overflow: 'auto' }}>
-        <Box sx={{ overflow: 'hidden' }}>
-          <AppBar
-            position="static"
-            color="primary"
-            elevation={0}
-            sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}
-          >
-            <Toolbar>
-              {currentOperation ? (
-                <Typography>Операция: {currentOperation.secondaryLabel} ({currentOperation.label})</Typography>
-                ) : (
-                <Typography>Операция</Typography>
-                )}
-            </Toolbar>
-          </AppBar>
-        </Box>        
         <Box sx={{           
-          height: '91%',
+          height: '100%',
           overflowY: 'auto'
         }}>
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 2, paddingTop: 2 }}>
@@ -270,7 +262,6 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
           }          
           <Notifications handleClose={handleClose} open={open} requestStatus={requestStatus} />
         </Box>
-      </Paper>      
     </>
   );
 }

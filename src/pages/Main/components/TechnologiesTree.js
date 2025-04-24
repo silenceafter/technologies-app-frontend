@@ -55,13 +55,15 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RestoreIcon from '@mui/icons-material/Restore';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 //действия для SpeedDial
 const actions = [
   { icon: <AssignmentIcon />, name: 'add-technology', title: 'Добавить технологию' },
   { icon: <FormatListNumberedIcon />, name: 'add-operation', title: 'Добавить операцию' },
+  { icon: <ContentCopyIcon />, name: 'restoreAll', title: 'Копировать' },
   { icon: <DeleteIcon />, name: 'delete', title: 'Удалить' },
-  { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление всех элементов' }
+  { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление' },
 ];
 
 //добавить кастомный класс и кастомное свойство элементу Box

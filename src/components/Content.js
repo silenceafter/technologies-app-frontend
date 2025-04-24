@@ -32,6 +32,7 @@ import { ComponentsSearch } from '../pages/Main/components/ComponentsSearch';
 import { MaterialsSearch } from '../pages/Main/components/MaterialsSearch';
 import { OperationsTabPanel } from '../pages/Main/components/OperationsTabPanel';
 import { OperationTabPanel } from '../pages/Main/components/OperationTabPanel';
+import { TechnologyTabPanel } from '../pages/Main/components/TechnologyTabPanel';
 
 import { 
   getSavedData as technologiesFetchData,
@@ -50,7 +51,10 @@ function Content({ setSmartBackdropActive, showLoading }) {
   //объекты
   //стейты  
   const [validateForm, setValidateForm] = useState(() => () => true);
-  const [expanded, setExpanded] = useState('panel1');
+  const [accordionTechnologiesTreeExpanded, setAccordionTechnologiesTreeExpanded] = useState(true);
+  const [accordionProductsTreeExpanded, setAccordionProductsTreeExpanded] = useState(false);
+  const [accordionTechnologyTabPanelExpanded, setAccordionTechnologyTabPanelExpanded] = useState(true);
+  const [accordionOperationTabPanelExpanded, setAccordionOperationTabPanelExpanded] = useState(true);
   const [open, setOpen] = useState(false);
   const [requestStatus, setRequestStatus] = useState(false);
   const [loading, setLoading] = useState({ save: false });
@@ -61,9 +65,18 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const { tabs } = useSelector((state) => state.operations);
   
   //события
-  const handleAccordeonChange = useCallback((panel) => (event, newExpanded) => {
-    setExpanded(newExpanded ? panel : false);
-  }, [setExpanded]);
+  const handleAccordeonTechnologiesTreeChange = () => {
+    setAccordionTechnologiesTreeExpanded(!accordionTechnologiesTreeExpanded);
+  };
+  const handleAccordeonProductsTreeChange = () => {
+    setAccordionProductsTreeExpanded(!accordionProductsTreeExpanded);
+  };
+  const handleAccordeonTechnologyTabPanelChange = () => {
+    setAccordionTechnologyTabPanelExpanded(!accordionTechnologyTabPanelExpanded);
+  };
+  const handleAccordeonOperationTabPanelChange = () => {
+    setAccordionOperationTabPanelExpanded(!accordionOperationTabPanelExpanded);
+  };
 
   const handleClose = useCallback((reason) => {
       if (reason === 'clickaway') {
@@ -131,8 +144,8 @@ function Content({ setSmartBackdropActive, showLoading }) {
         overflow: 'hidden',
       }}>
         <Accordion defaultExpanded
-          expanded={expanded === 'panel1'} 
-          onChange={handleAccordeonChange('panel1')}
+          expanded={accordionTechnologiesTreeExpanded}
+          onChange={handleAccordeonTechnologiesTreeChange}
           elevation={3} 
           sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
         >
@@ -156,9 +169,9 @@ function Content({ setSmartBackdropActive, showLoading }) {
             </Button>*/}
           </AccordionActions>
         </Accordion>
-        <Accordion /*defaultExpanded*/ expanded={false}
-          /*expanded={expanded === 'panel2'} 
-          onChange={handleAccordeonChange('panel2')}*/
+        <Accordion /*defaultExpanded*/ 
+          expanded={false}
+          onChange={handleAccordeonProductsTreeChange}
           elevation={3} 
           sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
         >
@@ -181,23 +194,68 @@ function Content({ setSmartBackdropActive, showLoading }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
-        gap: 2,                   
-        padding: 0,
-        paddingBottom: 0,
-        paddingRight: 0,
         backgroundColor: 'rgb(245,245,245)',
         borderRadius: 1,          
         boxShadow: 0,
-        width: '100%',/*90.5rem*/
+        width: '100%',
         height: '100%',
+        overflowY:'hidden'
         }}
       >
-        {/*<OperationsTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />*/}
-        {<OperationTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />}
-        <Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            backgroundColor: 'rgb(245,245,245)',
+            borderRadius: 1,          
+            boxShadow: 0,
+            width: '100%',
+            height: '95%',
+            overflowY:'hidden'
+          }}
+        >
+          <Accordion defaultExpanded
+            expanded={accordionTechnologyTabPanelExpanded}
+            onChange={handleAccordeonTechnologyTabPanelChange}
+            elevation={3} 
+            sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel3-content"
+              id="panel3-header"
+              sx={{ backgroundColor: 'primary.main' }}
+            >
+              <Typography component="span">Технология</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px' }}>
+              <TechnologyTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />
+            </AccordionDetails>        
+          </Accordion>
+          <Accordion defaultExpanded
+            expanded={accordionOperationTabPanelExpanded}
+            onChange={handleAccordeonOperationTabPanelChange}
+            elevation={3} 
+            sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel4-content"
+              id="panel4-header"
+              sx={{ backgroundColor: 'primary.main' }}
+            >
+              <Typography component="span">Операция</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', minHeight: '100px' }}>
+              <OperationTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />
+            </AccordionDetails>
+          </Accordion>
+        </Box>
+        <Box sx={{ paddingTop: 2 }}>
           <ButtonGroupPanel handleSave={handleSave} loading={showLoading} requestStatus={requestStatus} />
-        </Box>             
-      </Box>
+        </Box>
+      </Box>   
     </>
   );
 }
