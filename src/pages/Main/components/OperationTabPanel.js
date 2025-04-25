@@ -63,7 +63,7 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const handleUpdateTabContent = useCallback(
     (tabId, newContent, newValidateForm) => {
       dispatch(updateTab({ id: tabId, newContent: newContent, newValidateForm: newValidateForm }));
-    }, 
+    },
     [dispatch]
   );
 
@@ -93,11 +93,11 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
       setLoadingTimer(true);
       setTimeout(() => {
         setLoadingTimer(false);
-      }, 1000); 
+      }, 1000);
     }
   }, [drawingExternalCode]);
 
-  useEffect(() => {    
+  useEffect(() => {
     dispatch(fetchData({ search: '', limit: 10, page: 1 }));
   }, [dispatch]);
 
@@ -218,7 +218,6 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
   //
   return (
     <>
-    {console.log(technologiesItems)}
         <Box sx={{           
           height: '100%',
           overflowY: 'auto'
@@ -226,14 +225,14 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 2, paddingTop: 2 }}>
             {drawingExternalCode && !showLoading && currentTechnology && currentOperation && /*tabs.length > 0 && tabs[tabValue] &&*/ (
             <>
-              <Breadcrumbs aria-label="breadcrumb">
+              {/*<Breadcrumbs aria-label="breadcrumb">
                 <Typography color="inherit">Чертежи</Typography>
                 <Typography color="inherit">{drawingExternalCode}</Typography>
                 <Typography color="inherit">Технологии</Typography>
                 <Typography color="inherit">{currentTechnology.secondaryLabel} ({currentTechnology.label})</Typography>
                 <Typography color="inherit">Операции</Typography>                  
                 <Typography sx={{ color: 'text.primary' }}>{currentOperation.secondaryLabel} ({currentOperation.label})</Typography>
-              </Breadcrumbs>
+              </Breadcrumbs>*/}
             </>
             )}                
           </Box>

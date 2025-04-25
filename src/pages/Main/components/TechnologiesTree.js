@@ -455,9 +455,9 @@ const TechnologiesTree = () => {
     setTechnologyChip(`${technologySelector.name}: ${technologySelector.code}`);
   }, [technologySelector]);*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     dispatch(fetchData({search: '', limit: 50, page: 1}));
-  }, [dispatch]);
+  }, [dispatch]);*/
 
   useEffect(() => {
     if (items.length > 0 && !selectedId /*&& !hasUnsavedChanges*/) {
@@ -551,7 +551,6 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(selectedId)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}

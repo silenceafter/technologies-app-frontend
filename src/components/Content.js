@@ -36,9 +36,11 @@ import { TechnologyTabPanel } from '../pages/Main/components/TechnologyTabPanel'
 
 import { 
   getSavedData as technologiesFetchData,
-  clearItems as technologiesSetItems
+  clearItems as technologiesSetItems,
+  selectCurrentItems
 } from '../store/slices/technologiesSlice';
 import { setData, setShouldReloadTabs } from '../store/slices/operationsSlice';
+import { fetchData, selectTechnologies } from '../store/slices/lists/technologiesListSlice';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -53,16 +55,25 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const [validateForm, setValidateForm] = useState(() => () => true);
   const [accordionTechnologiesTreeExpanded, setAccordionTechnologiesTreeExpanded] = useState(true);
   const [accordionProductsTreeExpanded, setAccordionProductsTreeExpanded] = useState(false);
-  const [accordionTechnologyTabPanelExpanded, setAccordionTechnologyTabPanelExpanded] = useState(true);
+  const [accordionTechnologyTabPanelExpanded, setAccordionTechnologyTabPanelExpanded] = useState(false);
   const [accordionOperationTabPanelExpanded, setAccordionOperationTabPanelExpanded] = useState(true);
   const [open, setOpen] = useState(false);
   const [requestStatus, setRequestStatus] = useState(false);
   const [loading, setLoading] = useState({ save: false });
+  const [currentTechnology, setCurrentTechnology] = useState(null);
+  const [currentOperation, setCurrentOperation] = useState(null);
+  const [newTechnology, setNewTechnology] = useState(null);
+  const [autocompleteOptions, setAutocompleteOptions] = useState({});
+  const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
   
   //селекторы
   //const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
   const user = useSelector((state) => state.users.user);
   const { tabs } = useSelector((state) => state.operations);
+  const currentItems = useSelector(selectCurrentItems);
+  const technologiesSelectors = useSelector(selectTechnologies);
+  const technologiesItems = technologiesSelectors?.items;
+  const technologiesLoading = technologiesSelectors?.loading;
   
   //события
   const handleAccordeonTechnologiesTreeChange = () => {
@@ -131,6 +142,28 @@ function Content({ setSmartBackdropActive, showLoading }) {
       setOpen(true); 
     }, 300);
   }, []);
+
+  //эффекты
+  useEffect(() => {
+    if (currentItems.length > 0 && currentItems[0]) {
+      setCurrentTechnology(currentItems[0]);
+      setCurrentOperation(currentItems[1]);
+    }
+  }, [currentItems]);
+
+  useEffect(() => {
+    if (!technologiesLoading && technologiesItems) {
+      setAutocompleteOptions(prevState => ({
+        ...prevState,
+        technologies: technologiesSelectors
+      }));
+      setIsAutocompleteLoaded(true); //загрузка items завершена
+    }
+  }, [technologiesItems, technologiesLoading]);
+
+  useEffect(() => {
+    dispatch(fetchData({ search: '', limit: 50, page: 1 }));
+  }, [dispatch]);
   
   //вывод
   return (
@@ -227,10 +260,15 @@ function Content({ setSmartBackdropActive, showLoading }) {
               id="panel3-header"
               sx={{ backgroundColor: 'primary.main' }}
             >
-              <Typography component="span">Технология</Typography>
+              {currentTechnology ? (
+                <Typography component="span">Технология: {currentTechnology.secondaryLabel} ({currentTechnology.label})</Typography>  
+              ) : (
+                <Typography component="span">Технология</Typography>  
+              )}
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px' }}>
-              <TechnologyTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />
+              <TechnologyTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} autocompleteOptions={autocompleteOptions}
+              isAutocompleteLoaded={isAutocompleteLoaded} />
             </AccordionDetails>        
           </Accordion>
           <Accordion defaultExpanded
@@ -245,7 +283,11 @@ function Content({ setSmartBackdropActive, showLoading }) {
               id="panel4-header"
               sx={{ backgroundColor: 'primary.main' }}
             >
-              <Typography component="span">Операция</Typography>
+              {currentOperation ? (
+                <Typography component="span">Операция: {currentOperation.secondaryLabel} ({currentOperation.label})</Typography>  
+              ) : (
+                <Typography component="span">Операция</Typography>  
+              )}
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', minHeight: '100px' }}>
               <OperationTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />

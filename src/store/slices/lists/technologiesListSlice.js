@@ -62,5 +62,6 @@ const technologiesListSlice = createSlice({
 export const selectItems = (state) => state.technologiesList.items || [];
 export const selectLoading = (state) => state.technologiesList.loading;
 export const selectError = (state) => state.technologiesList.error;
+export const selectTechnologies = (state) => state.technologiesList;
 
 export default technologiesListSlice.reducer;

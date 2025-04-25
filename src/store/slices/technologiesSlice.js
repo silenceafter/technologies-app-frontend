@@ -427,7 +427,9 @@ const technologiesSlice = createSlice({
       const operation = findNodeById(state.items, id);
       const technology = findNodeById(state.items, operation.parentId);
 
-      //orderNumber
+      //технологии
+
+      //операции
       //operationCode
       let operationCode = { code: id, name: 'Новая операция' };
 
@@ -534,6 +536,39 @@ const technologiesSlice = createSlice({
         )
       };
     },
+    updateTechnology: (state, action) => {
+      const { id, newContent } = action.payload;
+      //найти технологию в state.items
+      const technology = findNodeById(state.items, id);
+
+      //technologyCode
+      let technologyCode = null;
+      if (newContent.changedValues.hasOwnProperty('technologyCode')) {
+        if (newContent.changedValues.technologyCode) {
+          technologyCode = newContent.changedValues.technologyCode;
+        }
+      }      
+      //
+      return {
+        ...state,
+        hasUnsavedChanges: true,
+        items: state.items.map((item) =>
+          item.id === technology.id
+            ? {
+                ...item,
+                content: {
+                  ...item.content,
+                  formValues: newContent.formValues,
+                  formErrors: newContent.formErrors,
+                  expandedPanels: newContent.expandedPanels,
+                  changedValues: newContent.changedValues,
+                  isDeleted: newContent.isDeleted,
+                },                            
+              }
+            : item
+        )
+      };
+    },
     setTabValue: (state, action) => {
       return {
         ...state,
@@ -621,6 +656,7 @@ export const {
   setSelectedItems, deleteSelectedItems,
   setSelectedId,
   restoreItems,
+  updateTechnology,
   //setUnsavedChanges,
   setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs, setCheckedItems
 } = technologiesSlice.actions;
