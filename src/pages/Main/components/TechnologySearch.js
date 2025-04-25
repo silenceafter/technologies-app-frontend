@@ -11,7 +11,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage } from '../../../store/slices/lists/technologiesListSlice';
 
-const TechnologySearch = React.memo(({ props, selectedValue, onChange, options, content}) => {
+const TechnologySearch = React.memo(({ props, selectedValue, onChange, options, content, errorValue}) => {
   const dispatch = useDispatch();
 
   //стейты
@@ -93,8 +93,8 @@ const TechnologySearch = React.memo(({ props, selectedValue, onChange, options, 
               fullWidth
               name={props.name + 'Visible'}
               id={props.id}
-              /*error={!!errorValue}
-              helperText={errorValue}*/
+              error={!!errorValue}
+              helperText={errorValue}
               placeholder={props.placeholder}
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}

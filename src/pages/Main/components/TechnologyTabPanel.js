@@ -22,7 +22,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading,
-  setTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs, selectCurrentItems, updateTechnology,
+  setTabs, setTabValue, setShouldReloadTabs, selectCurrentItems, updateTechnology,
 } from '../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
@@ -57,13 +57,6 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
   const currentItems = useSelector(selectCurrentItems);
 
   //события
-  /*const handleUpdateTechnologyContent = useCallback(
-    (tabId, newContent) => {
-      dispatch(updateTab({ id: tabId, newContent: newContent, newValidateForm: newValidateForm }));
-    }, 
-    [dispatch]
-  );*/
-
   const handleOptionSelect = useCallback((id, option) => {
     // Обновляем значение поля
     setLocalData((prev) => {
@@ -127,17 +120,7 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
         }        
       }
     ));
-    /*if (onUpdate) {
-      onUpdate(
-        { 
-          ...localData, 
-          formValues: { ...localData.formValues, [id]: option || null }, 
-          formErrors: { ...localData.formErrors, [id]: '' },
-          changedValues: { ...localData.changedValues, [id]: option || null }, 
-        }
-      );
-    }*/
-}, [localData/*, onUpdate*/]);
+}, [localData]);
 
   //эффекты
   //анимация загрузки вкладки
@@ -160,7 +143,7 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
   //
   return (
     <>
-    {console.log(technologiesItems)}
+    {console.log(currentItems)}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'
@@ -193,6 +176,7 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
                   onChange={handleOptionSelect}
                   options={autocompleteOptions.technologies || null}
                   content={currentTechnology?.content}
+                  errorValue={localData?.formErrors?.operationCode}
                 />
               )}
             </Box>

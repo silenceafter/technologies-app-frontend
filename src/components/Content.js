@@ -30,7 +30,6 @@ import { MeasuringToolsSearch } from '../pages/Main/components/MeasuringToolsSea
 import { ToolingSearch } from '../pages/Main/components/ToolingSearch';
 import { ComponentsSearch } from '../pages/Main/components/ComponentsSearch';
 import { MaterialsSearch } from '../pages/Main/components/MaterialsSearch';
-import { OperationsTabPanel } from '../pages/Main/components/OperationsTabPanel';
 import { OperationTabPanel } from '../pages/Main/components/OperationTabPanel';
 import { TechnologyTabPanel } from '../pages/Main/components/TechnologyTabPanel';
 
@@ -74,6 +73,8 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const technologiesSelectors = useSelector(selectTechnologies);
   const technologiesItems = technologiesSelectors?.items;
   const technologiesLoading = technologiesSelectors?.loading;
+
+  const bb = useSelector((state) => state.technologies);
   
   //события
   const handleAccordeonTechnologiesTreeChange = () => {
@@ -146,6 +147,20 @@ function Content({ setSmartBackdropActive, showLoading }) {
   //эффекты
   useEffect(() => {
     if (currentItems.length > 0 && currentItems[0]) {
+      if (!currentItems[0]) {
+        //технология скрыта, операция открыта
+        setAccordionTechnologyTabPanelExpanded(false);
+        setAccordionOperationTabPanelExpanded(true);
+      } else if (!currentItems[1]) {
+        //технология открыта, операция скрыта
+        setAccordionTechnologyTabPanelExpanded(true);
+        setAccordionOperationTabPanelExpanded(false);        
+      } else {
+        //технология скрыта, операция открыта
+        setAccordionTechnologyTabPanelExpanded(false);
+        setAccordionOperationTabPanelExpanded(true);
+      }
+      //
       setCurrentTechnology(currentItems[0]);
       setCurrentOperation(currentItems[1]);
     }
@@ -168,6 +183,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   //вывод
   return (
     <>
+    {console.log(bb)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

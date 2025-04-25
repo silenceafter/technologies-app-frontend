@@ -42,7 +42,9 @@ import {
   deleteSelectedItems,
   restoreItems, 
   setCheckedItems,
-  addTab
+  addTechnology,
+  addOperation,
+  deleteItems,
 } from '../../../store/slices/technologiesSlice';
 import { fetchData } from '../../../store/slices/lists/technologiesListSlice';
 import { resetTabs } from '../../../store/slices/operationsSlice';
@@ -99,6 +101,7 @@ const TechnologiesTree = () => {
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const technologySelector = useSelector(selectTechnology);
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
+  const user = useSelector((state) => state.users.user);
 
   //refs
   const itemRef = useRef(null);
@@ -137,6 +140,9 @@ const TechnologiesTree = () => {
       '&:hover': {
         backgroundColor: alpha(theme.palette.primary.main, 0.1),
       },
+    },
+    [`&[data-disabled]`]: {
+      backgroundColor: alpha(theme.palette.action.disabledBackground, 0), // основной цвет с альфа-прозрачностью
     },
     [`& .TechnologySelected`]: {
       backgroundColor: alpha(theme.palette.primary.main, 0.2),
@@ -258,9 +264,9 @@ const TechnologiesTree = () => {
     //эффекты
     useEffect(() => {
       setExpanded(expandedItems.includes(props.itemId));
-      setDisabled(disabledItems.includes(props.itemId));
+      /*setDisabled(disabledItems.includes(props.itemId));*/
       /*setSelected(selectedItems.includes(props.itemId));*/
-    }, [expandedItems, disabledItems, /*selectedItems,*/, props.itemId]);
+    }, [expandedItems, /*disabledItems,*/ /*selectedItems,*/, props.itemId]);
 
     //expanded
     /*const handleRootClick = (e) => {
@@ -339,6 +345,7 @@ const TechnologiesTree = () => {
         expanded={expanded}
         ref={ref}
         data-component-type={item.type}
+        data-disabled={disabledItems.includes(item.id) ? true : false}
         onClick={handleClick}        
       >
         { isProcessing && !dataLoaded ? (
@@ -473,6 +480,7 @@ const TechnologiesTree = () => {
     switch(action.name) {
       case 'delete':
         //dispatch(deleteSelectedItems(selectedItems));
+        dispatch(deleteItems());
         break;
 
       case 'restoreAll':
@@ -483,12 +491,11 @@ const TechnologiesTree = () => {
         break;
 
       case 'add-technology':
-        handleDialogOpen();
-        //dispatch(addItems());
+        dispatch(addTechnology(user?.UID));
         break;
 
       case 'add-operation':
-        dispatch(addTab(selectedId));      
+        dispatch(addOperation(selectedId));      
         break;
     }
   }, [/*selectedItems,*/ disabledItems, selectedId]);
@@ -556,13 +563,10 @@ const TechnologiesTree = () => {
         apiRef={apiRef}
         slots={{ item: renderCustomTreeItem }}
         items={items}
-        disabledItems={disabledItems}
+        /*disabledItems={disabledItems}*/
         expandedItems={expandedItems}
-        /*selectedItems={selectedItems}*/
         onItemExpansionToggle={handleItemExpansionToggle}
-        /*onSelectedItemsChange={handleSelectedItemsChange}*/
-        /*onItemSelectionToggle={handleItemSelectionToggle}*/
-        isItemDisabled={(item) => disabledItems.includes(item.id)}
+        /*isItemDisabled={(item) => disabledItems.includes(item.id)}*/
         disabledItemsFocusable={true}                        
         expansionTrigger='iconContainer'
       />                        

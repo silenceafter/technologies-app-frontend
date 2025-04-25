@@ -276,35 +276,7 @@ const technologiesSlice = createSlice({
               : item.children
           };
         })
-      };
-    
-
-      /*const selectedItemsData = state.items
-        .filter(item => action.payload.includes(item.id) || item.children?.some(child => action.payload.includes(child.id)))
-        .map(item => ({
-          ...item,
-          selected: action.payload.includes(item.id), //отмечаем основной элемент
-          children: item.children?.map(child => ({
-            ...child,
-            selected: action.payload.includes(child.id) //отмечаем детей
-          }))
-      }));
-      //
-      return {
-        ...state,
-        disabledItems: state.disabledItems.concat(action.payload),
-        selectedItems: state.selectedItems.filter(id => !action.payload.includes(id)),
-        items: state.items.map(item => ({
-          ...item,
-          selected: action.payload.includes(item.id), // если item есть в списке, добавляем selected
-          children: item.children
-            ? item.children.map(child => ({
-                ...child,
-                selected: action.payload.includes(child.id) // то же самое для детей
-              }))
-            : item.children
-        }))
-      };*/
+      };      
     },
     setSelectedId: (state, action) => {
       return {
@@ -327,24 +299,39 @@ const technologiesSlice = createSlice({
         tabCnt: 1,
       };
     },
-    addTab: (state, action) => {
-      //поиск по дереву state.items
-      const findNodeById = (items, targetId) => {
-        for (let item of items) {
-          if (item.id === targetId) {
-            return item; //нашли элемент
-          }
-          
-          //рекурсия для детей
-          if (item.children && item.children.length > 0) {
-            let foundInChildren = findNodeById(item.children, targetId);        
-            if (foundInChildren !== undefined) {
-              return foundInChildren; //вернули найденный элемент из потомков
-            }
-          }
-        }
-        return undefined; //ничего не нашли
+    addTechnology: (state, action) => {
+      const newTechnologyId = generateUUID();
+      const newDate = new Date();
+      return {
+        ...state,
+        selectedId: [ newTechnologyId, null ],
+        items: [
+          ...state.items,
+          {
+            id: newTechnologyId,            
+            label: 'Код технологии',
+            secondaryLabel: `Новая технология ${state.items.length + 1}`,
+            parentId: null,
+            children: [],
+            creationDate: newDate,
+            lastModified: newDate,
+            proxy: {},
+            type: 'technology',
+            content: {
+              changedValues: {},
+              dbValues: { technologyCode: null },
+              formValues: { technologyCode: null },
+              formErrors: {},
+              expandedPanels: {},
+              isDeleted: false,
+            },
+            userId: null,
+            UID: action.payload.UID,            
+          },
+        ],
       };
+    },
+    addOperation: (state, action) => {      
       const technology = findNodeById(state.items, action.payload[0]);
       const maxItem = technology.children.reduce(
         (maxItem, currentItem) => 
@@ -356,7 +343,6 @@ const technologiesSlice = createSlice({
 
       //id
       const newOperationId = generateUUID();
-
       //orderNumber
       let newOrderNumber = 1;
       if (maxItem) {
@@ -394,42 +380,47 @@ const technologiesSlice = createSlice({
         )
       };    
     },
-    removeTab: (state, action) => {
-      const updatedTabs = state.tabs.filter((tab) => tab.id !== action.payload);
+    updateTechnology: (state, action) => {
+      const { id, newContent } = action.payload;
+      //найти технологию в state.items
+      const technology = findNodeById(state.items, id);
+
+      //technologyCode
+      let technologyCode = null;
+      if (newContent.changedValues.hasOwnProperty('technologyCode')) {
+        if (newContent.changedValues.technologyCode) {
+          technologyCode = newContent.changedValues.technologyCode;
+        }
+      }      
+      //
       return {
         ...state,
-        tabs: updatedTabs,
+        hasUnsavedChanges: true,
+        items: state.items.map((item) =>
+          item.id === technology.id
+            ? {
+                ...item,
+                content: {
+                  ...item.content,
+                  formValues: newContent.formValues,
+                  formErrors: newContent.formErrors,
+                  expandedPanels: newContent.expandedPanels,
+                  changedValues: newContent.changedValues,
+                  isDeleted: newContent.isDeleted,
+                },                            
+              }
+            : item
+        )
       };
     },
-    updateTab: (state, action) => {
+    updateOperation: (state, action) => {
       //обновить вкладку
       const { id, newContent, newValidateForm } = action.payload;
 
-      //поиск по дереву state.items
-      const findNodeById = (items, targetId) => {
-        for (let item of items) {
-          if (item.id === targetId) {
-            return item; //нашли элемент
-          }
-          
-          //рекурсия для детей
-          if (item.children && item.children.length > 0) {
-            let foundInChildren = findNodeById(item.children, targetId);        
-            if (foundInChildren !== undefined) {
-              return foundInChildren; //вернули найденный элемент из потомков
-            }
-          }
-        }
-        return undefined; //ничего не нашли
-      }
-      
       //найти технологию и операцию в state.items
       const operation = findNodeById(state.items, id);
       const technology = findNodeById(state.items, operation.parentId);
 
-      //технологии
-
-      //операции
       //operationCode
       let operationCode = { code: id, name: 'Новая операция' };
 
@@ -536,37 +527,22 @@ const technologiesSlice = createSlice({
         )
       };
     },
-    updateTechnology: (state, action) => {
-      const { id, newContent } = action.payload;
-      //найти технологию в state.items
-      const technology = findNodeById(state.items, id);
-
-      //technologyCode
-      let technologyCode = null;
-      if (newContent.changedValues.hasOwnProperty('technologyCode')) {
-        if (newContent.changedValues.technologyCode) {
-          technologyCode = newContent.changedValues.technologyCode;
+    deleteItems: (state) => {
+      let ids = [];
+      //смотрим чекбоксы
+      for(const checkedItem of state.checkedItems) {
+        if (!state.disabledItems.includes(checkedItem)) {
+          ids.push(checkedItem);
         }
-      }      
+      }
       //
       return {
         ...state,
-        hasUnsavedChanges: true,
-        items: state.items.map((item) =>
-          item.id === technology.id
-            ? {
-                ...item,
-                content: {
-                  ...item.content,
-                  formValues: newContent.formValues,
-                  formErrors: newContent.formErrors,
-                  expandedPanels: newContent.expandedPanels,
-                  changedValues: newContent.changedValues,
-                  isDeleted: newContent.isDeleted,
-                },                            
-              }
-            : item
-        )
+        checkedItems: [],
+        disabledItems: [
+          ...state.disabledItems,
+          ...ids,
+        ],
       };
     },
     setTabValue: (state, action) => {
@@ -656,9 +632,9 @@ export const {
   setSelectedItems, deleteSelectedItems,
   setSelectedId,
   restoreItems,
-  updateTechnology,
+  updateTechnology, deleteItems,
   //setUnsavedChanges,
-  setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs, setCheckedItems
+  setTabs, resetTabs, addTechnology, addOperation, updateOperation, setTabValue, setShouldReloadTabs, setCheckedItems
 } = technologiesSlice.actions;
 
 //селекторы
