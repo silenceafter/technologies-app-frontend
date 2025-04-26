@@ -74,7 +74,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const technologiesItems = technologiesSelectors?.items;
   const technologiesLoading = technologiesSelectors?.loading;
 
-  const bb = useSelector((state) => state.technologies);
+  const bb = useSelector((state) => state.technologies.items);
   
   //события
   const handleAccordeonTechnologiesTreeChange = () => {

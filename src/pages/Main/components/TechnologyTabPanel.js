@@ -143,7 +143,6 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
   //
   return (
     <>
-    {console.log(currentItems)}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'

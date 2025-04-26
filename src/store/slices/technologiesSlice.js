@@ -56,6 +56,50 @@ const findNodeById = (items, targetId) => {
   return undefined; //ничего не нашли
 };
 
+const markElementsAsDeleted = (items, idsToMarkAsDeleted) => {
+  return items.map((item) => {
+    // Должен ли текущий элемент быть помечен как удалённый?
+    const shouldBeDeleted = idsToMarkAsDeleted.includes(item.id);
+
+    // Обновляем объект с возможностью сохранения вложенных элементов
+    const updatedItem = {
+      ...item,
+      content: {
+        ...item.content,
+        isDeleted: shouldBeDeleted ? true : item.content.isDeleted,
+      },
+    };
+
+    // Проверяем наличие вложенных элементов и рекурсивно применяем логику
+    if (updatedItem.children && Array.isArray(updatedItem.children)) {
+      updatedItem.children = markElementsAsDeleted(updatedItem.children, idsToMarkAsDeleted);
+    }
+    return updatedItem;
+  });
+};
+
+const restoreElements = (items, idsToMarkToRestore) => {
+  return items.map((item) => {
+    // Должен ли текущий элемент быть помечен как удалённый?
+    const shouldBeRestore = idsToMarkToRestore.includes(item.id);
+
+    // Обновляем объект с возможностью сохранения вложенных элементов
+    const updatedItem = {
+      ...item,
+      content: {
+        ...item.content,
+        isDeleted: shouldBeRestore ? false : item.content.isDeleted,
+      },
+    };
+
+    // Проверяем наличие вложенных элементов и рекурсивно применяем логику
+    if (updatedItem.children && Array.isArray(updatedItem.children)) {
+      updatedItem.children = restoreElements(updatedItem.children, idsToMarkToRestore);
+    }
+    return updatedItem;
+  });
+};
+
 //загрузка технологий и операций по коду ДСЕ
 export const getSavedData = createAsyncThunk(
   'technologiesTree/getSavedData',
@@ -154,50 +198,6 @@ const technologiesSlice = createSlice({
         items: [],
         loading: LOADING_DEFAULT
       }
-    },
-    restoreItems: (state, action) => {
-      const targetItemIds = Array.isArray(action.payload) ? action.payload : [action.payload]; //если передан один itemId, преобразуем его в массив
-      let parentId = null;
-      let foundItem = null;
-
-      //поиск элемента и его родителя
-      const findItemAndParent = (items, parent = null) => {
-        for (const item of items) {
-          if (targetItemIds.includes(item.id)) {  //проверяем, что itemId есть в targetItemIds
-            foundItem = item;
-            parentId = parent ? parent.id : null;
-            return;
-          }
-          if (item.children) {
-            findItemAndParent(item.children, item);
-          }
-        }
-      };
-
-      //запускаем поиск по всей структуре items
-      targetItemIds.forEach(itemId => {
-        if (!foundItem) {
-          findItemAndParent(state.items); //ищем каждый itemId из payload
-        }
-      });
-
-      //если элемент не найден — ничего не делаем
-      if (!foundItem) return state;
-
-      //получаем id всех детей, если это родительский элемент
-      const childrenIds = foundItem.children?.map(child => child.id) || [];
-
-      //собираем все id, которые нужно восстановить (элемент + его дети + родитель, если есть)
-      const itemsToRestore = [...targetItemIds, ...childrenIds];
-      if (parentId) {
-        itemsToRestore.push(parentId);
-      }
-
-      return {
-        ...state,
-        //убираем эти id из disabledItems
-        disabledItems: state.disabledItems.filter(itemId => !itemsToRestore.includes(itemId)),
-      };
     },
     setSelectedItems: (state, action) => {
       return {
@@ -535,9 +535,10 @@ const technologiesSlice = createSlice({
           ids.push(checkedItem);
         }
       }
-      //
+      const newItems = markElementsAsDeleted(state.items, ids);
       return {
         ...state,
+        items: newItems,
         checkedItems: [],
         disabledItems: [
           ...state.disabledItems,
@@ -545,6 +546,22 @@ const technologiesSlice = createSlice({
         ],
       };
     },
+    restoreItems: (state) => {
+      //уберем отмеченные элементы из disabledItems
+      const checkedIds = [...new Set(state.checkedItems)];
+      const filteredDisabledItems = state.disabledItems.filter(id => !checkedIds.includes(id));
+      const newItems = restoreElements(state.items, checkedIds);
+
+      //
+      return {
+        ...state,
+        items: newItems,
+        checkedItems: [],
+        disabledItems: filteredDisabledItems,
+      };
+
+    },
+
     setTabValue: (state, action) => {
       return {
         ...state,

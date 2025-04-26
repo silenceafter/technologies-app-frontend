@@ -63,7 +63,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 const actions = [
   { icon: <AssignmentIcon />, name: 'add-technology', title: 'Добавить технологию' },
   { icon: <FormatListNumberedIcon />, name: 'add-operation', title: 'Добавить операцию' },
-  { icon: <ContentCopyIcon />, name: 'restoreAll', title: 'Копировать' },
+  { icon: <ContentCopyIcon />, name: 'copy', title: 'Копировать' },
   { icon: <DeleteIcon />, name: 'delete', title: 'Удалить' },
   { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление' },
 ];
@@ -171,6 +171,7 @@ const TechnologiesTree = () => {
     const selectedId = useSelector((state) => state.technologies.selectedId);
     let customClassName;
     //
+    if (!selectedId) { return; }
     if (selectedId.includes(pp) && type == 'technology') {
       customClassName = `${className} TechnologySelected`;
     } else if (selectedId.includes(pp) && type == 'operation') {
@@ -484,10 +485,7 @@ const TechnologiesTree = () => {
         break;
 
       case 'restoreAll':
-        const parentItemIds = items
-          .filter(item => item.children && item.children.length > 0)
-          .map(item => item.id);
-        handleContextMenuItemRestore(disabledItems);
+        dispatch(restoreItems());
         break;
 
       case 'add-technology':
@@ -566,7 +564,7 @@ const TechnologiesTree = () => {
         /*disabledItems={disabledItems}*/
         expandedItems={expandedItems}
         onItemExpansionToggle={handleItemExpansionToggle}
-        /*isItemDisabled={(item) => disabledItems.includes(item.id)}*/
+        isItemDisabled={(item) => disabledItems.includes(item.id)}
         disabledItemsFocusable={true}                        
         expansionTrigger='iconContainer'
       />                        
