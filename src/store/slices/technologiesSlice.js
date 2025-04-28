@@ -551,7 +551,6 @@ const technologiesSlice = createSlice({
       const checkedIds = [...new Set(state.checkedItems)];
       const filteredDisabledItems = state.disabledItems.filter(id => !checkedIds.includes(id));
       const newItems = restoreElements(state.items, checkedIds);
-
       //
       return {
         ...state,
@@ -559,9 +558,36 @@ const technologiesSlice = createSlice({
         checkedItems: [],
         disabledItems: filteredDisabledItems,
       };
-
     },
-
+    deleteItem: (state, action) => {
+      //удаление одного элемента
+      let ids = [];
+      ids.push(action.payload);
+      const newItems = markElementsAsDeleted(state.items, ids);
+      //
+      return {
+        ...state,
+        items: newItems,
+        checkedItems: [],
+        disabledItems: [
+          ...state.disabledItems,
+          ...ids,
+        ],
+      };
+    },
+    restoreItem: (state, action) => {
+      //уберем отмеченные элементы из disabledItems
+      const checkedIds = [action.payload];
+      const filteredDisabledItems = state.disabledItems.filter(id => !checkedIds.includes(id));
+      const newItems = restoreElements(state.items, checkedIds);
+      //
+      return {
+        ...state,
+        items: newItems,
+        checkedItems: [],
+        disabledItems: filteredDisabledItems,
+      };
+    },
     setTabValue: (state, action) => {
       return {
         ...state,
@@ -648,8 +674,8 @@ export const {
   clearItems, addItems,
   setSelectedItems, deleteSelectedItems,
   setSelectedId,
-  restoreItems,
-  updateTechnology, deleteItems,
+  restoreItems, restoreItem,
+  updateTechnology, deleteItems, deleteItem,
   //setUnsavedChanges,
   setTabs, resetTabs, addTechnology, addOperation, updateOperation, setTabValue, setShouldReloadTabs, setCheckedItems
 } = technologiesSlice.actions;

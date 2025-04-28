@@ -40,11 +40,11 @@ import {
   setSelectedItems, 
   setSelectedId,
   deleteSelectedItems,
-  restoreItems, 
+  restoreItems, restoreItem,
   setCheckedItems,
   addTechnology,
   addOperation,
-  deleteItems,
+  deleteItems, deleteItem,
 } from '../../../store/slices/technologiesSlice';
 import { fetchData } from '../../../store/slices/lists/technologiesListSlice';
 import { resetTabs } from '../../../store/slices/operationsSlice';
@@ -517,12 +517,15 @@ const TechnologiesTree = () => {
     setContextMenu(null);
   };
 
-  const handleContextMenuItemRestore = (nodes) => {
-    dispatch(restoreItems(nodes));
+  const handleContextMenuItemRestore = (node) => {
+    //dispatch(restoreItems(nodes));
+    dispatch(restoreItem(node));
     handleContextMenuClose();
   };
 
   const handleContextMenuItemDelete = (node) => {
+    dispatch(deleteItem(node));
+    handleContextMenuClose();
     /*dispatch(deleteSelectedItems(node));
     handleContextMenuClose();*/
   };
@@ -604,7 +607,7 @@ const TechnologiesTree = () => {
       >
         <MenuItem onClick={() => handleContextMenuItemRestore(selectedNode)}>Отменить удаление</MenuItem>
         <MenuItem onClick={() => handleContextMenuItemDelete(selectedNode)}>Удалить</MenuItem>
-        <MenuItem onClick={() => handleContextMenuItemRename(selectedNode)}>Переименовать</MenuItem>
+        {/*<MenuItem onClick={() => handleContextMenuItemRename(selectedNode)}>Переименовать</MenuItem>*/}
       </Menu>
       {<Dialog
         open={open}
