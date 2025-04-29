@@ -5,9 +5,11 @@ import {
     Box,
     Breadcrumbs,
     CircularProgress,
+    Grid,
     Paper,
     IconButton,
     Skeleton,
+    TextField,
     Typography
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -57,7 +59,7 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
   const currentItems = useSelector(selectCurrentItems);
 
   //события
-  const handleOptionSelect = useCallback((id, option) => {
+  /*const handleOptionSelect = useCallback((id, option) => {
     // Обновляем значение поля
     setLocalData((prev) => {
       const prevOption = prev.content.dbValues[id];
@@ -120,7 +122,7 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
         }        
       }
     ));
-}, [localData]);
+}, [localData]);*/
 
   //эффекты
   //анимация загрузки вкладки
@@ -143,40 +145,54 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
   //
   return (
     <>
+    {console.log(localData)}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'
       }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 2, /*paddingTop: 2*/ }}>
-          {drawingExternalCode && !showLoading && currentTechnology && currentOperation && (
-          <>
-            {/*<Breadcrumbs aria-label="breadcrumb">
-              <Typography color="inherit">Чертежи</Typography>
-              <Typography color="inherit">{drawingExternalCode}</Typography>
-              <Typography color="inherit">Технологии</Typography>
-              <Typography color="inherit">{currentTechnology.secondaryLabel} ({currentTechnology.label})</Typography>
-              <Typography color="inherit">Операции</Typography>                  
-              <Typography sx={{ color: 'text.primary' }}>{currentOperation.secondaryLabel} ({currentOperation.label})</Typography>
-            </Breadcrumbs>*/}
-          </>
-          )}                
-        </Box>
         {!isAutocompleteLoaded || showLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', height: '100%', alignItems: 'center', py: 5 }}>
               <CircularProgress size={40} />
             </Box>
           ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', margin: 2/*, height: '90%'*/ }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 2, width: '500px' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 2, width: '100%' }}>
               {currentTechnology && (
-                <TechnologySearch
+                /*<TechnologySearch
                   props={{id: "technology-code", name: "newTechnology", placeholder: "Технология"}}
                   selectedValue={currentTechnology?.content.formValues.technologyCode}
                   onChange={handleOptionSelect}
                   options={autocompleteOptions.technologies || null}
                   content={currentTechnology?.content}
                   errorValue={localData?.formErrors?.operationCode}
-                />
+                />*/
+                <form>
+                  <Grid container spacing={2} columns={{xs:5}}>
+                    {/* Первая строка */}
+                    <Grid item xs={12}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={2.4}>
+                          <TextField                       
+                            fullWidth           
+                            name='technologyCode'
+                            id="technology-code-1"
+                            label="Код технологии"
+                            type="text"
+                            size="small"
+                            value={currentTechnology.content.formValues.technologyCode?.code || 'будет присвоен после сохранения'}
+                            slotProps={{
+                              formHelperText: {
+                                sx: { whiteSpace: 'nowrap' },
+                              },
+                              input: { readOnly: true }
+                            }}
+                          >
+                          </TextField>
+                        </Grid>
+                      </Grid>                    
+                    </Grid>
+                  </Grid>
+                </form>
               )}
             </Box>
           </Box>

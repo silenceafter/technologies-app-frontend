@@ -68,13 +68,12 @@ function Content({ setSmartBackdropActive, showLoading }) {
   //селекторы
   //const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
   const user = useSelector((state) => state.users.user);
-  const { tabs } = useSelector((state) => state.operations);
+  //const { tabs } = useSelector((state) => state.operations);
   const currentItems = useSelector(selectCurrentItems);
-  const technologiesSelectors = useSelector(selectTechnologies);
-  const technologiesItems = technologiesSelectors?.items;
-  const technologiesLoading = technologiesSelectors?.loading;
-
-  const bb = useSelector((state) => state.technologies.items);
+  const technologiesListSelectors = useSelector(selectTechnologies);
+  const technologiesListItems = technologiesListSelectors?.items;
+  const technologiesListLoading = technologiesListSelectors?.loading;
+  const technologiesItems = useSelector((state) => state.technologies.items);
   
   //события
   const handleAccordeonTechnologiesTreeChange = () => {
@@ -109,7 +108,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
             setLoadingTimer(false);
           }, 1000);*/
 
-          await dispatch(setData({ user: user, tabs: tabs })).unwrap();
+          //await dispatch(setData({ user: user, technologies: technologiesItems })).unwrap();
           //dispatch(productsSetItems());
           dispatch(technologiesSetItems()); //очистить компонент технологий
           //dispatch(productsFetchData({limit: 50, page: 1}));
@@ -149,16 +148,16 @@ function Content({ setSmartBackdropActive, showLoading }) {
     if (currentItems.length > 0 && currentItems[0]) {
       if (!currentItems[0]) {
         //технология скрыта, операция открыта
-        setAccordionTechnologyTabPanelExpanded(false);
-        setAccordionOperationTabPanelExpanded(true);
+        /*setAccordionTechnologyTabPanelExpanded(false);
+        setAccordionOperationTabPanelExpanded(true);*/
       } else if (!currentItems[1]) {
         //технология открыта, операция скрыта
-        setAccordionTechnologyTabPanelExpanded(true);
-        setAccordionOperationTabPanelExpanded(false);        
+        /*setAccordionTechnologyTabPanelExpanded(true);
+        setAccordionOperationTabPanelExpanded(false);*/      
       } else {
         //технология скрыта, операция открыта
-        setAccordionTechnologyTabPanelExpanded(false);
-        setAccordionOperationTabPanelExpanded(true);
+        /*setAccordionTechnologyTabPanelExpanded(false);
+        setAccordionOperationTabPanelExpanded(true);*/
       }
       //
       setCurrentTechnology(currentItems[0]);
@@ -167,14 +166,14 @@ function Content({ setSmartBackdropActive, showLoading }) {
   }, [currentItems]);
 
   useEffect(() => {
-    if (!technologiesLoading && technologiesItems) {
+    if (!technologiesListLoading && technologiesListItems) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
-        technologies: technologiesSelectors
+        technologies: technologiesListSelectors
       }));
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
-  }, [technologiesItems, technologiesLoading]);
+  }, [technologiesListItems, technologiesListLoading]);
 
   useEffect(() => {
     dispatch(fetchData({ search: '', limit: 50, page: 1 }));
@@ -183,7 +182,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   //вывод
   return (
     <>
-    {console.log(bb)}
+    {console.log(technologiesItems)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

@@ -22,6 +22,9 @@ const initialState = {
     tooling: true,
     measuringTools: true
   },
+  newTechnologyCode: null,
+  newTechnologyCodeLoading: false,
+  newTechnologyCodeError: null,
   //
   tabs: [],
   tabValue: 0,
@@ -324,6 +327,7 @@ const technologiesSlice = createSlice({
               formErrors: {},
               expandedPanels: {},
               isDeleted: false,
+              isNewRecord: true,
             },
             userId: null,
             UID: action.payload.UID,            
@@ -372,6 +376,7 @@ const technologiesSlice = createSlice({
                       expandedPanels: state.expandedPanelsDefault,
                       changedValues: {},
                       isDeleted: false,
+                      isNewRecord: true,
                     },
                   }
                 ]                                                                                          
@@ -381,7 +386,7 @@ const technologiesSlice = createSlice({
       };    
     },
     updateTechnology: (state, action) => {
-      const { id, newContent } = action.payload;
+      const { id, newContent, newValidateForm } = action.payload;
       //найти технологию в state.items
       const technology = findNodeById(state.items, id);
 
@@ -407,6 +412,8 @@ const technologiesSlice = createSlice({
                   expandedPanels: newContent.expandedPanels,
                   changedValues: newContent.changedValues,
                   isDeleted: newContent.isDeleted,
+                  isNewRecord: newContent.isNewRecord,
+                  validateForm: newValidateForm
                 },                            
               }
             : item
@@ -517,6 +524,7 @@ const technologiesSlice = createSlice({
                           expandedPanels: newContent.expandedPanels,
                           changedValues: newContent.changedValues,
                           isDeleted: newContent.isDeleted,
+                          isNewRecord: newContent.isNewRecord,
                           validateForm: newValidateForm
                         }                        
                       }

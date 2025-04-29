@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { 
     Autocomplete, 
     Box, 
@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage } from '../../../store/slices/lists/technologiesListSlice';
+import { debounce } from 'lodash';
 
 const TechnologySearch = React.memo(({ props, selectedValue, onChange, options, content, errorValue}) => {
   const dispatch = useDispatch();
@@ -17,6 +18,9 @@ const TechnologySearch = React.memo(({ props, selectedValue, onChange, options, 
   //стейты
   const [inputValue, setInputValue] = useState(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
   const [selectedOption, setSelectedOption] = useState(selectedValue || null);
+
+  //рефы
+  const listRef = useRef(null);
   
   //запросы
   const {
@@ -33,6 +37,16 @@ const TechnologySearch = React.memo(({ props, selectedValue, onChange, options, 
     setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
     setSelectedOption(selectedValue || null);
   }, [selectedValue, dispatch]);
+
+  const handleScroll = useCallback((event) => {
+      if (listRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = event.target;
+        if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
+          //dispatch(setPage(page + 1));
+          dispatch(fetchData({ search, limit, page: page + 1 }));
+        }
+      }
+    }, [dispatch, page, search, limit, loading, hasMore]);
   //
   return (
     <>
@@ -51,6 +65,7 @@ const TechnologySearch = React.memo(({ props, selectedValue, onChange, options, 
           }}
         onInputChange={(event, newInputValue) => {
             setInputValue(newInputValue);
+            dispatch(fetchData({ search: newInputValue, limit, page: 1 }));
         }}
         onChange={(event, newValue) => {
           setSelectedOption(newValue);
@@ -62,6 +77,14 @@ const TechnologySearch = React.memo(({ props, selectedValue, onChange, options, 
         loadingText="поиск данных"
         noOptionsText="нет результатов"
         loading={loading}
+        ListboxProps={{                  
+            onScroll: handleScroll,
+            ref: listRef,
+            sx: {
+            maxHeight: '42.5vh',
+            overflowY: 'auto'
+            }
+        }}
         renderGroup={(params) => (
             <div key={params.key}>
             {params.children}

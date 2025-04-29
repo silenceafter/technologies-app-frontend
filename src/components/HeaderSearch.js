@@ -79,7 +79,7 @@ function HeaderSearch(props) {
     <>
       <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0, paddingBottom: '0.5rem' }}>
         <Toolbar>
-          <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+          <Grid container spacing={0} sx={{ alignItems: 'center' }}>
             <Grid item>
               {/*<SearchIcon color="inherit" sx={{ display: 'block' }} />*/}
             </Grid>
@@ -192,7 +192,6 @@ function HeaderSearch(props) {
       </AppBar>
     </>
   );
-
 }
 
 export { HeaderSearch };

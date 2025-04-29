@@ -790,11 +790,6 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
       </Accordion>
     </>
   );
-}/*, (prevProps, nextProps) => {
-  return JSON.stringify(prevProps.content) === JSON.stringify(nextProps.content) &&
-    JSON.stringify(prevProps.autocompleteOptions) === JSON.stringify(nextProps.autocompleteOptions) &&
-    prevProps.setValidateForm === nextProps.setValidateForm &&
-    prevProps.onUpdate === nextProps.onUpdate;
-}*/);
+});
 
 export {OperationCard};
