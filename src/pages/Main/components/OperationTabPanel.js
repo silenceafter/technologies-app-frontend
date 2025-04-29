@@ -33,14 +33,14 @@ import {
 import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
 
-function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
+function OperationTabPanel({ handleClose, open, requestStatus, showLoading, onValidationComplete }) {
   const dispatch = useDispatch();
 
   //стейты
   const [autocompleteOptions, setAutocompleteOptions] = useState({});
   const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
   const [isUserClosedAllTabs, setIsUserClosedAllTabs] = useState(false);
-  const [validateForm, setValidateForm] = useState(() => () => true);
+  //const [validateForm, setValidateForm] = useState(() => () => true);
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
@@ -61,30 +61,29 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
 
   //события
   const handleUpdateTabContent = useCallback(
-    (tabId, newContent, newValidateForm) => {
-      dispatch(updateOperation({ id: tabId, newContent: newContent, newValidateForm: newValidateForm }));
+    (tabId, newContent) => {
+      dispatch(updateOperation({ id: tabId, newContent: newContent }));
     },
     [dispatch]
   );
 
   const handleOperationUpdate = useCallback(
     (newData) => {
-      //const currentTab = tabs[tabValue];
-      if (/*currentTab && currentTab.id*/ currentOperation.id) {
-        handleUpdateTabContent(/*currentTab.id*/ currentOperation.id, newData, newData.validateForm);
+      if (currentOperation.id) {
+        handleUpdateTabContent(currentOperation.id, newData);
       }
     },
     [handleUpdateTabContent, currentOperation]
   );
 
-  const setValidateFormStable = useCallback(
+  const setValidateForm = useCallback(onValidationComplete, [onValidationComplete]);
+  const validateForm = useCallback(() => {
+    return setValidateForm ? setValidateForm() : false;
+  }, [setValidateForm]);
+  /*const setValidateFormStable = useCallback(
     (newValidateForm) => setValidateForm(newValidateForm),
     [setValidateForm]
-  );
-
-  const handleAccordeonChange = useCallback((panel) => (event, newExpanded) => {
-    setExpanded(newExpanded ? panel : false);
-  }, [setExpanded]);
+  );*/
 
   //эффекты
   //анимация загрузки вкладки
@@ -142,6 +141,15 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
       setCurrentOperation(currentItems[1]);
     }
   }, [currentItems]);
+
+  useEffect(() => {
+    console.profile('OperationTabPanel: validateForm usage'); // Начало профилирования
+  if (validateForm) {
+    const isValid = validateForm(); // Вызов функции валидации
+    onValidationComplete(isValid); // Передача результата в родительский компонент
+  }
+  console.profileEnd('OperationTabPanel: validateForm usage'); // Конец профилирования
+  }, [validateForm, onValidationComplete]);
   //
   return (
     <>
@@ -159,7 +167,7 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
               <OperationCard
                 content={currentOperation.content}
                 onUpdate={handleOperationUpdate}
-                setValidateForm={setValidateFormStable}
+                setValidateForm={onValidationComplete}
                 autocompleteOptions={autocompleteOptions}
                 hasUnsavedChanges={hasUnsavedChanges}
               />)}

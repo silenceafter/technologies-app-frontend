@@ -179,7 +179,7 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
                             label="Код технологии"
                             type="text"
                             size="small"
-                            value={currentTechnology.content.formValues.technologyCode?.code || 'будет присвоен после сохранения'}
+                            value={currentTechnology.content.formValues.technologyCode?.code || currentTechnology.label}
                             slotProps={{
                               formHelperText: {
                                 sx: { whiteSpace: 'nowrap' },

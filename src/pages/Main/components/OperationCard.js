@@ -293,7 +293,9 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   }, [content]);
 
   useEffect(() => {
-    setValidateForm(() => validateForm);
+    console.profile('OperationCard: register validateForm'); // Начало профилирования
+  setValidateForm(() => validateForm); // Передаем функцию в родительский компонент
+  console.profileEnd('OperationCard: register validateForm'); // Конец профилирования
   }, [setValidateForm, validateForm]);
 
   useEffect(() => {
@@ -572,38 +574,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
                     />                  
                   </Grid>
                 </Grid>
-              </Grid>                                                    
-              {/* Девятая строка */}
-              <Grid item xs={12}>
-                <Grid container spacing={2}>
-                  <Grid item xs={4.8}>
-                    {localData.isDeleted
-                      ? (
-                          <Button 
-                            variant='contained'
-                            color='error'
-                            onClick={(e) => {
-                              //e.stopPropagation();
-                              handleDeleteTab(e);
-                            }}
-                          >
-                            Восстановить операцию
-                          </Button>
-                        ) : (
-                          <Button 
-                            variant='contained'
-                            onClick={(e) => {
-                              //e.stopPropagation();
-                              handleDeleteTab(e);
-                            }}
-                          >
-                            Удалить операцию
-                          </Button>
-                          )
-                    }                                  
-                  </Grid>
-                </Grid>
-              </Grid>                                                    
+              </Grid>                                                 
             </Grid>
           </form>              
         </AccordionDetails>

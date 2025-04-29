@@ -51,7 +51,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const dispatch = useDispatch();
   //объекты
   //стейты  
-  const [validateForm, setValidateForm] = useState(() => () => true);
+  const [validateForm, setValidateForm] = useState(() => () => false);
   const [accordionTechnologiesTreeExpanded, setAccordionTechnologiesTreeExpanded] = useState(true);
   const [accordionProductsTreeExpanded, setAccordionProductsTreeExpanded] = useState(false);
   const [accordionTechnologyTabPanelExpanded, setAccordionTechnologyTabPanelExpanded] = useState(false);
@@ -98,9 +98,15 @@ function Content({ setSmartBackdropActive, showLoading }) {
   
   const handleSave = async () => {
     //сохранение
-    setSmartBackdropActive(true);
-    setLoading((prev) => ({ ...prev, save: true }));  
-    await new Promise((resolve) => setTimeout(async () => {      
+    //setSmartBackdropActive(true);
+    console.profile('Content: handleSave and validateForm'); // Начало профилирования
+  setLoading((prev) => ({ ...prev, save: true }));
+
+  const isValid = validateForm(); // Вызов функции валидации
+  console.log('Validation result:', isValid);
+
+    await new Promise((resolve) => setTimeout(async () => {
+      
       if (validateForm()) {
         try {
           //обновление
@@ -115,7 +121,6 @@ function Content({ setSmartBackdropActive, showLoading }) {
           
           //dispatch(resetTabs());
           dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
-          dispatch(setShouldReloadTabs(true));
 
           handleClose();
           setRequestStatus('success');
@@ -178,11 +183,15 @@ function Content({ setSmartBackdropActive, showLoading }) {
   useEffect(() => {
     dispatch(fetchData({ search: '', limit: 50, page: 1 }));
   }, [dispatch]);
+
+  const [isValid, setIsValid] = useState(false);
+  const handleValidationResult = useCallback((isValid) => {
+    setIsValid(isValid); // Сохраняем результат валидации
+  }, []);
   
   //вывод
   return (
     <>
-    {console.log(technologiesItems)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -305,7 +314,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
               )}
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', minHeight: '100px' }}>
-              <OperationTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />
+              <OperationTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} onValidationComplete={handleValidationResult} />
             </AccordionDetails>
           </Accordion>
         </Box>

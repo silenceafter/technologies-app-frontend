@@ -312,7 +312,7 @@ const technologiesSlice = createSlice({
           ...state.items,
           {
             id: newTechnologyId,            
-            label: 'Код технологии',
+            label: newTechnologyId.split('-')[0],
             secondaryLabel: `Новая технология ${state.items.length + 1}`,
             parentId: null,
             children: [],
@@ -365,7 +365,7 @@ const technologiesSlice = createSlice({
                   {
                     id: newOperationId,
                     parentId: technology.id,
-                    label: 'Код операции',
+                    label: newOperationId.split('-')[0],
                     secondaryLabel: `Новая операция ${newOrderNumber}`,
                     proxy: {},
                     type: 'operation',
@@ -422,7 +422,7 @@ const technologiesSlice = createSlice({
     },
     updateOperation: (state, action) => {
       //обновить вкладку
-      const { id, newContent, newValidateForm } = action.payload;
+      const { id, newContent/*, newValidateForm*/ } = action.payload;
 
       //найти технологию и операцию в state.items
       const operation = findNodeById(state.items, id);
@@ -525,7 +525,7 @@ const technologiesSlice = createSlice({
                           changedValues: newContent.changedValues,
                           isDeleted: newContent.isDeleted,
                           isNewRecord: newContent.isNewRecord,
-                          validateForm: newValidateForm
+                          /*validateForm: newValidateForm*/
                         }                        
                       }
                     : child                
