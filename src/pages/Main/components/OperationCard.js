@@ -6,9 +6,9 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import _ from 'lodash';
 
-const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompleteOptions, hasUnsavedChanges}) => {
+const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, hasUnsavedChanges}) => {
   //стейты
-  const [localData, setLocalData] = useState({ 
+  const [localData, setLocalData] = useState({
       dbValues: { orderNumber: 1 },
       formValues: { orderNumber: 1 },
       formErrors: {}, 
@@ -89,7 +89,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
             ...localData.formErrors,
             [name]: errorMessage
           },
-          validateForm,
+          //validateForm,
           changedValues:
           {
             ...localData.changedValues,
@@ -193,7 +193,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   }, [localData, setLocalData, onUpdate]);
 
   //проверка формы
-  const validateForm = useCallback(() => {
+  /*const validateForm = useCallback(() => {
     const errors = {};
     const textFieldMessage = 'Поле обязательно для заполнения';
     const autocompleteTextFieldMessage = 'Выберите значение из списка';
@@ -224,7 +224,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     }*/
 
     //grade
-    if (!localData.formValues.grade) {
+    /*if (!localData.formValues.grade) {
       errors.grade = textFieldMessage;
     }
 
@@ -274,7 +274,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
     }*/
 
     //обновляем ошибки
-    setLocalData((prev) => ({
+    /*setLocalData((prev) => ({
       ...prev,
       formErrors: errors,
     }));
@@ -290,13 +290,7 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
       );
     }
     return Object.keys(errors).length === 0;
-  }, [content]);
-
-  useEffect(() => {
-    console.profile('OperationCard: register validateForm'); // Начало профилирования
-  setValidateForm(() => validateForm); // Передаем функцию в родительский компонент
-  console.profileEnd('OperationCard: register validateForm'); // Конец профилирования
-  }, [setValidateForm, validateForm]);
+  }, [content]);*/
 
   useEffect(() => {
       setLocalData(content);
@@ -304,7 +298,6 @@ const OperationCard = React.memo(({content, onUpdate, setValidateForm, autocompl
   //
   return (
     <>
-    {/*console.log(localData)*/}
       {/* Параметры */}
       <Accordion defaultExpanded
         expanded={localData.expandedPanels['parameters'] || false}

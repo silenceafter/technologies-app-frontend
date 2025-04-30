@@ -129,7 +129,7 @@ export const getSavedData = createAsyncThunk(
         children: item.children.map(processItem) || [],
         type: item.type,
       });
-      console.log(data.map(processItem));
+      /*console.log(data.map(processItem));*/
       return data.map(processItem);
     } catch (error) {
       return rejectWithValue(error.message);
@@ -528,7 +528,35 @@ const technologiesSlice = createSlice({
                           /*validateForm: newValidateForm*/
                         }                        
                       }
-                    : child                
+                    : child
+                ),                
+              }
+            : item
+        )
+      };
+    },
+    updateOperationFormErrors: (state, action) => {
+      const { id, formErrors } = action.payload;
+      const operation = findNodeById(state.items, id);
+      const technology = findNodeById(state.items, operation.parentId);
+      //
+      return {
+        ...state,
+        hasUnsavedChanges: true,
+        items: state.items.map((item) =>
+          item.id === technology.id
+            ? {
+                ...item,
+                children: item.children.map((child) =>
+                  child.id === operation.id
+                    ? {
+                        ...child,
+                        content: {
+                          ...child.content,
+                          formErrors: formErrors,
+                        }                        
+                      }
+                    : child
                 ),                
               }
             : item
@@ -685,7 +713,7 @@ export const {
   restoreItems, restoreItem,
   updateTechnology, deleteItems, deleteItem,
   //setUnsavedChanges,
-  setTabs, resetTabs, addTechnology, addOperation, updateOperation, setTabValue, setShouldReloadTabs, setCheckedItems
+  setTabs, resetTabs, addTechnology, addOperation, updateOperation, updateOperationFormErrors, setTabValue, setShouldReloadTabs, setCheckedItems
 } = technologiesSlice.actions;
 
 //селекторы

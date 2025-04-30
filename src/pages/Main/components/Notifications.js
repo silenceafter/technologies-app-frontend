@@ -1,10 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
     Alert,
     Snackbar
 } from '@mui/material';
 
 function Notifications({ handleClose, open, requestStatus }) {
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (requestStatus) {
+      switch(requestStatus) {
+        case 'success':
+          setMessage('Успешно сохранено!');
+          break;
+
+        case 'warning':
+          setMessage('Неправильно заполнена форма');
+          break;
+
+        case 'error':
+          setMessage('Ошибка при отправке!');
+          break;
+      }
+      
+    }
+  }, [requestStatus]);
+
   return (
     <>
       <Snackbar
@@ -15,11 +36,11 @@ function Notifications({ handleClose, open, requestStatus }) {
       >
         <Alert
           onClose={handleClose}
-          severity={requestStatus === 'success' ? 'success' : 'error'}
+          severity={requestStatus}
           variant="filled"
           sx={{ width: '100%' }}
         >
-          {requestStatus === 'success' ? 'Успешно сохранено!' : 'Ошибка при отправке!'}
+          {message}
         </Alert>
       </Snackbar>
     </>

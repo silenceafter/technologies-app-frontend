@@ -208,13 +208,7 @@ const operationsSlice = createSlice({
       })
       .addCase(setData.fulfilled, (state, action) => {
         state.loading = false;
-        state.tabs = []; /*state.tabs.map((tab) => ({
-          ...tab,
-          content: {
-            ...tab.content,
-            changedValues: tab.content.changedValues ? [] : tab.content.changedValues,
-          },
-        }));*/
+        state.tabs = [];
       })
       .addCase(setData.rejected, (state, action) => {
         state.loading = false;

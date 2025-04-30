@@ -36,7 +36,8 @@ import { TechnologyTabPanel } from '../pages/Main/components/TechnologyTabPanel'
 import { 
   getSavedData as technologiesFetchData,
   clearItems as technologiesSetItems,
-  selectCurrentItems
+  selectCurrentItems,
+  updateOperation, updateOperationFormErrors
 } from '../store/slices/technologiesSlice';
 import { setData, setShouldReloadTabs } from '../store/slices/operationsSlice';
 import { fetchData, selectTechnologies } from '../store/slices/lists/technologiesListSlice';
@@ -51,7 +52,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const dispatch = useDispatch();
   //объекты
   //стейты  
-  const [validateForm, setValidateForm] = useState(() => () => false);
+  //const [validateForm, setValidateForm] = useState(() => () => false);
   const [accordionTechnologiesTreeExpanded, setAccordionTechnologiesTreeExpanded] = useState(true);
   const [accordionProductsTreeExpanded, setAccordionProductsTreeExpanded] = useState(false);
   const [accordionTechnologyTabPanelExpanded, setAccordionTechnologyTabPanelExpanded] = useState(false);
@@ -64,6 +65,10 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const [newTechnology, setNewTechnology] = useState(null);
   const [autocompleteOptions, setAutocompleteOptions] = useState({});
   const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
+  const [formValues, setFormValues] = useState([]);
+  const [formErrors, setFormErrors] = useState([]);
+  const [isValid, setIsValid] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
   
   //селекторы
   //const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
@@ -89,6 +94,89 @@ function Content({ setSmartBackdropActive, showLoading }) {
     setAccordionOperationTabPanelExpanded(!accordionOperationTabPanelExpanded);
   };
 
+  const validateForm = () => {
+    if (!formValues) { return { isValid: false, errors: [] }; }
+    const errors = {};
+    const textFieldMessage = 'Поле обязательно для заполнения';
+    const autocompleteTextFieldMessage = 'Выберите значение из списка';
+
+    //orderNumber
+    if (!formValues.orderNumber) {
+      errors.orderNumber = textFieldMessage;
+    }
+
+    //operationCode
+    if (!formValues.operationCode) {
+      errors.operationCode = autocompleteTextFieldMessage;
+    }
+    
+    //shopNumber
+    if (!formValues.shopNumber) {
+      errors.shopNumber = textFieldMessage;
+    }
+
+    //document
+    if (!formValues.document) {
+      errors.document = textFieldMessage;
+    }
+
+    //job
+    /*if (!formValues.job) {
+      errors.job = autocompleteTextFieldMessage;
+    }*/
+
+    //grade
+    if (!formValues.grade) {
+      errors.grade = textFieldMessage;
+    }
+
+    //workingConditions
+    if (!formValues.workingConditions) {
+      errors.workingConditions = textFieldMessage;
+    }
+
+    //numberOfWorkers
+    if (!formValues.numberOfWorkers) {
+      errors.numberOfWorkers = textFieldMessage;
+    }
+
+    //numberOfProcessedParts
+    if (!formValues.numberOfProcessedParts) {
+      errors.numberOfProcessedParts = textFieldMessage;
+    }
+
+    //laborEffort
+    if (!formValues.laborEffort) {
+      errors.laborEffort = textFieldMessage;
+    }
+
+    //equipment
+    /*if (!formValues.equipment) {
+      errors.equipment = autocompleteTextFieldMessage;
+    }
+
+    //components
+    if (!formValues.components) {
+      errors.components = autocompleteTextFieldMessage;
+    }
+
+    //materials
+    if (!formValues.materials) {
+      errors.materials = autocompleteTextFieldMessage;
+    }
+
+    //tooling
+    if (!formValues.tooling) {
+      errors.tooling = autocompleteTextFieldMessage;
+    }
+
+    //measuringTools
+    if (!formValues.measuringTools) {
+      errors.measuringTools = autocompleteTextFieldMessage;
+    }*/
+    return { isValid: Object.keys(errors).length === 0, errors };
+  };
+
   const handleClose = useCallback((reason) => {
       if (reason === 'clickaway') {
         return;
@@ -99,47 +187,42 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const handleSave = async () => {
     //сохранение
     //setSmartBackdropActive(true);
-    console.profile('Content: handleSave and validateForm'); // Начало профилирования
   setLoading((prev) => ({ ...prev, save: true }));
-
-  const isValid = validateForm(); // Вызов функции валидации
-  console.log('Validation result:', isValid);
-
-    await new Promise((resolve) => setTimeout(async () => {
+  const { isValid, errors } = validateForm(); // валидация
       
-      if (validateForm()) {
-        try {
-          //обновление
-          /*setTimeout(() => {
-            setLoadingTimer(false);
-          }, 1000);*/
+  if (isValid) {
+    try {
+      //обновление
 
-          //await dispatch(setData({ user: user, technologies: technologiesItems })).unwrap();
-          //dispatch(productsSetItems());
-          dispatch(technologiesSetItems()); //очистить компонент технологий
-          //dispatch(productsFetchData({limit: 50, page: 1}));
-          
-          //dispatch(resetTabs());
-          dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
-
-          handleClose();
-          setRequestStatus('success');
-          showSnackbar();
-
-          
-          
-        } catch (error) {
-          handleClose();
-          setRequestStatus('error');
-          showSnackbar();
-        }
+      const result = await dispatch(setData({ user: user, technologies: technologiesItems })).unwrap();
+      if (result) {
+        //успешно
+        //dispatch(productsSetItems());
+        dispatch(technologiesSetItems()); //очистить компонент технологий
+        //dispatch(productsFetchData({limit: 50, page: 1}));            
+        //dispatch(resetTabs());
+        dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
+        //
+        setStatusMessage('success');
       } else {
-        handleClose();
-        setRequestStatus('error');
-        showSnackbar();
+        //ошибка
+        setStatusMessage('error');
       }
-      setLoading((prev) => ({ ...prev, save: false }));        
-    }, 0));
+    } catch (error) {
+      setStatusMessage('error');          
+    } finally {
+      handleClose();
+      setRequestStatus(statusMessage);
+      showSnackbar();
+    }
+  } else {
+    //обновить ошибки в redux
+    dispatch(updateOperationFormErrors({ id: currentOperation.id, formErrors: errors }));
+    handleClose();
+    setRequestStatus('warning');
+    showSnackbar();
+  }
+  setLoading((prev) => ({ ...prev, save: false }));        
   };
 
   const showSnackbar = useCallback(() => {
@@ -171,6 +254,16 @@ function Content({ setSmartBackdropActive, showLoading }) {
   }, [currentItems]);
 
   useEffect(() => {
+    if (currentOperation) {
+      const formValues = currentOperation.content.formValues;
+      const formErrors = currentOperation?.сontent?.formErrors;
+      //
+      setFormValues(formValues);
+      setFormErrors(formErrors);
+    }
+  }, [currentOperation]);
+
+  useEffect(() => {
     if (!technologiesListLoading && technologiesListItems) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
@@ -183,15 +276,11 @@ function Content({ setSmartBackdropActive, showLoading }) {
   useEffect(() => {
     dispatch(fetchData({ search: '', limit: 50, page: 1 }));
   }, [dispatch]);
-
-  const [isValid, setIsValid] = useState(false);
-  const handleValidationResult = useCallback((isValid) => {
-    setIsValid(isValid); // Сохраняем результат валидации
-  }, []);
   
   //вывод
   return (
     <>
+    {console.log(technologiesItems)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -314,7 +403,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
               )}
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', minHeight: '100px' }}>
-              <OperationTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} onValidationComplete={handleValidationResult} />
+              <OperationTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />
             </AccordionDetails>
           </Accordion>
         </Box>

@@ -33,7 +33,7 @@ import {
 import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
 
-function OperationTabPanel({ handleClose, open, requestStatus, showLoading, onValidationComplete }) {
+function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const dispatch = useDispatch();
 
   //стейты
@@ -75,15 +75,6 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading, onVa
     },
     [handleUpdateTabContent, currentOperation]
   );
-
-  const setValidateForm = useCallback(onValidationComplete, [onValidationComplete]);
-  const validateForm = useCallback(() => {
-    return setValidateForm ? setValidateForm() : false;
-  }, [setValidateForm]);
-  /*const setValidateFormStable = useCallback(
-    (newValidateForm) => setValidateForm(newValidateForm),
-    [setValidateForm]
-  );*/
 
   //эффекты
   //анимация загрузки вкладки
@@ -141,15 +132,6 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading, onVa
       setCurrentOperation(currentItems[1]);
     }
   }, [currentItems]);
-
-  useEffect(() => {
-    console.profile('OperationTabPanel: validateForm usage'); // Начало профилирования
-  if (validateForm) {
-    const isValid = validateForm(); // Вызов функции валидации
-    onValidationComplete(isValid); // Передача результата в родительский компонент
-  }
-  console.profileEnd('OperationTabPanel: validateForm usage'); // Конец профилирования
-  }, [validateForm, onValidationComplete]);
   //
   return (
     <>
@@ -167,7 +149,6 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading, onVa
               <OperationCard
                 content={currentOperation.content}
                 onUpdate={handleOperationUpdate}
-                setValidateForm={onValidationComplete}
                 autocompleteOptions={autocompleteOptions}
                 hasUnsavedChanges={hasUnsavedChanges}
               />)}
