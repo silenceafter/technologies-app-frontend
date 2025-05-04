@@ -489,7 +489,7 @@ const TechnologiesTree = () => {
         break;
 
       case 'add-technology':
-        dispatch(addTechnology(user?.UID));
+        dispatch(addTechnology({ user: { UID: user?.UID }, drawing: { externalCode: drawingExternalCode } }));
         break;
 
       case 'add-operation':

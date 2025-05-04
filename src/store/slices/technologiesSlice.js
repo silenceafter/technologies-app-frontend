@@ -303,6 +303,7 @@ const technologiesSlice = createSlice({
       };
     },
     addTechnology: (state, action) => {
+      const { user, drawing } = action.payload;
       const newTechnologyId = generateUUID();
       const newDate = new Date();
       return {
@@ -329,8 +330,11 @@ const technologiesSlice = createSlice({
               isDeleted: false,
               isNewRecord: true,
             },
+            drawing: {
+              externalCode: drawing.externalCode,
+            },
             userId: null,
-            UID: action.payload.UID,            
+            UID: user.UID,
           },
         ],
       };
