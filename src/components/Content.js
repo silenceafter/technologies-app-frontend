@@ -37,7 +37,7 @@ import {
   getSavedData as technologiesFetchData,
   clearItems as technologiesSetItems,
   selectCurrentItems,
-  updateOperation, updateOperationFormErrors
+  updateOperation, updateTechnologyFormErrors, updateOperationFormErrors
 } from '../store/slices/technologiesSlice';
 import { setData, setShouldReloadTabs } from '../store/slices/operationsSlice';
 import { fetchData, selectTechnologies } from '../store/slices/lists/technologiesListSlice';
@@ -64,11 +64,14 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const [currentOperation, setCurrentOperation] = useState(null);
   const [newTechnology, setNewTechnology] = useState(null);
   const [autocompleteOptions, setAutocompleteOptions] = useState({});
-  const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(false);
-  const [formValues, setFormValues] = useState([]);
-  const [formErrors, setFormErrors] = useState([]);
+  const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(true);//false
+  const [technologyFormValues, setTechnologyFormValues] = useState([]);
+  const [technologyFormErrors, setTechnologyFormErrors] = useState([]);
+  const [operationFormValues, setOperationFormValues] = useState([]);
+  const [operationFormErrors, setOperationFormErrors] = useState([]);
   const [isValid, setIsValid] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const [formErrors, setFormErrors] = useState(false);
   
   //селекторы
   //const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
@@ -95,86 +98,97 @@ function Content({ setSmartBackdropActive, showLoading }) {
   };
 
   const validateForm = () => {
-    if (!formValues) { return { isValid: false, errors: [] }; }
-    const errors = {};
+    if (!technologyFormValues || !operationFormValues) { return { isValid: false, technologyErrors: [], operationErrors: [] }; }
+    const technologyErrors = {};
+    const operationErrors = {};
     const textFieldMessage = 'Поле обязательно для заполнения';
     const autocompleteTextFieldMessage = 'Выберите значение из списка';
 
+    //технология
+    if (!technologyFormValues.prefix) {
+      technologyErrors.prefix = autocompleteTextFieldMessage;
+    }
+
+    //операция
     //orderNumber
-    if (!formValues.orderNumber) {
-      errors.orderNumber = textFieldMessage;
+    if (!operationFormValues.orderNumber) {
+      operationErrors.orderNumber = textFieldMessage;
     }
 
     //operationCode
-    if (!formValues.operationCode) {
-      errors.operationCode = autocompleteTextFieldMessage;
+    if (!operationFormValues.operationCode) {
+      operationErrors.operationCode = autocompleteTextFieldMessage;
     }
     
     //shopNumber
-    if (!formValues.shopNumber) {
-      errors.shopNumber = textFieldMessage;
+    if (!operationFormValues.shopNumber) {
+      operationErrors.shopNumber = textFieldMessage;
     }
 
     //document
-    if (!formValues.document) {
-      errors.document = textFieldMessage;
+    if (!operationFormValues.document) {
+      operationErrors.document = textFieldMessage;
     }
 
     //job
-    /*if (!formValues.job) {
-      errors.job = autocompleteTextFieldMessage;
+    /*if (!operationFormValues.job) {
+      operationErrors.job = autocompleteTextFieldMessage;
     }*/
 
     //grade
-    if (!formValues.grade) {
-      errors.grade = textFieldMessage;
+    if (!operationFormValues.grade) {
+      operationErrors.grade = textFieldMessage;
     }
 
     //workingConditions
-    if (!formValues.workingConditions) {
-      errors.workingConditions = textFieldMessage;
+    if (!operationFormValues.workingConditions) {
+      operationErrors.workingConditions = textFieldMessage;
     }
 
     //numberOfWorkers
-    if (!formValues.numberOfWorkers) {
-      errors.numberOfWorkers = textFieldMessage;
+    if (!operationFormValues.numberOfWorkers) {
+      operationErrors.numberOfWorkers = textFieldMessage;
     }
 
     //numberOfProcessedParts
-    if (!formValues.numberOfProcessedParts) {
-      errors.numberOfProcessedParts = textFieldMessage;
+    if (!operationFormValues.numberOfProcessedParts) {
+      operationErrors.numberOfProcessedParts = textFieldMessage;
     }
 
     //laborEffort
-    if (!formValues.laborEffort) {
-      errors.laborEffort = textFieldMessage;
+    if (!operationFormValues.laborEffort) {
+      operationErrors.laborEffort = textFieldMessage;
     }
 
     //equipment
-    /*if (!formValues.equipment) {
-      errors.equipment = autocompleteTextFieldMessage;
+    /*if (!operationFormValues.equipment) {
+      operationErrors.equipment = autocompleteTextFieldMessage;
     }
 
     //components
-    if (!formValues.components) {
-      errors.components = autocompleteTextFieldMessage;
+    if (!operationFormValues.components) {
+      operationErrors.components = autocompleteTextFieldMessage;
     }
 
     //materials
-    if (!formValues.materials) {
-      errors.materials = autocompleteTextFieldMessage;
+    if (!operationFormValues.materials) {
+      operationErrors.materials = autocompleteTextFieldMessage;
     }
 
     //tooling
-    if (!formValues.tooling) {
-      errors.tooling = autocompleteTextFieldMessage;
+    if (!operationFormValues.tooling) {
+      operationErrors.tooling = autocompleteTextFieldMessage;
     }
 
     //measuringTools
-    if (!formValues.measuringTools) {
-      errors.measuringTools = autocompleteTextFieldMessage;
+    if (!operationFormValues.measuringTools) {
+      operationErrors.measuringTools = autocompleteTextFieldMessage;
     }*/
-    return { isValid: Object.keys(errors).length === 0, errors };
+    return { 
+      isValid: Object.keys(technologyErrors).length === 0 && Object.keys(operationErrors).length === 0, 
+      technologyErrors,
+      operationErrors
+    };
   };
 
   const handleClose = useCallback((reason) => {
@@ -188,7 +202,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
     //сохранение
     //setSmartBackdropActive(true);
   setLoading((prev) => ({ ...prev, save: true }));
-  const { isValid, errors } = validateForm(); // валидация
+  const { isValid, technologyErrors, operationErrors } = validateForm(); // валидация
       
   if (isValid) {
     try {
@@ -217,7 +231,13 @@ function Content({ setSmartBackdropActive, showLoading }) {
     }
   } else {
     //обновить ошибки в redux
-    dispatch(updateOperationFormErrors({ id: currentOperation.id, formErrors: errors }));
+    if (currentTechnology) {
+      dispatch(updateTechnologyFormErrors({ id: currentTechnology.id, formErrors: technologyErrors }));
+    }
+    if (currentOperation) {
+      dispatch(updateOperationFormErrors({ id: currentOperation.id, formErrors: operationErrors }));
+    }
+    //
     handleClose();
     setRequestStatus('warning');
     showSnackbar();
@@ -254,14 +274,15 @@ function Content({ setSmartBackdropActive, showLoading }) {
   }, [currentItems]);
 
   useEffect(() => {
-    if (currentOperation) {
-      const formValues = currentOperation.content.formValues;
-      const formErrors = currentOperation?.сontent?.formErrors;
-      //
-      setFormValues(formValues);
-      setFormErrors(formErrors);
+    if (currentTechnology) {
+      setTechnologyFormValues(currentTechnology.content.formValues);
+      setTechnologyFormErrors(currentTechnology.content.formErrors);
     }
-  }, [currentOperation]);
+    if (currentOperation) {
+      setOperationFormValues(currentOperation.content.formValues);
+      setOperationFormErrors(currentOperation.content.formErrors);
+    }
+  }, [currentTechnology, currentOperation]);
 
   useEffect(() => {
     if (!technologiesListLoading && technologiesListItems) {
@@ -273,9 +294,9 @@ function Content({ setSmartBackdropActive, showLoading }) {
     }
   }, [technologiesListItems, technologiesListLoading]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     dispatch(fetchData({ search: '', limit: 50, page: 1 }));
-  }, [dispatch]);
+  }, [dispatch]);*/
   
   //вывод
   return (
@@ -397,9 +418,9 @@ function Content({ setSmartBackdropActive, showLoading }) {
               sx={{ backgroundColor: 'primary.main' }}
             >
               {currentOperation ? (
-                <Typography component="span">Операция: {currentOperation.secondaryLabel} ({currentOperation.label})</Typography>  
+                <Typography component="span">Операция: {currentOperation.secondaryLabel} ({currentOperation.label})</Typography>
               ) : (
-                <Typography component="span">Операция</Typography>  
+                <Typography component="span">Операция</Typography>
               )}
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', minHeight: '100px' }}>

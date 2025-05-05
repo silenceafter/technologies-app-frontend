@@ -20,10 +20,11 @@ import usersReducer from './slices/usersSlice';
 import technologiesReducer from './slices/technologiesSlice';
 import operationsReducer from './slices/operationsSlice';
 import unsavedChangesReducer from './slices/unsavedChangesSlice';
+import technologiesPrefixReducer from './slices/technologiesPrefixSlice';
 
 //корневой редьюсер
 const rootReducer = combineReducers({  
-  technologiesList: technologiesListReducer,
+  /*technologiesList: technologiesListReducer,*/
   operationsList: operationsListReducer,
   jobsList: jobsListReducer,
   measuringToolsList: measuringToolsListReducer,
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
   header: headerReducer,
   drawings: drawingsReducer,
   technologies: technologiesReducer,
+  technologiesPrefix: technologiesPrefixReducer,
   operations: operationsReducer,
   users: usersReducer, /* храним обязательно */  
 });

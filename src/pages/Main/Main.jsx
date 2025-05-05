@@ -67,8 +67,8 @@ function Main() {
 
   //переменные
   const showLoading = useMemo(() => {
-    return technologiesLoading || loadingTimer;
-  }, [technologiesLoading, loadingTimer]); 
+    return /*technologiesLoading ||*/ loadingTimer;
+  }, [/*technologiesLoading,*/ loadingTimer]); 
 
   //эффекты
   useEffect(() => {

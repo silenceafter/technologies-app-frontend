@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    Backdrop,
     Box,
-    Breadcrumbs,
     CircularProgress,
+    FormControl,
+    FormHelperText,
     Grid,
-    Paper,
-    IconButton,
-    Skeleton,
-    TextField,
-    Typography
+    MenuItem,
+    InputLabel,
+    Select,
+    TextField
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from "@mui/icons-material/Close";
@@ -28,6 +27,7 @@ import {
 } from '../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
+import { fetchData as technologiesPrefixFetchData} from '../../../store/slices/technologiesPrefixSlice';
 import { TechnologySearch } from '../components/TechnologySearch';
 import _ from 'lodash';
 
@@ -40,14 +40,8 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
-  const [newTechnology, setNewTechnology] = useState(null);
-  const [localData, setLocalData] = useState({ 
-    dbValues: {},
-    formValues: {},
-    formErrors: {}, 
-    changedValues: {},
-    expandedPanels: {},             
-  });
+  const [prefixList, setPrefixList] = useState('');
+  const [prefixHasError, setPrefixHasError] = useState(false);
 
   //селекторы
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
@@ -57,72 +51,14 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
   const selectedIds = useSelector((state) => state.technologies.selectedId);
   const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
   const currentItems = useSelector(selectCurrentItems);
+  const technologiesPrefixItems = useSelector((state) => state.technologiesPrefix.items);
+  const technologiesPrefixLoading = useSelector((state) => state.technologiesPrefix.loading);
+  const user = useSelector((state) => state.users.user);
 
   //события
-  /*const handleOptionSelect = useCallback((id, option) => {
-    // Обновляем значение поля
-    setLocalData((prev) => {
-      const prevOption = prev.content.dbValues[id];
-      //проверяем изменения
-      if (!_.isEqual(prevOption, option)) {
-        //есть изменения
-        return {
-          ...prev,
-          content: {
-            ...prev.content,
-            formValues: {
-              ...prev.formValues,
-              [id]: option || null,
-            },
-            changedValues: {
-              ...prev.changedValues,
-              [id]: option || null,
-            }
-          },          
-        };        
-      } else {
-        //нет изменений
-        return {
-          ...prev,
-          content: {
-            ...prev.content,
-            formValues: {
-              ...prev.formValues,
-              [id]: option || null,
-            },
-            changedValues: {
-              ...prev.changedValues,
-              [id]: option || null,
-            }, 
-          },          
-        };
-      }
-    });
-  
-    //убираем ошибку для этого поля
-    setLocalData((prev) => ({
-      ...prev,
-      content: {
-        ...prev.content,
-        formErrors: {
-          ...prev.formErrors,
-          [id]: '',
-        },
-      },
-    }));
-  
-    //передаем изменения в родительский компонент
-    dispatch(updateTechnology(
-      { id: currentTechnology.id,
-        newContent: {
-          ...localData.content,
-            formValues: { ...localData.formValues, [id]: option || null }, 
-            formErrors: { ...localData.formErrors, [id]: '' },
-            changedValues: { ...localData.changedValues, [id]: option || null },
-        }        
-      }
-    ));
-}, [localData]);*/
+  const handleChange = (event) => {
+    dispatch(updateTechnology({ id: currentTechnology.id, prefixValue: event.target.value}));
+  };
 
   //эффекты
   //анимация загрузки вкладки
@@ -139,9 +75,29 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
     if (currentItems.length > 0 && currentItems[0]) {
       setCurrentTechnology(currentItems[0]);
       setCurrentOperation(currentItems[1]);
-      setLocalData(currentItems[0]);
     }
   }, [currentItems]);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(technologiesPrefixFetchData({ UID: user.UID, ivHex: user.ivHex, keyHex: user.keyHex }));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!technologiesPrefixLoading && technologiesPrefixItems.length > 0) {
+      const menuItems = technologiesPrefixItems.map(option => (
+        <MenuItem key={option.prefix} value={option.prefix}>{option.prefix}</MenuItem>
+      ));
+      setPrefixList(menuItems);
+    }
+  }, [technologiesPrefixItems, technologiesPrefixLoading]);
+
+  useEffect(() => {
+    if (currentTechnology) {
+      setPrefixHasError(('prefix' in currentTechnology?.content?.formErrors ? true : false));
+    }
+  }, [currentTechnology]);
   //
   return (
     <>
@@ -188,6 +144,21 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
                           >
                           </TextField>
                         </Grid>
+                        {currentTechnology?.content?.isNewRecord && (<Grid item xs={4.8}>
+                          <FormControl size='small' fullWidth required error={prefixHasError}>
+                            <InputLabel id="technologies-prefix-select-label">Префикс</InputLabel>
+                            <Select
+                              labelId="technologies-prefix-select-label"
+                              id="technologies-prefix-select"
+                              value={currentTechnology?.content?.formValues?.prefix}
+                              label="Префикс *"
+                              onChange={(e) => handleChange(e)}
+                            >
+                              {prefixList}
+                            </Select>
+                            {setPrefixHasError && <FormHelperText>111</FormHelperText>}
+                          </FormControl>
+                        </Grid>)}
                       </Grid>                    
                     </Grid>
                   </Grid>

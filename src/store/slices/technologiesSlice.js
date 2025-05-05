@@ -324,7 +324,7 @@ const technologiesSlice = createSlice({
             content: {
               changedValues: {},
               dbValues: { technologyCode: null },
-              formValues: { technologyCode: null },
+              formValues: { technologyCode: null, prefix: null },
               formErrors: {},
               expandedPanels: {},
               isDeleted: false,
@@ -390,17 +390,8 @@ const technologiesSlice = createSlice({
       };    
     },
     updateTechnology: (state, action) => {
-      const { id, newContent, newValidateForm } = action.payload;
-      //найти технологию в state.items
-      const technology = findNodeById(state.items, id);
-
-      //technologyCode
-      let technologyCode = null;
-      if (newContent.changedValues.hasOwnProperty('technologyCode')) {
-        if (newContent.changedValues.technologyCode) {
-          technologyCode = newContent.changedValues.technologyCode;
-        }
-      }      
+      const { id, prefixValue } = action.payload;
+      const technology = findNodeById(state.items, id);//найти технологию в state.items
       //
       return {
         ...state,
@@ -411,18 +402,19 @@ const technologiesSlice = createSlice({
                 ...item,
                 content: {
                   ...item.content,
-                  formValues: newContent.formValues,
-                  formErrors: newContent.formErrors,
-                  expandedPanels: newContent.expandedPanels,
-                  changedValues: newContent.changedValues,
-                  isDeleted: newContent.isDeleted,
-                  isNewRecord: newContent.isNewRecord,
-                  validateForm: newValidateForm
+                  formValues: {
+                    ...item.content.formValues,
+                    prefix: prefixValue,
+                  },
+                  changedValues: {
+                    ...item.content.changedValues,
+                    prefix: prefixValue,
+                  },
                 },                            
               }
             : item
         )
-      };
+      };      
     },
     updateOperation: (state, action) => {
       //обновить вкладку
@@ -534,6 +526,26 @@ const technologiesSlice = createSlice({
                       }
                     : child
                 ),                
+              }
+            : item
+        )
+      };
+    },
+    updateTechnologyFormErrors: (state, action) => {
+      const { id, formErrors } = action.payload;
+      const technology = findNodeById(state.items, id);
+      //
+      return {
+        ...state,
+        hasUnsavedChanges: true,
+        items: state.items.map((item) =>
+          item.id === technology.id
+            ? {
+                ...item,
+                content: {
+                  ...item.content,
+                  formErrors: formErrors,
+                }                                
               }
             : item
         )
@@ -715,9 +727,9 @@ export const {
   setSelectedItems, deleteSelectedItems,
   setSelectedId,
   restoreItems, restoreItem,
-  updateTechnology, deleteItems, deleteItem,
+  deleteItems, deleteItem,
   //setUnsavedChanges,
-  setTabs, resetTabs, addTechnology, addOperation, updateOperation, updateOperationFormErrors, setTabValue, setShouldReloadTabs, setCheckedItems
+  setTabs, resetTabs, addTechnology, addOperation, updateTechnology, updateOperation, updateTechnologyFormErrors, updateOperationFormErrors, setTabValue, setShouldReloadTabs, setCheckedItems
 } = technologiesSlice.actions;
 
 //селекторы
