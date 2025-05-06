@@ -76,7 +76,6 @@ const headerSlice = createSlice({
 export const selectSearch = (state) => state.header.search;
 export const selectLimit = (state) => state.header.limit;
 export const selectPage = (state) => state.header.page;
-//export const selectDrawing = (state) => state.header.drawing;
 
 export const { setSearch, setLimit, setPage } = headerSlice.actions;
 export default headerSlice.reducer;

@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from "@mui/icons-material/Close";
-import { Notifications } from '../components/Notifications';
 import { OperationCard } from '../components/OperationCard';
 import { MemoizedTabPanel as TabPanel } from '../components/TabPanel';
 import { TechnologyBreadcrumbs } from '../components/TechnologyBreadcrumbs';
@@ -25,13 +24,13 @@ import {
   selectLoading as technologiesSelectLoading,
   setTabs, setTabValue, setShouldReloadTabs, selectCurrentItems, updateTechnology,
 } from '../../../store/slices/technologiesSlice';
-import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
+import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
 import { fetchData as technologiesPrefixFetchData} from '../../../store/slices/technologiesPrefixSlice';
 import { TechnologySearch } from '../components/TechnologySearch';
 import _ from 'lodash';
 
-function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, autocompleteOptions, isAutocompleteLoaded }) {
+function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isAutocompleteLoaded }) {
   const dispatch = useDispatch();
 
   //стейты
@@ -95,7 +94,7 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
 
   useEffect(() => {
     if (currentTechnology) {
-      setPrefixHasError(('prefix' in currentTechnology?.content?.formErrors ? true : false));
+      setPrefixHasError(('prefix' in currentTechnology?.content?.formErrors && !currentTechnology?.content?.formValues?.prefix ? true : false));
     }
   }, [currentTechnology]);
   //
@@ -156,7 +155,7 @@ function TechnologyTabPanel({ handleClose, open, requestStatus, showLoading, aut
                             >
                               {prefixList}
                             </Select>
-                            {setPrefixHasError && <FormHelperText>111</FormHelperText>}
+                            {prefixHasError && <FormHelperText>{currentTechnology?.content?.formErrors?.prefix}</FormHelperText>}
                           </FormControl>
                         </Grid>)}
                       </Grid>                    

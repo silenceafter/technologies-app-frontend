@@ -21,6 +21,7 @@ import technologiesReducer from './slices/technologiesSlice';
 import operationsReducer from './slices/operationsSlice';
 import unsavedChangesReducer from './slices/unsavedChangesSlice';
 import technologiesPrefixReducer from './slices/technologiesPrefixSlice';
+import notificationsReducer from './slices/notificationsSlice';
 
 //корневой редьюсер
 const rootReducer = combineReducers({  
@@ -41,6 +42,7 @@ const rootReducer = combineReducers({
   technologiesPrefix: technologiesPrefixReducer,
   operations: operationsReducer,
   users: usersReducer, /* храним обязательно */  
+  notifications: notificationsReducer,
 });
 
 //конфигурация persist

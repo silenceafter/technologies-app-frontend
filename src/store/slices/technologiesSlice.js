@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { selectDrawingExternalCode } from './drawingsSlice';
-import { isContentEditable } from '@testing-library/user-event/dist/utils';
 
 const LOADING_DEFAULT = false;
 const initialState = {
@@ -136,53 +135,6 @@ export const getSavedData = createAsyncThunk(
     }
   }
 );
-
-//удалить технологии и/или операции
-/*export const deleteSavedData = createAsyncThunk(
-  'technologiesTree/deleteSavedData',
-  async ({}, { getState, rejectWithValue }) => {
-    try {
-      const state = getState();
-      const externalCode = selectDrawingExternalCode(state);
-
-      const selectedItemsData = state.items
-        .filter(item => state.selectedItems.includes(item.id) || item.children?.some(child => state.selectedItems.includes(child.id)))
-        .map(item => ({
-          ...item,
-          selected: state.selectedItems.includes(item.id), //отмечаем основной элемент
-          children: item.children?.map(child => ({
-            ...child,
-            selected: state.selectedItems.includes(child.id) //отмечаем детей
-          }))
-      }));
-
-      //
-      const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/DeleteSavedData.v0.php', {
-        method: 'POST',
-        body: JSON.stringify({}),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Network response was not ok');
-      }
-
-      //для пустого значения
-      if (!externalCode.trim()) return rejectWithValue('Пустое значение поиска (реквизит drawing)');
-
-      //приведем к нужному виду
-      const processItem = (item) => ({
-        ...item,
-        id: item.id || item.ItemId,
-        label: item.label || 'Unnamed Item',
-        secondaryLabel: item.secondaryLabel || null,
-        children: item.children.map(processItem) || [],
-      });
-      return data.map(processItem);
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);*/
 
 const technologiesSlice = createSlice({
   name: 'technologies',
@@ -698,12 +650,6 @@ const technologiesSlice = createSlice({
         checkedItems: Array.from(updatedCheckedItems),
       };
     },
-    /*setUnsavedChanges: (state, action) => {
-      return {
-        ...state,
-        hasUnsavedChanges: action.payload,
-      };
-    },*/
   },
   extraReducers: (builder) => {
     builder
@@ -714,6 +660,10 @@ const technologiesSlice = createSlice({
       .addCase(getSavedData.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
+        state.hasUnsavedChanges = false;
+        state.selectedId = state.items.length > 0 
+          ? [state.items[0].id, state.items[0].children.length > 0 ? state.items[0].children[0].id : null] 
+          : [null, null];
       })
       .addCase(getSavedData.rejected, (state, action) => {
         state.loading = false;
@@ -728,7 +678,6 @@ export const {
   setSelectedId,
   restoreItems, restoreItem,
   deleteItems, deleteItem,
-  //setUnsavedChanges,
   setTabs, resetTabs, addTechnology, addOperation, updateTechnology, updateOperation, updateTechnologyFormErrors, updateOperationFormErrors, setTabValue, setShouldReloadTabs, setCheckedItems
 } = technologiesSlice.actions;
 
@@ -740,7 +689,7 @@ export const selectCurrentItems = (state) => {
   if (state.technologies.items && state.technologies.selectedId) {
     const technology = findNodeById(state.technologies.items, state.technologies.selectedId[0]);
     const operation = findNodeById(state.technologies.items, state.technologies.selectedId[1]);
-    return [ technology, operation];
+    return [technology, operation];
   }
   return [null, null];
 };

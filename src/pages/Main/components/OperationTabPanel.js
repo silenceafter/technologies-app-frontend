@@ -30,10 +30,10 @@ import {
   selectLoading as technologiesSelectLoading,
   setTabs, updateOperation, setTabValue, setShouldReloadTabs, selectCurrentItems,
 } from '../../../store/slices/technologiesSlice';
-import { selectDrawingExternalCode, selectTechnology, setTechnology } from '../../../store/slices/drawingsSlice';
+import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
 
-function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
+function OperationTabPanel({ handleClose, open, showLoading }) {
   const dispatch = useDispatch();
 
   //стейты
@@ -56,24 +56,16 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
   const operationsItems = operationsSelectors?.items;
   const operationsLoading = operationsSelectors?.loading;
   const selectedIds = useSelector((state) => state.technologies.selectedId);
-  const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
   const currentItems = useSelector(selectCurrentItems);
 
   //события
-  const handleUpdateTabContent = useCallback(
-    (tabId, newContent) => {
-      dispatch(updateOperation({ id: tabId, newContent: newContent }));
-    },
-    [dispatch]
-  );
-
   const handleOperationUpdate = useCallback(
     (newData) => {
-      if (currentOperation.id) {
-        handleUpdateTabContent(currentOperation.id, newData);
+      if (currentOperation) {
+        dispatch(updateOperation({ id: currentOperation.id, newContent: newData })); //handleUpdateTabContent(currentOperation.id, newData);
       }
     },
-    [handleUpdateTabContent, currentOperation]
+    [currentOperation]
   );
 
   //эффекты
@@ -135,6 +127,7 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
   //
   return (
     <>
+    {console.log(selectedIds)}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'
@@ -150,12 +143,11 @@ function OperationTabPanel({ handleClose, open, requestStatus, showLoading }) {
                 content={currentOperation.content}
                 onUpdate={handleOperationUpdate}
                 autocompleteOptions={autocompleteOptions}
-                hasUnsavedChanges={hasUnsavedChanges}
               />)}
           </Box>
           )
         }        
-        <Notifications handleClose={handleClose} open={open} requestStatus={requestStatus} />
+        <Notifications handleClose={handleClose} open={open} />
       </Box>
     </>
   );

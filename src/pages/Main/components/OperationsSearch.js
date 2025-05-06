@@ -1,21 +1,14 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
-import { 
-    AppBar,
+import {
     Autocomplete, 
     Box, 
     CircularProgress, 
-    Grid,
-    Link,
     ListItem, 
     ListItemText,
-    TextField,
-    Toolbar
+    TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setPage } from '../../../store/slices/lists/operationsListSlice';
-import { debounce } from 'lodash';
-import Skeleton from '@mui/material/Skeleton';
 
 const OperationsSearch = React.memo(({props, id, selectedValue, options, onChange, errorValue }) => {
   const dispatch = useDispatch();
@@ -24,14 +17,8 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
   //стейты
   const [inputValue, setInputValue] = useState(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
   const [selectedOption, setSelectedOption] = useState(selectedValue || null);
-
-  //селекторы
-  const tabs = useSelector((state) => state.operations.tabs);
   
   //запросы
-  /*const search = useSelector(selectSearch);
-  const limit = useSelector(selectLimit);
-  const page = useSelector(selectPage);*/
   const { 
     search = '', 
     limit = 10, 
@@ -41,33 +28,10 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
     hasMore = false 
   } = options;
 
-  //запросы для прокрутки списка
+  //рефы
   const listRef = useRef(null);
 
-  const debouncedFetchData = debounce(() => {
-    dispatch(fetchData({ search: inputValue, limit, page: 1 }));
-  }, 1);
-
-  /*useEffect(() => {
-    //загрузка данных при пустом поисковом запросе
-    if (!search) {
-      dispatch(fetchData({ search: '', limit, page: 1 }));
-    }
-  }, [dispatch, search, limit, page]);
-
-  useEffect(() => {
-    //поиск при изменении значения в поле ввода
-    if (inputValue !== search) {
-      dispatch(setSearch(inputValue));
-      debouncedFetchData();
-    }
-  }, [inputValue, search, debouncedFetchData, dispatch]);
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);//чистим обработчик при размонтировании
-  }, [loading, hasMore]);*/
-
+  //события
   const handleScroll = useCallback((event) => {
     if (listRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
@@ -81,7 +45,6 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
   useEffect(() => {
     setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
     setSelectedOption(selectedValue || null);
-    //dispatch(setOperation(selectedValue ? { code: selectedValue.code, name: selectedValue.name } : { code: '', name: `Новая операция ${tabs ? tabs.length : ''}` }));
   }, [selectedValue, dispatch]);
   //
   return (    
@@ -104,7 +67,6 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
           }}
           onChange={(event, newValue) => {
             setSelectedOption(newValue);
-            //dispatch(setOperation({ code: !newValue ? '' : newValue.code, name: !newValue ? '' : newValue.name }));
             //
             if (onOptionSelect) {
               onOptionSelect('operationCode', newValue);
@@ -172,7 +134,7 @@ const OperationsSearch = React.memo(({props, id, selectedValue, options, onChang
               },
           }}
           value={selectedOption || null}
-            />
+        />
     </>
   );
 });

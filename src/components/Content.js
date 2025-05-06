@@ -43,6 +43,7 @@ import { setData, setShouldReloadTabs } from '../store/slices/operationsSlice';
 import { fetchData, selectTechnologies } from '../store/slices/lists/technologiesListSlice';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { setStatus } from '../store/slices/notificationsSlice';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -54,11 +55,10 @@ function Content({ setSmartBackdropActive, showLoading }) {
   //стейты  
   //const [validateForm, setValidateForm] = useState(() => () => false);
   const [accordionTechnologiesTreeExpanded, setAccordionTechnologiesTreeExpanded] = useState(true);
-  const [accordionProductsTreeExpanded, setAccordionProductsTreeExpanded] = useState(false);
-  const [accordionTechnologyTabPanelExpanded, setAccordionTechnologyTabPanelExpanded] = useState(false);
+  const [accordionProductsTreeExpanded, setAccordionProductsTreeExpanded] = useState(true);
+  const [accordionTechnologyTabPanelExpanded, setAccordionTechnologyTabPanelExpanded] = useState(true);
   const [accordionOperationTabPanelExpanded, setAccordionOperationTabPanelExpanded] = useState(true);
   const [open, setOpen] = useState(false);
-  const [requestStatus, setRequestStatus] = useState(false);
   const [loading, setLoading] = useState({ save: false });
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
@@ -74,7 +74,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const [formErrors, setFormErrors] = useState(false);
   
   //селекторы
-  //const hasUnsavedChanges = useSelector((state) => state.unsavedChanges.hasUnsavedChanges);
+  const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
   const user = useSelector((state) => state.users.user);
   //const { tabs } = useSelector((state) => state.operations);
   const currentItems = useSelector(selectCurrentItems);
@@ -105,7 +105,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
     const autocompleteTextFieldMessage = 'Выберите значение из списка';
 
     //технология
-    if (!technologyFormValues.prefix) {
+    if (!technologyFormValues.prefix && currentTechnology.content.isNewRecord && !currentTechnology.content.isDeleted) {
       technologyErrors.prefix = autocompleteTextFieldMessage;
     }
 
@@ -198,51 +198,56 @@ function Content({ setSmartBackdropActive, showLoading }) {
       setOpen(false);
   }, []);
   
-  const handleSave = async () => {
-    //сохранение
-    //setSmartBackdropActive(true);
-  setLoading((prev) => ({ ...prev, save: true }));
-  const { isValid, technologyErrors, operationErrors } = validateForm(); // валидация
-      
-  if (isValid) {
-    try {
-      //обновление
+  const handleSave = async () => {   
+    if (!hasUnsavedChanges) {
+      //сохранение не требуется
+      dispatch(setStatus('info'));//setRequestStatus('info');
+      showSnackbar();
+      return;
+    }
 
-      const result = await dispatch(setData({ user: user, technologies: technologiesItems })).unwrap();
-      if (result) {
-        //успешно
-        //dispatch(productsSetItems());
-        dispatch(technologiesSetItems()); //очистить компонент технологий
-        //dispatch(productsFetchData({limit: 50, page: 1}));            
-        //dispatch(resetTabs());
-        dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
-        //
-        setStatusMessage('success');
-      } else {
-        //ошибка
-        setStatusMessage('error');
+    //сохранение
+    setSmartBackdropActive(true);
+    setLoading((prev) => ({ ...prev, save: true }));
+    const { isValid, technologyErrors, operationErrors } = validateForm(); // валидация     
+    if (isValid) {
+      try {
+        //обновление
+        const result = await dispatch(setData({ user: user, technologies: technologiesItems })).unwrap();
+        if (result) {
+          //успешно
+          //dispatch(productsSetItems());
+          dispatch(technologiesSetItems()); //очистить компонент технологий
+          //dispatch(productsFetchData({limit: 50, page: 1}));            
+          //dispatch(resetTabs());
+          dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
+          //
+          dispatch(setStatus('success'));//setStatusMessage('success');
+        } else {
+          //ошибка
+          dispatch(setStatus('error'));//setStatusMessage('error');
+        }
+      } catch (error) {
+        dispatch(setStatus('error'));//setStatusMessage('error');          
+      } finally {
+        handleClose();
+        showSnackbar();
       }
-    } catch (error) {
-      setStatusMessage('error');          
-    } finally {
+    } else {
+      //обновить ошибки в redux
+      if (currentTechnology) {
+        dispatch(updateTechnologyFormErrors({ id: currentTechnology.id, formErrors: technologyErrors }));
+      }
+      if (currentOperation) {
+        dispatch(updateOperationFormErrors({ id: currentOperation.id, formErrors: operationErrors }));
+      }
+      //
       handleClose();
-      setRequestStatus(statusMessage);
+      dispatch(setStatus('warning'));//setRequestStatus('warning');
       showSnackbar();
     }
-  } else {
-    //обновить ошибки в redux
-    if (currentTechnology) {
-      dispatch(updateTechnologyFormErrors({ id: currentTechnology.id, formErrors: technologyErrors }));
-    }
-    if (currentOperation) {
-      dispatch(updateOperationFormErrors({ id: currentOperation.id, formErrors: operationErrors }));
-    }
-    //
-    handleClose();
-    setRequestStatus('warning');
-    showSnackbar();
-  }
-  setLoading((prev) => ({ ...prev, save: false }));        
+    setLoading((prev) => ({ ...prev, save: false }));
+    setSmartBackdropActive(false);
   };
 
   const showSnackbar = useCallback(() => {
@@ -254,20 +259,6 @@ function Content({ setSmartBackdropActive, showLoading }) {
   //эффекты
   useEffect(() => {
     if (currentItems.length > 0 && currentItems[0]) {
-      if (!currentItems[0]) {
-        //технология скрыта, операция открыта
-        /*setAccordionTechnologyTabPanelExpanded(false);
-        setAccordionOperationTabPanelExpanded(true);*/
-      } else if (!currentItems[1]) {
-        //технология открыта, операция скрыта
-        /*setAccordionTechnologyTabPanelExpanded(true);
-        setAccordionOperationTabPanelExpanded(false);*/      
-      } else {
-        //технология скрыта, операция открыта
-        /*setAccordionTechnologyTabPanelExpanded(false);
-        setAccordionOperationTabPanelExpanded(true);*/
-      }
-      //
       setCurrentTechnology(currentItems[0]);
       setCurrentOperation(currentItems[1]);
     }
@@ -293,10 +284,6 @@ function Content({ setSmartBackdropActive, showLoading }) {
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
   }, [technologiesListItems, technologiesListLoading]);
-
-  /*useEffect(() => {
-    dispatch(fetchData({ search: '', limit: 50, page: 1 }));
-  }, [dispatch]);*/
   
   //вывод
   return (
@@ -401,7 +388,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
               )}
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px' }}>
-              <TechnologyTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} autocompleteOptions={autocompleteOptions}
+              <TechnologyTabPanel handleClose={handleClose} showLoading={showLoading} autocompleteOptions={autocompleteOptions}
               isAutocompleteLoaded={isAutocompleteLoaded} />
             </AccordionDetails>        
           </Accordion>
@@ -424,12 +411,12 @@ function Content({ setSmartBackdropActive, showLoading }) {
               )}
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', minHeight: '100px' }}>
-              <OperationTabPanel handleClose={handleClose} open={open} requestStatus={requestStatus} showLoading={showLoading} />
+              <OperationTabPanel handleClose={handleClose} open={open} showLoading={showLoading} />
             </AccordionDetails>
           </Accordion>
         </Box>
         <Box sx={{ paddingTop: 2 }}>
-          <ButtonGroupPanel handleSave={handleSave} loading={showLoading} requestStatus={requestStatus} />
+          <ButtonGroupPanel handleSave={handleSave} loading={showLoading} />
         </Box>
       </Box>   
     </>

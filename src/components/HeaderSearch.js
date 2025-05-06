@@ -105,16 +105,9 @@ function HeaderSearch(props) {
                 onChange={(event, newValue) => {
                   setValue(newValue);              
 
-                  //обновить выбранное значение в redux                 
+                  //обновить выбранное значение в redux
                   if (newValue) {
-                    dispatch(setDrawing(newValue));
-                    /*dispatch(setDrawing(
-                      {
-                        externalCode: newValue.externalCode, 
-                        internalCode: newValue.internalCode, 
-                        name: newValue.name
-                      }
-                    ));*/               
+                    dispatch(setDrawing(newValue));              
                   } else {
                     dispatch(clearDrawing());
                     dispatch(clearTechnology());

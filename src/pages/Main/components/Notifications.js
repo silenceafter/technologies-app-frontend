@@ -3,29 +3,13 @@ import {
     Alert,
     Snackbar
 } from '@mui/material';
+import { useSelector } from 'react-redux';
 
-function Notifications({ handleClose, open, requestStatus }) {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    if (requestStatus) {
-      switch(requestStatus) {
-        case 'success':
-          setMessage('Успешно сохранено!');
-          break;
-
-        case 'warning':
-          setMessage('Неправильно заполнена форма');
-          break;
-
-        case 'error':
-          setMessage('Ошибка при отправке!');
-          break;
-      }
-      
-    }
-  }, [requestStatus]);
-
+function Notifications({ handleClose, open }) {
+  //селекторы
+  const message = useSelector((state) => state.notifications.message);
+  const status = useSelector((state) => state.notifications.status);
+  //
   return (
     <>
       <Snackbar
@@ -34,14 +18,14 @@ function Notifications({ handleClose, open, requestStatus }) {
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} //нижний правый угол
       >
-        <Alert
+        {status && message && (<Alert
           onClose={handleClose}
-          severity={requestStatus}
+          severity={status}
           variant="filled"
           sx={{ width: '100%' }}
         >
           {message}
-        </Alert>
+        </Alert>)}
       </Snackbar>
     </>
   );

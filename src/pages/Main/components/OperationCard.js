@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Accordion, Button, Grid, TextField, Typography } from '@mui/material';
 import { OperationsSearch } from './OperationsSearch';
+import { JobsSearch } from './JobsSearch';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import _ from 'lodash';
 
-const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, hasUnsavedChanges}) => {
+const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
   //стейты
   const [localData, setLocalData] = useState({
       dbValues: { orderNumber: 1 },
@@ -89,7 +90,6 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, hasUn
             ...localData.formErrors,
             [name]: errorMessage
           },
-          //validateForm,
           changedValues:
           {
             ...localData.changedValues,
@@ -179,118 +179,6 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, hasUn
     },
     [localData, setLocalData]
   );
-
-  const handleDeleteTab = useCallback((e) => {
-    setLocalData((prev) => ({
-      ...prev,
-      isDeleted: !prev.isDeleted,
-    }));
-
-    //передать изменения в родительский компонент
-    if (onUpdate) {
-      onUpdate({...localData, isDeleted: !localData.isDeleted});
-    }
-  }, [localData, setLocalData, onUpdate]);
-
-  //проверка формы
-  /*const validateForm = useCallback(() => {
-    const errors = {};
-    const textFieldMessage = 'Поле обязательно для заполнения';
-    const autocompleteTextFieldMessage = 'Выберите значение из списка';
-
-    //orderNumber
-    if (!localData.formValues.orderNumber) {
-      errors.orderNumber = textFieldMessage;
-    }
-
-    //operationCode
-    if (!localData.formValues.operationCode) {
-      errors.operationCode = autocompleteTextFieldMessage;
-    }
-    
-    //shopNumber
-    if (!localData.formValues.shopNumber) {
-      errors.shopNumber = textFieldMessage;
-    }
-
-    //document
-    if (!localData.formValues.document) {
-      errors.document = textFieldMessage;
-    }
-
-    //job
-    /*if (!localData.formValues.job) {
-      errors.job = autocompleteTextFieldMessage;
-    }*/
-
-    //grade
-    /*if (!localData.formValues.grade) {
-      errors.grade = textFieldMessage;
-    }
-
-    //workingConditions
-    if (!localData.formValues.workingConditions) {
-      errors.workingConditions = textFieldMessage;
-    }
-
-    //numberOfWorkers
-    if (!localData.formValues.numberOfWorkers) {
-      errors.numberOfWorkers = textFieldMessage;
-    }
-
-    //numberOfProcessedParts
-    if (!localData.formValues.numberOfProcessedParts) {
-      errors.numberOfProcessedParts = textFieldMessage;
-    }
-
-    //laborEffort
-    if (!localData.formValues.laborEffort) {
-      errors.laborEffort = textFieldMessage;
-    }
-
-    //equipment
-    /*if (!localData.formValues.equipment) {
-      errors.equipment = autocompleteTextFieldMessage;
-    }
-
-    //components
-    if (!localData.formValues.components) {
-      errors.components = autocompleteTextFieldMessage;
-    }
-
-    //materials
-    if (!localData.formValues.materials) {
-      errors.materials = autocompleteTextFieldMessage;
-    }
-
-    //tooling
-    if (!localData.formValues.tooling) {
-      errors.tooling = autocompleteTextFieldMessage;
-    }
-
-    //measuringTools
-    if (!localData.formValues.measuringTools) {
-      errors.measuringTools = autocompleteTextFieldMessage;
-    }*/
-
-    //обновляем ошибки
-    /*setLocalData((prev) => ({
-      ...prev,
-      formErrors: errors,
-    }));
-    //
-    if (Object.keys(errors).length > 0) {
-      onUpdate(
-        { 
-          ...localData, 
-          formValues: {...localData.formValues}, 
-          formErrors: errors,
-          changedValues: { ...localData.changedValues},
-        }
-      );
-    }
-    return Object.keys(errors).length === 0;
-  }, [content]);*/
 
   useEffect(() => {
       setLocalData(content);
@@ -424,11 +312,11 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, hasUn
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    {/*<JobsSearch 
-                      id="job-code-6" 
-                      onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues['job']} 
-                      errorValue={localData.formErrors['job']}
+                    {/*<JobsSearch props={{id: "job-code-2", placeholder: "Код профессии"}}
+                      id="jobCode"
+                      selectedValue={localData.formValues.jobCode}
+                      onChange={handleOptionSelect} 
+                      errorValue={localData.formErrors.jobCode}
                     />*/}
                   </Grid>
                 </Grid>

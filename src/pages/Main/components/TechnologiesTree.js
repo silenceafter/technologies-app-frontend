@@ -31,10 +31,7 @@ import {
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import { 
-  selectDrawingExternalCode,
-  selectTechnology 
-} from '../../../store/slices/drawingsSlice';
+import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import {  
   addItems,
   setSelectedItems, 
@@ -99,7 +96,6 @@ const TechnologiesTree = () => {
   const loading = useSelector((state) => state.technologies.loading);
   const error = useSelector((state) => state.technologies.error);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
-  const technologySelector = useSelector(selectTechnology);
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
   const user = useSelector((state) => state.users.user);
 
