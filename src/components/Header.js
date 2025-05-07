@@ -73,7 +73,6 @@ function Header(props) {
   //
   return (
     <>
-    {console.log(user)}
       <AppBar color="primary" position="sticky" elevation={0}>
         <Toolbar>
           <Grid container spacing={1} sx={{ alignItems: 'center' }}>

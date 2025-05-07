@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { 
     Autocomplete, 
     Box, 
@@ -9,89 +9,34 @@ import {
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../store/slices/lists/jobsListSlice';
+import { createFilterOptions } from '@mui/material/Autocomplete';
 
 const JobsSearch = React.memo(({props, id, selectedValue, options, onChange, errorValue }) => {
   const dispatch = useDispatch();
   const onOptionSelect = onChange;
   
-    //стейты
-    const [inputValue, setInputValue] = useState(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
-    const [selectedOption, setSelectedOption] = useState(selectedValue || null);
-    
-    //запросы
-    const { 
-      search = '', 
-      limit = 10, 
-      page = 1, 
-      items = [], 
-      loading = false, 
-      hasMore = false 
-    } = options;
-
-    //рефы
-    const listRef = useRef(null);
-
-    //события
-    const handleScroll = useCallback((event) => {
-      if (listRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } = event.target;
-        if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
-          dispatch(setPage(page + 1));
-          dispatch(fetchData({ search, limit, page: page + 1 }));
-        }
-      }
-    }, [dispatch, page, search, limit, loading, hasMore]);
-    
-    useEffect(() => {
-      setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
-      setSelectedOption(selectedValue || null);
-    }, [selectedValue, dispatch]);
-
-  //TextField
-  /*const [inputValue, setInputValue] = useState('');
+  //стейты
+  const [inputValue, setInputValue] = useState(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
+  const [selectedOption, setSelectedOption] = useState(selectedValue || null);
   
   //запросы
-  const search = useSelector(selectSearch);
-  const limit = useSelector(selectLimit);
-  const page = useSelector(selectPage);
+  const { 
+    search = '', 
+    limit = 500, 
+    page = 1, 
+    items = [], 
+    loading = false, 
+    hasMore = false 
+  } = options;
 
-  //запросы для прокрутки списка
-  const { items, loading, error, hasMore } = useSelector((state) => state.jobs);
+  //рефы
   const listRef = useRef(null);
 
-  const debouncedFetchData = debounce(() => {
-    dispatch(fetchData({ search: inputValue, limit, page: 1 }));
-  }, 1);
-
+  //эффекты
   useEffect(() => {
-    //загрузка данных при пустом поисковом запросе
-    if (!search) {
-      dispatch(fetchData({ search: '', limit, page: 1 }));
-    }
-  }, [dispatch, search, limit, page]);
-
-  useEffect(() => {
-    //поиск при изменении значения в поле ввода
-    if (inputValue !== search) {
-      dispatch(setSearch(inputValue));
-      debouncedFetchData();
-    }
-  }, [inputValue, search, debouncedFetchData, dispatch]);
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);//чистим обработчик при размонтировании
-  }, [loading, hasMore]);
-
-  const handleScroll = (event) => {
-    if (listRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = event.target;
-      if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
-        dispatch(setPage(page + 1));
-        dispatch(fetchData({ search, limit, page: page + 1 }));
-      }
-    }
-  };*/
+    setInputValue(selectedValue ? `${selectedValue?.code} ${selectedValue?.name}` : '');
+    setSelectedOption(selectedValue || null);
+  }, [selectedValue, dispatch]);
   //
   return (
     <>
@@ -108,13 +53,13 @@ const JobsSearch = React.memo(({props, id, selectedValue, options, onChange, err
         }}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
-          dispatch(fetchData({ search: newInputValue, limit, page: 1 }));
+          //dispatch(fetchData({ search: newInputValue, limit, page: 1 }));
         }}
         onChange={(event, newValue) => {
           setSelectedOption(newValue);
           //
           if (onOptionSelect) {
-            onOptionSelect('operationCode', newValue);
+            onOptionSelect('jobCode', newValue);
           }
         }}
         inputValue={inputValue}
@@ -122,8 +67,8 @@ const JobsSearch = React.memo(({props, id, selectedValue, options, onChange, err
         noOptionsText="нет результатов"
         loading={loading}
         ListboxProps={{                  
-            onScroll: handleScroll,
-            ref: listRef,
+            /*onScroll: handleScroll,
+            ref: listRef,*/
             sx: {
             maxHeight: '42.5vh',
             overflowY: 'auto'

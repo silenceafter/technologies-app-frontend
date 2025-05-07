@@ -312,12 +312,13 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    {/*<JobsSearch props={{id: "job-code-2", placeholder: "Код профессии"}}
+                    {<JobsSearch props={{id: "job-code-2", placeholder: "Код профессии"}}
                       id="jobCode"
                       selectedValue={localData.formValues.jobCode}
+                      options={autocompleteOptions.jobs || null}
                       onChange={handleOptionSelect} 
                       errorValue={localData.formErrors.jobCode}
-                    />*/}
+                    />}
                   </Grid>
                 </Grid>
               </Grid>
@@ -451,11 +452,10 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                       size='small'
                       onChange={handleInputChange}
                       value={localData.formValues.operationDescription || ''}
-                      /*sx={{ resize: 'both', overflow: 'auto' }}*/
                     />                  
                   </Grid>
                 </Grid>
-              </Grid>                                                 
+              </Grid>                                                
             </Grid>
           </form>              
         </AccordionDetails>

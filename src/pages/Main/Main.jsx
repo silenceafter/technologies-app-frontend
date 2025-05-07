@@ -42,16 +42,13 @@ function Copyright() {
 function Main() {
   //константы
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const drawerWidth = 256;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
   //стейты
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = React.useState(true);
 
   //селекторы
   const user = useSelector((state) => state.users.user);
@@ -69,6 +66,11 @@ function Main() {
   const showLoading = useMemo(() => {
     return /*technologiesLoading ||*/ loadingTimer;
   }, [/*technologiesLoading,*/ loadingTimer]); 
+
+  //события
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   //эффекты
   useEffect(() => {
@@ -100,7 +102,27 @@ function Main() {
       {console.log(user)}
       <ProtectedRoute>
         <ThemeProvider theme={theme}>
-          <Box sx={{ display: 'flex', minHeight: '100vh' }}>          
+          <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+            <Box 
+              component="nav" 
+              sx={{ 
+                width: { sm: mobileOpen ? drawerWidth : 0 }, 
+                flexShrink: { sm: 0 },  
+                '& .MuiDrawer-paper': {
+                  width: drawerWidth,
+                  boxSizing: 'border-box',
+                  transition: 'width 0.3s ease-in-out',
+                }, 
+              }}
+            >
+              <Navigator
+                PaperProps={{ style: { width: mobileOpen ? drawerWidth : 0 } }}
+                variant="persistent"
+                anchor="left"
+                open={mobileOpen}
+                onClose={handleDrawerToggle}
+              />
+            </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
               <Header onDrawerToggle={handleDrawerToggle} />              
               <Box component="main" sx={{ flex: 1, py: 2, px: 2, bgcolor: '#eaeff1' }}>

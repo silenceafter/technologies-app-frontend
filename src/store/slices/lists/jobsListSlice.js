@@ -6,7 +6,7 @@ const initialState = {
   error: null,
   hasMore: true,
   search: '',
-  limit: 100,
+  limit: 500,
   page: 1,
 };
 
@@ -75,6 +75,7 @@ const jobsListSlice = createSlice({
 export const selectSearch = (state) => state.jobsList.search;
 export const selectLimit = (state) => state.jobsList.limit;
 export const selectPage = (state) => state.jobsList.page;
+export const selectJobs = (state) => state.jobsList;
 
 export const { setSearch, setLimit, setPage } = jobsListSlice.actions;
 export default jobsListSlice.reducer;

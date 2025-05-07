@@ -11,44 +11,37 @@ import {
     Select,
     TextField
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from "@mui/icons-material/Close";
-import { OperationCard } from '../components/OperationCard';
-import { MemoizedTabPanel as TabPanel } from '../components/TabPanel';
-import { TechnologyBreadcrumbs } from '../components/TechnologyBreadcrumbs';
-import { MemoizedTabs } from '../components/MemoizedTabs';
-import Toolbar from '@mui/material/Toolbar';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading,
   setTabs, setTabValue, setShouldReloadTabs, selectCurrentItems, updateTechnology,
 } from '../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
-import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
 import { fetchData as technologiesPrefixFetchData} from '../../../store/slices/technologiesPrefixSlice';
-import { TechnologySearch } from '../components/TechnologySearch';
 import _ from 'lodash';
 
 function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isAutocompleteLoaded }) {
   const dispatch = useDispatch();
+  const dateOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZoneName: 'shortOffset'
+  };
 
   //стейты
-  const [isUserClosedAllTabs, setIsUserClosedAllTabs] = useState(false);
-  const [validateForm, setValidateForm] = useState(() => () => true);
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
   const [prefixList, setPrefixList] = useState('');
   const [prefixHasError, setPrefixHasError] = useState(false);
+  const [technologyCreationDate, setTechnologyCreationDate] = useState(null);
 
   //селекторы
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
-  const { tabs, tabValue, tabCnt, expandedPanelsDefault, shouldReloadTabs } = useSelector((state) => state.technologies);
-  const technologiesItems = useSelector(technologiesSelectItems);
-  const technologiesLoading = useSelector(technologiesSelectLoading);
-  const selectedIds = useSelector((state) => state.technologies.selectedId);
-  const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
   const currentItems = useSelector(selectCurrentItems);
   const technologiesPrefixItems = useSelector((state) => state.technologiesPrefix.items);
   const technologiesPrefixLoading = useSelector((state) => state.technologiesPrefix.loading);
@@ -83,6 +76,7 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
     }
   }, [user]);
 
+
   useEffect(() => {
     if (!technologiesPrefixLoading && technologiesPrefixItems.length > 0) {
       const menuItems = technologiesPrefixItems.map(option => (
@@ -95,6 +89,7 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
   useEffect(() => {
     if (currentTechnology) {
       setPrefixHasError(('prefix' in currentTechnology?.content?.formErrors && !currentTechnology?.content?.formValues?.prefix ? true : false));
+      setTechnologyCreationDate(new Date(currentTechnology.creationDate));
     }
   }, [currentTechnology]);
   //
@@ -112,14 +107,6 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', margin: 2/*, height: '90%'*/ }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 2, width: '100%' }}>
               {currentTechnology && (
-                /*<TechnologySearch
-                  props={{id: "technology-code", name: "newTechnology", placeholder: "Технология"}}
-                  selectedValue={currentTechnology?.content.formValues.technologyCode}
-                  onChange={handleOptionSelect}
-                  options={autocompleteOptions.technologies || null}
-                  content={currentTechnology?.content}
-                  errorValue={localData?.formErrors?.operationCode}
-                />*/
                 <form>
                   <Grid container spacing={2} columns={{xs:5}}>
                     {/* Первая строка */}
@@ -159,6 +146,29 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
                           </FormControl>
                         </Grid>)}
                       </Grid>                    
+                    </Grid>
+                    {/* Вторая строка */}
+                    <Grid item xs={12}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={4.8}>
+                          <TextField                       
+                            fullWidth           
+                            name='technologyCreationDate'
+                            id="technology-creation-date-3"
+                            label="Дата создания"
+                            type="text"
+                            size="small"
+                            value={technologyCreationDate && technologyCreationDate.toLocaleString('ru-RU', dateOptions) || null}
+                            slotProps={{
+                              formHelperText: {
+                                sx: { whiteSpace: 'nowrap' },
+                              },
+                              input: { readOnly: true }
+                            }}
+                          >
+                          </TextField>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </form>

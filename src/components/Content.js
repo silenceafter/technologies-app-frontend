@@ -130,10 +130,10 @@ function Content({ setSmartBackdropActive, showLoading }) {
       operationErrors.document = textFieldMessage;
     }
 
-    //job
-    /*if (!operationFormValues.job) {
-      operationErrors.job = autocompleteTextFieldMessage;
-    }*/
+    //jobCode
+    if (!operationFormValues.jobCode) {
+      operationErrors.jobCode = autocompleteTextFieldMessage;
+    }
 
     //grade
     if (!operationFormValues.grade) {

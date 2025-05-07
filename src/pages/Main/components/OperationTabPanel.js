@@ -32,6 +32,7 @@ import {
 } from '../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
+import { selectJobs, fetchData as jobsFetchData } from '../../../store/slices/lists/jobsListSlice';
 
 function OperationTabPanel({ handleClose, open, showLoading }) {
   const dispatch = useDispatch();
@@ -58,6 +59,11 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   const selectedIds = useSelector((state) => state.technologies.selectedId);
   const currentItems = useSelector(selectCurrentItems);
 
+  //jobCode
+  const jobsSelectors = useSelector(selectJobs);
+  const jobsItems = jobsSelectors?.items;
+  const jobsLoading = jobsSelectors?.loading;
+
   //события
   const handleOperationUpdate = useCallback(
     (newData) => {
@@ -81,17 +87,20 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
 
   useEffect(() => {
     dispatch(fetchData({ search: '', limit: 10, page: 1 }));
+    dispatch(jobsFetchData({ search: '', limit: 500, page: 1 }));
   }, [dispatch]);
 
   useEffect(() => {
-    if (!operationsLoading && operationsItems) {
+    if (!operationsLoading && operationsItems &&
+        !jobsLoading && jobsItems) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
-        operations: operationsSelectors
+        operations: operationsSelectors,
+        jobs: jobsSelectors,
       }));
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
-  }, [operationsItems, operationsLoading]);
+  }, [operationsItems, operationsLoading, jobsItems, jobsLoading]);
 
   //очистить стейт вкладок/карточек
   useEffect(() => {
@@ -127,7 +136,7 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   //
   return (
     <>
-    {console.log(selectedIds)}
+    {console.log(autocompleteOptions)}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'
