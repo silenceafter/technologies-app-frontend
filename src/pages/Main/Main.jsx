@@ -4,7 +4,7 @@ import { Grid, Paper, AppBar, Toolbar, Tabs, Tab, TextField, InputAdornment, Box
 import SearchIcon from '@mui/icons-material/Search';
 import SortableTree from 'react-sortable-tree';
 import 'react-sortable-tree/style.css';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, rgbToHex, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navigator from '../../components/Navigator';
 import { Content } from '../../components/Content';
@@ -132,7 +132,7 @@ function Main() {
                   alignItems: 'flex-start',
                   gap: 2,                   
                   padding: 2,
-                  backgroundColor: 'rgb(245,245,245)',
+                  backgroundColor: 'rgb(234, 239, 241)', /*'rgb(245,245,245)',*/
                   borderRadius: 1,          
                   boxShadow: 3,
                   height: '46rem', /*735px*/

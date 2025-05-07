@@ -161,7 +161,7 @@ function HeaderSearch(props) {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="Код/Наименование"
+                    placeholder="код/наименование чертежа"
                     variant="outlined"
                     sx={{ backgroundColor: '#fff', borderRadius: 1, width: '30%' }}
                     size='small'

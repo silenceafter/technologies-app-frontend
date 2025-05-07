@@ -41,6 +41,7 @@ import {
 } from '../store/slices/technologiesSlice';
 import { setData, setShouldReloadTabs } from '../store/slices/operationsSlice';
 import { fetchData, selectTechnologies } from '../store/slices/lists/technologiesListSlice';
+import { selectDrawingExternalCode } from '../store/slices/drawingsSlice';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { setStatus } from '../store/slices/notificationsSlice';
@@ -82,6 +83,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   const technologiesListItems = technologiesListSelectors?.items;
   const technologiesListLoading = technologiesListSelectors?.loading;
   const technologiesItems = useSelector((state) => state.technologies.items);
+  const drawingExternalCode = useSelector(selectDrawingExternalCode);
   
   //события
   const handleAccordeonTechnologiesTreeChange = () => {
@@ -289,7 +291,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   return (
     <>
     {console.log(technologiesItems)}
-      <Box sx={{
+      {drawingExternalCode && <Box sx={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
@@ -311,8 +313,8 @@ function Content({ setSmartBackdropActive, showLoading }) {
           >
             <Typography component="span">Технологии и операции</Typography>
           </AccordionSummary>
-          <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px' }}>
-            <Box sx={{ height: '100%' /*, display: 'flex', flexDirection: 'column', gap: 2*/ }}>
+          <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', /*border: '1px solid rgba(0, 0, 0, 0.12)'*/ }}>
+            <Box sx={{ height: '100%', /*, display: 'flex', flexDirection: 'column', gap: 2*/ }}>
               <TechnologiesTree />
             </Box>              
           </AccordionDetails>
@@ -343,12 +345,12 @@ function Content({ setSmartBackdropActive, showLoading }) {
             </Box>
           </AccordionDetails>          
         </Accordion>
-      </Box>
-      <Box sx={{
+      </Box>}
+      {drawingExternalCode && <Box sx={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
-        backgroundColor: 'rgb(245,245,245)',
+        backgroundColor: 'rgb(234, 239, 241)', /*'rgb(245,245,245)',*/
         borderRadius: 1,          
         boxShadow: 0,
         width: '100%',
@@ -361,7 +363,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-start',
-            backgroundColor: 'rgb(245,245,245)',
+            backgroundColor: 'rgb(234, 239, 241)', /*'rgb(245,245,245)',*/
             borderRadius: 1,          
             boxShadow: 0,
             width: '100%',
@@ -418,7 +420,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
         <Box sx={{ paddingTop: 2 }}>
           <ButtonGroupPanel handleSave={handleSave} loading={showLoading} />
         </Box>
-      </Box>   
+      </Box>}
     </>
   );
 }

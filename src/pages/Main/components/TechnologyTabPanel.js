@@ -156,6 +156,7 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
                             name='technologyCreationDate'
                             id="technology-creation-date-3"
                             label="Дата создания"
+                            placeholder={!technologyCreationDate ? 'Дата создания' : ''}
                             type="text"
                             size="small"
                             value={technologyCreationDate && technologyCreationDate.toLocaleString('ru-RU', dateOptions) || null}
@@ -163,7 +164,8 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
                               formHelperText: {
                                 sx: { whiteSpace: 'nowrap' },
                               },
-                              input: { readOnly: true }
+                              input: { readOnly: true },
+                              inputLabel: { shrink: !!technologyCreationDate }
                             }}
                           >
                           </TextField>
