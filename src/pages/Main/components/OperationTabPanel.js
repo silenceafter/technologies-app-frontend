@@ -33,6 +33,7 @@ import {
 import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
 import { selectJobs, fetchData as jobsFetchData } from '../../../store/slices/lists/jobsListSlice';
+import { selectEquipment, fetchData as equipmentFetchData } from '../../../store/slices/lists/equipmentListSlice';
 
 function OperationTabPanel({ handleClose, open, showLoading }) {
   const dispatch = useDispatch();
@@ -64,6 +65,11 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   const jobsItems = jobsSelectors?.items;
   const jobsLoading = jobsSelectors?.loading;
 
+  //equipment
+  const equipmentSelectors = useSelector(selectEquipment);
+  const equipmentItems = equipmentSelectors?.items;
+  const equipmentLoading = equipmentSelectors?.loading;
+
   //события
   const handleOperationUpdate = useCallback(
     (newData) => {
@@ -88,19 +94,22 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   useEffect(() => {
     dispatch(fetchData({ search: '', limit: 10, page: 1 }));
     dispatch(jobsFetchData({ search: '', limit: 500, page: 1 }));
+    dispatch(equipmentFetchData({ search: '', limit: 10, page: 1 }));
   }, [dispatch]);
 
   useEffect(() => {
     if (!operationsLoading && operationsItems &&
-        !jobsLoading && jobsItems) {
+        !jobsLoading && jobsItems &&
+        !equipmentLoading && equipmentItems) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
         operations: operationsSelectors,
         jobs: jobsSelectors,
+        equipment: equipmentSelectors,
       }));
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
-  }, [operationsItems, operationsLoading, jobsItems, jobsLoading]);
+  }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading]);
 
   //очистить стейт вкладок/карточек
   useEffect(() => {
@@ -128,6 +137,8 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   }
 
   useEffect(() => {
+    if (!currentItems) { return; }
+    if (!currentItems[0]) { return; }
     if (currentItems.length > 0 && currentItems[0]) {
       setCurrentTechnology(currentItems[0]);
       setCurrentOperation(currentItems[1]);

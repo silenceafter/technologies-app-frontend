@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Accordion, Button, Grid, TextField, Typography } from '@mui/material';
 import { OperationsSearch } from './OperationsSearch';
 import { JobsSearch } from './JobsSearch';
+import { EquipmentSearch } from './EquipmentSearch';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -186,6 +187,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
   //
   return (
     <>
+    {console.log(localData.formValues.equipmentCode)}
       {/* Параметры */}
       <Accordion defaultExpanded
         expanded={localData.expandedPanels['parameters'] || false}
@@ -483,13 +485,14 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    {/*<EquipmentSearch 
-                      id="equipment" 
-                      onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues.equipment}
-                      errorValue={localData.formErrors.equipment}
-                    />*/}
-                  </Grid>
+                    <EquipmentSearch props={{id: "equipment-2", placeholder: "Оборудование"}}
+                      id="equipment"
+                      selectedValue={localData.formValues.equipmentCode}
+                      options={autocompleteOptions.equipment || null}
+                      onChange={handleOptionSelect}
+                      errorValue={localData.formErrors.equipmentCode}
+                    />
+                  </Grid>                  
                 </Grid>
               </Grid>
             </Grid>                

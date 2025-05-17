@@ -75,6 +75,7 @@ const equipmentListSlice = createSlice({
 export const selectSearch = (state) => state.equipmentList.search;
 export const selectLimit = (state) => state.equipmentList.limit;
 export const selectPage = (state) => state.equipmentList.page;
+export const selectEquipment = (state) => state.equipmentList;
 
 export const { setSearch, setLimit, setPage } = equipmentListSlice.actions;
 export default equipmentListSlice.reducer;

@@ -162,13 +162,15 @@ function Content({ setSmartBackdropActive, showLoading }) {
       operationErrors.laborEffort = textFieldMessage;
     }
 
-    //equipment
-    /*if (!operationFormValues.equipment) {
-      operationErrors.equipment = autocompleteTextFieldMessage;
+    //equipmentCode
+    if (operationFormValues.equipmentCode) {
+      if (operationFormValues.equipmentCode.length == 0) {
+        operationErrors.equipmentCode = autocompleteTextFieldMessage;
+      }      
     }
 
     //components
-    if (!operationFormValues.components) {
+    /*if (!operationFormValues.components) {
       operationErrors.components = autocompleteTextFieldMessage;
     }
 
@@ -260,6 +262,8 @@ function Content({ setSmartBackdropActive, showLoading }) {
 
   //эффекты
   useEffect(() => {
+    if (!currentItems) { return; }
+    if (!currentItems[0]) { return; }
     if (currentItems.length > 0 && currentItems[0]) {
       setCurrentTechnology(currentItems[0]);
       setCurrentOperation(currentItems[1]);

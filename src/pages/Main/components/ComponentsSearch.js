@@ -133,7 +133,7 @@ function ComponentsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
             tagValue.map((option, index) => (
               <Chip
                 key={index}
-                label={option.name || option.label}
+                label={`${option.name} ${option.type ? option.type : ''}` || option.label}
                 {...getTagProps({ index })}         
               />
             ))
