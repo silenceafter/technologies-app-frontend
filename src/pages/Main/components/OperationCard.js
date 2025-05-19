@@ -500,6 +500,42 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
         </AccordionDetails>
       </Accordion>
 
+      {/* Оснастка */}
+      <Accordion defaultExpanded 
+        expanded={localData.expandedPanels['tooling'] || false} 
+        onChange={handleAccordionChange('tooling')} 
+        elevation={2} 
+        sx={{ bgcolor: 'primary.secondary', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
+          aria-controls="panel1-content"
+          id="panel1-header"
+          sx={{ backgroundColor: '#eaeff1', color: 'black' }}
+        >
+          <Typography component="span">Оснастка</Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ padding: 2, overflow: 'auto'}}>
+          <form>
+            <Grid container spacing={2} columns={{xs:5}}>
+            {/* Первая строка */}
+              <Grid item xs={12}>
+                <Grid container spacing={2}>
+                  <Grid item xs={4.8}>
+                    {/*<ToolingSearch
+                      id="tooling" 
+                      onOptionSelect={handleOptionSelect} 
+                      selectedValue={localData.formValues.tooling}
+                      errorValue={localData.formErrors.tooling}
+                    />*/}
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>                      
+          </form>              
+        </AccordionDetails>
+      </Accordion>
+
       {/* Комплектующие */}
       <Accordion defaultExpanded 
         expanded={localData.expandedPanels['components'] || false} 
@@ -570,43 +606,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
             </Grid>
           </form>              
         </AccordionDetails>
-      </Accordion>
-      
-      {/* Оснастка */}
-      <Accordion defaultExpanded 
-        expanded={localData.expandedPanels['tooling'] || false} 
-        onChange={handleAccordionChange('tooling')} 
-        elevation={2} 
-        sx={{ bgcolor: 'primary.secondary', color: 'black', width: '100%', height: 'auto', overflow: 'hidden' }}
-      >
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
-          aria-controls="panel1-content"
-          id="panel1-header"
-          sx={{ backgroundColor: '#eaeff1', color: 'black' }}
-        >
-          <Typography component="span">Оснастка</Typography>
-        </AccordionSummary>
-        <AccordionDetails sx={{ padding: 2, overflow: 'auto'}}>
-          <form>
-            <Grid container spacing={2} columns={{xs:5}}>
-            {/* Первая строка */}
-              <Grid item xs={12}>
-                <Grid container spacing={2}>
-                  <Grid item xs={4.8}>
-                    {/*<ToolingSearch
-                      id="tooling" 
-                      onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues.tooling}
-                      errorValue={localData.formErrors.tooling}
-                    />*/}
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>                      
-          </form>              
-        </AccordionDetails>
-      </Accordion>
+      </Accordion>      
 
       {/* Измерительный инструмент */}
       <Accordion defaultExpanded 

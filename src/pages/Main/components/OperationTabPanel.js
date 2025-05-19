@@ -34,6 +34,7 @@ import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
 import { selectJobs, fetchData as jobsFetchData } from '../../../store/slices/lists/jobsListSlice';
 import { selectEquipment, fetchData as equipmentFetchData } from '../../../store/slices/lists/equipmentListSlice';
+import { selectTooling, fetchData as toolingFetchData } from '../../../store/slices/lists/toolingListSlice';
 
 function OperationTabPanel({ handleClose, open, showLoading }) {
   const dispatch = useDispatch();
@@ -70,6 +71,11 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   const equipmentItems = equipmentSelectors?.items;
   const equipmentLoading = equipmentSelectors?.loading;
 
+  //tooling
+  const toolingSelectors = useSelector(selectTooling);
+  const toolingItems = toolingSelectors?.items;
+  const toolingLoading = toolingSelectors?.loading;
+
   //события
   const handleOperationUpdate = useCallback(
     (newData) => {
@@ -95,21 +101,24 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
     dispatch(fetchData({ search: '', limit: 10, page: 1 }));
     dispatch(jobsFetchData({ search: '', limit: 500, page: 1 }));
     dispatch(equipmentFetchData({ search: '', limit: 10, page: 1 }));
+    dispatch(toolingFetchData({ search: '', limit: 10, page: 1 }));
   }, [dispatch]);
 
   useEffect(() => {
     if (!operationsLoading && operationsItems &&
         !jobsLoading && jobsItems &&
-        !equipmentLoading && equipmentItems) {
+        !equipmentLoading && equipmentItems &&
+        !toolingLoading && toolingItems) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
         operations: operationsSelectors,
         jobs: jobsSelectors,
         equipment: equipmentSelectors,
+        tooling: toolingSelectors,
       }));
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
-  }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading]);
+  }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading, toolingItems, toolingLoading]);
 
   //очистить стейт вкладок/карточек
   useEffect(() => {

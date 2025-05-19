@@ -53,8 +53,8 @@ const toolingListSlice = createSlice({
         state.loading = false;
         const newItems = action.payload.data.filter(newItem => 
           !state.items.some(existingItem => {
-            return `${existingItem.code}-${existingItem.name}` === 
-                `${newItem.code}-${newItem.name}`;
+            return `${existingItem.name}-${existingItem.type}` === 
+                `${newItem.name}-${newItem.type}`;
             })
         );
         //
@@ -75,6 +75,7 @@ const toolingListSlice = createSlice({
 export const selectSearch = (state) => state.toolingList.search;
 export const selectLimit = (state) => state.toolingList.limit;
 export const selectPage = (state) => state.toolingList.page;
+export const selectTooling = (state) => state.toolingList;
 
 export const { setSearch, setLimit, setPage } = toolingListSlice.actions;
 export default toolingListSlice.reducer;

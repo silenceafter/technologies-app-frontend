@@ -169,6 +169,13 @@ function Content({ setSmartBackdropActive, showLoading }) {
       }      
     }
 
+    //toolingCode
+    if (operationFormValues.toolingCode) {
+      if (operationFormValues.toolingCode.length == 0) {
+        operationErrors.toolingCode = autocompleteTextFieldMessage;
+      }
+    }
+
     //components
     /*if (!operationFormValues.components) {
       operationErrors.components = autocompleteTextFieldMessage;
@@ -177,11 +184,6 @@ function Content({ setSmartBackdropActive, showLoading }) {
     //materials
     if (!operationFormValues.materials) {
       operationErrors.materials = autocompleteTextFieldMessage;
-    }
-
-    //tooling
-    if (!operationFormValues.tooling) {
-      operationErrors.tooling = autocompleteTextFieldMessage;
     }
 
     //measuringTools
