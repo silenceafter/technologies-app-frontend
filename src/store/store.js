@@ -22,6 +22,8 @@ import operationsReducer from './slices/operationsSlice';
 import unsavedChangesReducer from './slices/unsavedChangesSlice';
 import technologiesPrefixReducer from './slices/technologiesPrefixSlice';
 import notificationsReducer from './slices/notificationsSlice';
+import dashboardReducer from './slices/dashboardSlice';
+import { Dashboard } from '@mui/icons-material';
 
 //корневой редьюсер
 const rootReducer = combineReducers({  
@@ -43,6 +45,7 @@ const rootReducer = combineReducers({
   operations: operationsReducer,
   users: usersReducer, /* храним обязательно */  
   notifications: notificationsReducer,
+  dashboard: dashboardReducer,
 });
 
 //конфигурация persist

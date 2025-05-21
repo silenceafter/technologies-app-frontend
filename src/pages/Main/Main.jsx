@@ -26,6 +26,7 @@ import CardActionArea from '@mui/material/CardActionArea';
 import ProtectedRoute from '../../ProtectedRoute';
 import Backdrop from '@mui/material/Backdrop';
 import { selectLoading } from '../../store/slices/technologiesSlice';
+import { getTechnologiesCreatedByUser } from '../../store/slices/dashboardSlice';
 
 function Copyright() {
   return (
@@ -61,11 +62,15 @@ function Main() {
   const [backdropVisible, setBackdropVisible] = useState(false);
   const [smartBackdropActive, setSmartBackdropActive] = useState(false);
   const { tabs, tabValue } = useSelector((state) => state.operations);
+  const technologyCreatedByUserItems = useSelector((state) => state.dashboard.technologyCreatedByUserItems);
+  const technologyCreatedByUserLoading = useSelector((state) => state.dashboard.technologyCreatedByUserLoading);
 
   //переменные
   const showLoading = useMemo(() => {
     return /*technologiesLoading ||*/ loadingTimer;
-  }, [/*technologiesLoading,*/ loadingTimer]); 
+  }, [/*technologiesLoading,*/ loadingTimer]);
+  const technologyCreatedByUserHeaders = ['№', 'Код ДСЕ', 'Наименование ДСЕ', 'Код технологии', 'Наименование технологии', 'Дата создания', 'Дата последнего изменения'];
+  let columns;
 
   //события
   const handleDrawerToggle = () => {
@@ -95,11 +100,18 @@ function Main() {
     checkDone();
     return () => clearTimeout(timeoutId);
   }, [smartBackdropActive]);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(getTechnologiesCreatedByUser({ user: user }));
+    }
+  }, [user]);
   
   //main
   return (
       <>
       {console.log(user)}
+      {console.log(columns)}
       <ProtectedRoute>
         <ThemeProvider theme={theme}>
           <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -139,6 +151,35 @@ function Main() {
                   overflow: 'hidden',                
                 }}>
                   <Content setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
+                  {!drawing && <Box>
+                    {/*<Grid container spacing={2} columns={{xs:5}}>                    
+                      <Grid item xs={12}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={2.4}>
+                            <TextField                          
+                              fullWidth                          
+                              name='orderNumber'
+                              id="order-number-1"
+                              label="Номер операции"
+                              type="text"
+                              size="small"
+                              onChange={handleInputChange}
+                              error={!!localData.formErrors.orderNumber}
+                              helperText={localData.formErrors.orderNumber}
+                              value={localData.formValues.orderNumber || ''}
+                              slotProps={{
+                                formHelperText: {
+                                  sx: { whiteSpace: 'nowrap' },
+                                },
+                                input: { readOnly: false }
+                              }}
+                            >
+                            </TextField>
+                          </Grid>
+                        </Grid>                    
+                      </Grid>
+                    </Grid>*/}
+                  </Box>}
                 </Box>            
               </Box>
               <Box component="footer" sx={{ paddingLeft: 1, paddingRight: 1, paddingBottom: 1, bgcolor: '#eaeff1' }}>

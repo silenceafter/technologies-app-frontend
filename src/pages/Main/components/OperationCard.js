@@ -187,7 +187,6 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
   //
   return (
     <>
-    {console.log(localData.formValues.equipmentCode)}
       {/* Параметры */}
       <Accordion defaultExpanded
         expanded={localData.expandedPanels['parameters'] || false}

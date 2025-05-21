@@ -156,7 +156,7 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   //
   return (
     <>
-    {console.log(autocompleteOptions)}
+    {/*console.log(autocompleteOptions)*/}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'

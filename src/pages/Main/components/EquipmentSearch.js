@@ -50,7 +50,6 @@ const EquipmentSearch = React.memo(({props, id, selectedValue, options, onChange
   //
   return (    
     <>
-    {console.log(items)}
         <Autocomplete
           /*freeSolo*/
           multiple

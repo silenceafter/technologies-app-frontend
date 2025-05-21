@@ -88,7 +88,7 @@ function Header(props) {
               </Link>
             </Grid>
             <Grid item>
-              <Tooltip title="Alerts • No alerts">
+              <Tooltip title="Уведомления • Нет уведомлений">
                 <IconButton color="inherit">
                   <NotificationsIcon />
                 </IconButton>
@@ -187,7 +187,7 @@ function Header(props) {
               </Button>
             </Grid>
             <Grid item>
-              <Tooltip title="Help">
+              <Tooltip title="Помощь">
                 <IconButton color="inherit">
                   <HelpIcon />
                 </IconButton>
