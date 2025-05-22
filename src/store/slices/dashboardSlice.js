@@ -1,10 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { property } from 'lodash';
 
 const LOADING_DEFAULT = false;
 const initialState = {
-  technologyCreatedByUserLoading: LOADING_DEFAULT,
-  technologyCreatedByUserError: null,
-  technologyCreatedByUserItems: null,
+  technologiesCreatedByUserLoading: LOADING_DEFAULT,
+  technologiesCreatedByUserError: null,
+  technologiesCreatedByUserItems: null,
+  technologiesCreatedByUserHeaders: null,
 };
 
 //загрузка данных для дашборда
@@ -60,17 +62,18 @@ const dashboardSlice = createSlice({
   extraReducers: (builder) => {
     //getTechnologiesCreatedByUser
     builder.addCase(getTechnologiesCreatedByUser.pending, (state) => {
-      state.technologyCreatedByUserLoading = true;
-      state.technologyCreatedByUserError = null;
+      state.technologiesCreatedByUserLoading = true;
+      state.technologiesCreatedByUserError = null;
     });
     builder.addCase(getTechnologiesCreatedByUser.fulfilled, (state, action) => {      
-      state.technologyCreatedByUserItems = action.payload.TechnologiesCreatedByUser;
-      state.technologyCreatedByUserError = null;
-      state.technologyCreatedByUserLoading = false;
+      state.technologiesCreatedByUserItems = action.payload.TechnologiesCreatedByUser;
+      state.technologiesCreatedByUserHeaders = action.payload.TechnologiesCreatedByUserHeaders;
+      state.technologiesCreatedByUserError = null;
+      state.technologiesCreatedByUserLoading = false;
     });
     builder.addCase(getTechnologiesCreatedByUser.rejected, (state, action) => {
-      state.technologyCreatedByUserLoading = false;
-      state.technologyCreatedByUserError = action.payload.errorMessage;
+      state.technologiesCreatedByUserLoading = false;
+      state.technologiesCreatedByUserError = action.payload.errorMessage;
     });
   },
 });

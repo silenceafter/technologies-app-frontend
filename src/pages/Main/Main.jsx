@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Grid, Paper, AppBar, Toolbar, Tabs, Tab, TextField, InputAdornment, Box, Typography, Button, Link, CircularProgress } from '@mui/material';
+import { Grid, Paper, AppBar, Toolbar, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, InputAdornment, Box, Typography, Button, Link, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SortableTree from 'react-sortable-tree';
 import 'react-sortable-tree/style.css';
@@ -14,7 +14,7 @@ import theme from '../../theme';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { authenticate, setTokens } from '../../store/slices/usersSlice';
 import { use } from 'react';
-
+import { styled } from '@mui/material/styles'; 
 import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Tooltip from '@mui/material/Tooltip';
@@ -27,6 +27,7 @@ import ProtectedRoute from '../../ProtectedRoute';
 import Backdrop from '@mui/material/Backdrop';
 import { selectLoading } from '../../store/slices/technologiesSlice';
 import { getTechnologiesCreatedByUser } from '../../store/slices/dashboardSlice';
+import { tableCellClasses } from '@mui/material';
 
 function Copyright() {
   return (
@@ -62,15 +63,52 @@ function Main() {
   const [backdropVisible, setBackdropVisible] = useState(false);
   const [smartBackdropActive, setSmartBackdropActive] = useState(false);
   const { tabs, tabValue } = useSelector((state) => state.operations);
-  const technologyCreatedByUserItems = useSelector((state) => state.dashboard.technologyCreatedByUserItems);
-  const technologyCreatedByUserLoading = useSelector((state) => state.dashboard.technologyCreatedByUserLoading);
+  const technologiesCreatedByUserItems = useSelector((state) => state.dashboard.technologiesCreatedByUserItems);
+  const technologiesCreatedByUserLoading = useSelector((state) => state.dashboard.technologiesCreatedByUserLoading);
+  const technologiesCreatedByUserHeaders = useSelector((state) => state.dashboard.technologiesCreatedByUserHeaders);
 
   //переменные
   const showLoading = useMemo(() => {
     return /*technologiesLoading ||*/ loadingTimer;
   }, [/*technologiesLoading,*/ loadingTimer]);
-  const technologyCreatedByUserHeaders = ['№', 'Код ДСЕ', 'Наименование ДСЕ', 'Код технологии', 'Наименование технологии', 'Дата создания', 'Дата последнего изменения'];
-  let columns;
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({ // Обращаемся к теме через аргумент theme
+    '&.MuiTableCell-head': { // Новый селектор для заголовочной клетки
+      backgroundColor: 'rgb(8, 22, 39)', /*theme.palette.common.black,*/
+      color: theme.palette.common.white,
+    },
+    '&.MuiTableCell-body': { // Новый селектор для основной клетки
+      fontSize: 14,
+    },
+  }));
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.action.hover,
+    },
+    // Hide last border
+    '&:last-child td, &:last-child th': {
+      border: 0,
+    },
+  }));
+  const formatDate = (dateStr) => {
+    const utcDate = new Date(dateStr);
+
+    // Преобразуем в Московское время
+    const moscowOffsetHours = 3; // Москва в зимний период +3 часа относительно UTC
+    const moscowDate = new Date(
+      utcDate.getUTCFullYear(),
+      utcDate.getUTCMonth(),
+      utcDate.getUTCDate(),
+      utcDate.getUTCHours() + moscowOffsetHours, // учитываем московское смещение
+      utcDate.getUTCMinutes(),
+      utcDate.getUTCSeconds()
+    );
+
+    // Параметры форматирования даты
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+
+    // Возвращаем дату в Московском формате
+    return moscowDate.toLocaleString('ru-RU', options);
+  };
 
   //события
   const handleDrawerToggle = () => {
@@ -111,7 +149,7 @@ function Main() {
   return (
       <>
       {console.log(user)}
-      {console.log(columns)}
+      {console.log(technologiesCreatedByUserHeaders)}
       <ProtectedRoute>
         <ThemeProvider theme={theme}>
           <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -151,34 +189,28 @@ function Main() {
                   overflow: 'hidden',                
                 }}>
                   <Content setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
-                  {!drawing && <Box>
-                    {/*<Grid container spacing={2} columns={{xs:5}}>                    
-                      <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={2.4}>
-                            <TextField                          
-                              fullWidth                          
-                              name='orderNumber'
-                              id="order-number-1"
-                              label="Номер операции"
-                              type="text"
-                              size="small"
-                              onChange={handleInputChange}
-                              error={!!localData.formErrors.orderNumber}
-                              helperText={localData.formErrors.orderNumber}
-                              value={localData.formValues.orderNumber || ''}
-                              slotProps={{
-                                formHelperText: {
-                                  sx: { whiteSpace: 'nowrap' },
-                                },
-                                input: { readOnly: false }
-                              }}
-                            >
-                            </TextField>
-                          </Grid>
-                        </Grid>                    
-                      </Grid>
-                    </Grid>*/}
+                  {!drawing && technologiesCreatedByUserHeaders && technologiesCreatedByUserItems && <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 1 }}>
+                    <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
+                    <TableContainer component={Paper}>
+                      <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                        <TableHead>
+                          <TableRow>
+                            {Object.entries(technologiesCreatedByUserHeaders).map(([key, value], index) => (
+                              <StyledTableCell key={key}>{value}</StyledTableCell>
+                            ))}
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {technologiesCreatedByUserItems.map((row, index) => (
+                            <StyledTableRow key={index}>
+                              {Object.entries(technologiesCreatedByUserHeaders).map(([key, _], colIndex) => (
+                                <StyledTableCell key={`${index}-${colIndex}`}>{key == 'creation_date' || key == 'last_modified' ? formatDate(row[key]) : row[key]}</StyledTableCell>
+                              ))}
+                            </StyledTableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
                   </Box>}
                 </Box>            
               </Box>
