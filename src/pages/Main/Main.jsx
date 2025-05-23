@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Grid, Paper, AppBar, Toolbar, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, InputAdornment, Box, Typography, Button, Link, CircularProgress } from '@mui/material';
+import { Grid, Paper, Card, CardActions, CardContent, AppBar, Toolbar, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, InputAdornment, Box, Typography, Button, Link, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SortableTree from 'react-sortable-tree';
 import 'react-sortable-tree/style.css';
@@ -19,10 +19,6 @@ import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Tooltip from '@mui/material/Tooltip';
 import { HeaderSearchT } from '../../components/HeaderSearchT';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import CardActionArea from '@mui/material/CardActionArea';
 import ProtectedRoute from '../../ProtectedRoute';
 import Backdrop from '@mui/material/Backdrop';
 import { selectLoading } from '../../store/slices/technologiesSlice';
@@ -66,6 +62,8 @@ function Main() {
   const technologiesCreatedByUserItems = useSelector((state) => state.dashboard.technologiesCreatedByUserItems);
   const technologiesCreatedByUserLoading = useSelector((state) => state.dashboard.technologiesCreatedByUserLoading);
   const technologiesCreatedByUserHeaders = useSelector((state) => state.dashboard.technologiesCreatedByUserHeaders);
+  const technologiesCreatedByUserCount = useSelector((state) => state.dashboard.technologiesCreatedByUserCount);
+  const technologiesCreatedByUserLastCreationDate = useSelector((state) => state.dashboard.technologiesCreatedByUserLastCreationDate);
 
   //переменные
   const showLoading = useMemo(() => {
@@ -149,7 +147,7 @@ function Main() {
   return (
       <>
       {console.log(user)}
-      {console.log(technologiesCreatedByUserHeaders)}
+      {console.log(technologiesCreatedByUserItems)}
       <ProtectedRoute>
         <ThemeProvider theme={theme}>
           <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -186,10 +184,41 @@ function Main() {
                   borderRadius: 1,          
                   boxShadow: 3,
                   height: '46rem', /*735px*/
-                  overflow: 'hidden',                
+                  overflow: 'hidden',
                 }}>
                   <Content setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
-                  {!drawing && technologiesCreatedByUserHeaders && technologiesCreatedByUserItems && <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 1 }}>
+                  {!drawing && technologiesCreatedByUserHeaders && technologiesCreatedByUserItems && technologiesCreatedByUserCount && technologiesCreatedByUserLastCreationDate && <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}>
+                    <Typography variant='h6'>Статистика</Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+                      <Card sx={{ minWidth: 275 }}>
+                        <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
+                          <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                            Создано техпроцессов
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {technologiesCreatedByUserCount}
+                          </Typography>                          
+                        </CardContent>
+                        <CardActions>
+                          <Button size="small">Подробнее</Button>
+                        </CardActions>
+                      </Card>
+
+                      <Card sx={{ minWidth: 275 }}>
+                        <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
+                          <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                            Дата создания последнего техпроцесса
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {formatDate(technologiesCreatedByUserLastCreationDate)}
+                          </Typography>                          
+                        </CardContent>
+                        <CardActions>
+                          <Button size="small">Подробнее</Button>
+                        </CardActions>
+                      </Card>
+                    </Box>
+
                     <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
                     <TableContainer component={Paper}>
                       <Table sx={{ minWidth: 700 }} aria-label="customized table">

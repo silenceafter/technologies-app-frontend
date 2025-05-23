@@ -7,6 +7,8 @@ const initialState = {
   technologiesCreatedByUserError: null,
   technologiesCreatedByUserItems: null,
   technologiesCreatedByUserHeaders: null,
+  technologiesCreatedByUserCount: null,
+  technologiesCreatedByUserLastCreationDate: null,
 };
 
 //загрузка данных для дашборда
@@ -68,6 +70,9 @@ const dashboardSlice = createSlice({
     builder.addCase(getTechnologiesCreatedByUser.fulfilled, (state, action) => {      
       state.technologiesCreatedByUserItems = action.payload.TechnologiesCreatedByUser;
       state.technologiesCreatedByUserHeaders = action.payload.TechnologiesCreatedByUserHeaders;
+      state.technologiesCreatedByUserCount = action.payload.TechnologiesCreatedByUserCount;
+      state.technologiesCreatedByUserLastCreationDate = action.payload.TechnologiesCreatedByUserLastCreationDate;
+      //
       state.technologiesCreatedByUserError = null;
       state.technologiesCreatedByUserLoading = false;
     });
