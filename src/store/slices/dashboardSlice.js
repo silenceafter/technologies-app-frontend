@@ -9,6 +9,7 @@ const initialState = {
   technologiesCreatedByUserHeaders: null,
   technologiesCreatedByUserCount: null,
   technologiesCreatedByUserLastCreationDate: null,
+  technologiesCreatedByUserLastMonthActions: null,
 };
 
 //загрузка данных для дашборда
@@ -72,6 +73,7 @@ const dashboardSlice = createSlice({
       state.technologiesCreatedByUserHeaders = action.payload.TechnologiesCreatedByUserHeaders;
       state.technologiesCreatedByUserCount = action.payload.TechnologiesCreatedByUserCount;
       state.technologiesCreatedByUserLastCreationDate = action.payload.TechnologiesCreatedByUserLastCreationDate;
+      state.technologiesCreatedByUserLastMonthActions = action.payload.TechnologiesCreatedByUserLastMonthActions;
       //
       state.technologiesCreatedByUserError = null;
       state.technologiesCreatedByUserLoading = false;

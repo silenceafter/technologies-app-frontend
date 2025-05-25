@@ -17,13 +17,14 @@ import { use } from 'react';
 import { styled } from '@mui/material/styles'; 
 import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import Tooltip from '@mui/material/Tooltip';
+//import Tooltip from '@mui/material/Tooltip';
 import { HeaderSearchT } from '../../components/HeaderSearchT';
 import ProtectedRoute from '../../ProtectedRoute';
 import Backdrop from '@mui/material/Backdrop';
 import { selectLoading } from '../../store/slices/technologiesSlice';
 import { getTechnologiesCreatedByUser } from '../../store/slices/dashboardSlice';
 import { tableCellClasses } from '@mui/material';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Rectangle } from 'recharts';
 
 function Copyright() {
   return (
@@ -64,6 +65,7 @@ function Main() {
   const technologiesCreatedByUserHeaders = useSelector((state) => state.dashboard.technologiesCreatedByUserHeaders);
   const technologiesCreatedByUserCount = useSelector((state) => state.dashboard.technologiesCreatedByUserCount);
   const technologiesCreatedByUserLastCreationDate = useSelector((state) => state.dashboard.technologiesCreatedByUserLastCreationDate);
+  const technologiesCreatedByUserLastMonthActions = useSelector((state) => state.dashboard.technologiesCreatedByUserLastMonthActions);
 
   //переменные
   const showLoading = useMemo(() => {
@@ -184,62 +186,100 @@ function Main() {
                   borderRadius: 1,          
                   boxShadow: 3,
                   height: '46rem', /*735px*/
-                  overflow: 'hidden',
+                  overflow: !drawing ? 'auto' : 'hidden',
                 }}>
                   <Content setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
-                  {!drawing && technologiesCreatedByUserHeaders && technologiesCreatedByUserItems && technologiesCreatedByUserCount && technologiesCreatedByUserLastCreationDate && <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}>
-                    <Typography variant='h6'>Статистика</Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                      <Card sx={{ minWidth: 275 }}>
-                        <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
-                          <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-                            Создано техпроцессов
-                          </Typography>
-                          <Typography variant="h5" component="div">
-                            {technologiesCreatedByUserCount}
-                          </Typography>                          
-                        </CardContent>
-                        <CardActions>
-                          <Button size="small">Подробнее</Button>
-                        </CardActions>
-                      </Card>
+                  {!drawing && technologiesCreatedByUserHeaders && technologiesCreatedByUserItems && technologiesCreatedByUserCount && 
+                    technologiesCreatedByUserLastCreationDate && technologiesCreatedByUserLastMonthActions && <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
+                      <Typography variant='h6'>Статистика</Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+                        <Card sx={{ minWidth: 275 }}>
+                          <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
+                            <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                              Создано техпроцессов
+                            </Typography>
+                            <Typography variant="h5" component="div">
+                              {technologiesCreatedByUserCount}
+                            </Typography>                          
+                          </CardContent>
+                          <CardActions>
+                            <Button size="small">Подробнее</Button>
+                          </CardActions>
+                        </Card>                      
 
-                      <Card sx={{ minWidth: 275 }}>
-                        <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
-                          <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-                            Дата создания последнего техпроцесса
-                          </Typography>
-                          <Typography variant="h5" component="div">
-                            {formatDate(technologiesCreatedByUserLastCreationDate)}
-                          </Typography>                          
-                        </CardContent>
-                        <CardActions>
-                          <Button size="small">Подробнее</Button>
-                        </CardActions>
-                      </Card>
-                    </Box>
+                        <Card sx={{ minWidth: 275 }}>
+                          <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
+                            <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                              Дата создания последнего техпроцесса
+                            </Typography>
+                            <Typography variant="h5" component="div">
+                              {formatDate(technologiesCreatedByUserLastCreationDate)}
+                            </Typography>                          
+                          </CardContent>
+                          <CardActions>
+                            <Button size="small">Подробнее</Button>
+                          </CardActions>
+                        </Card>                  
+                      </Box>
 
-                    <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
-                    <TableContainer component={Paper}>
-                      <Table sx={{ minWidth: 700 }} aria-label="customized table">
-                        <TableHead>
-                          <TableRow>
-                            {Object.entries(technologiesCreatedByUserHeaders).map(([key, value], index) => (
-                              <StyledTableCell key={key}>{value}</StyledTableCell>
-                            ))}
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {technologiesCreatedByUserItems.map((row, index) => (
-                            <StyledTableRow key={index}>
-                              {Object.entries(technologiesCreatedByUserHeaders).map(([key, _], colIndex) => (
-                                <StyledTableCell key={`${index}-${colIndex}`}>{key == 'creation_date' || key == 'last_modified' ? formatDate(row[key]) : row[key]}</StyledTableCell>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <Typography variant='h6'>Активность</Typography>
+                          <Card variant="outlined" style={{ width: '100%', maxWidth: '600px', height: '100%' }}>
+                            <CardContent>                        
+                              {/* Описание */}
+                              <Typography color="text.secondary">
+                                Количество выполненных действий за месяц
+                              </Typography>
+                              
+                              {/* Сам график */}
+                              <BarChart
+                                width={600}
+                                height={370}
+                                data={technologiesCreatedByUserLastMonthActions}
+                                margin={{
+                                  top: 15,
+                                  right: 30,
+                                  left: -30,
+                                  bottom: 5,
+                                }}
+                              >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis dataKey="actions_count" />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey="day" name='Дата' fill="#82ca9d" activeBar={<Rectangle fill="pink" stroke="purple" />} />
+                                <Bar dataKey="actions_count" name='Кол-во действий' fill="#8884d8" activeBar={<Rectangle fill="gold" stroke="blue" />} />
+                              </BarChart>
+                            </CardContent>
+                          </Card>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', flexDirection: 'column',  gap: 2, width: '100%' }}>
+                        <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
+                        <TableContainer component={Paper}>
+                          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                            <TableHead>
+                              <TableRow>
+                                {Object.entries(technologiesCreatedByUserHeaders).map(([key, value], index) => (
+                                  <StyledTableCell key={key}>{value}</StyledTableCell>
+                                ))}
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {technologiesCreatedByUserItems.map((row, index) => (
+                                <StyledTableRow key={index}>
+                                  {Object.entries(technologiesCreatedByUserHeaders).map(([key, _], colIndex) => (
+                                    <StyledTableCell key={`${index}-${colIndex}`}>{key == 'creation_date' || key == 'last_modified' ? formatDate(row[key]) : row[key]}</StyledTableCell>
+                                  ))}
+                                </StyledTableRow>
                               ))}
-                            </StyledTableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Box>
+                    </Box>                    
                   </Box>}
                 </Box>            
               </Box>
