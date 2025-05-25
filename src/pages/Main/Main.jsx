@@ -258,8 +258,8 @@ function Main() {
 
                       <Box sx={{ display: 'flex', flexDirection: 'column',  gap: 2, width: '100%' }}>
                         <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
-                        <TableContainer component={Paper}>
-                          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                        <TableContainer component={Paper} sx={{ height: '100%'}}>
+                          <Table sx={{ minWidth: 700, height: '100%' }} aria-label="customized table">
                             <TableHead>
                               <TableRow>
                                 {Object.entries(technologiesCreatedByUserHeaders).map(([key, value], index) => (
