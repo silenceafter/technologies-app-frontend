@@ -25,6 +25,7 @@ import { selectLoading } from '../../store/slices/technologiesSlice';
 import { getTechnologiesCreatedByUser } from '../../store/slices/dashboardSlice';
 import { tableCellClasses } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Rectangle } from 'recharts';
+import { Dashboard } from './Dashboard/Dashboard';
 
 function Copyright() {
   return (
@@ -189,7 +190,8 @@ function Main() {
                   overflow: !drawing ? 'auto' : 'hidden',
                 }}>
                   <Content setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
-                  {!drawing && technologiesCreatedByUserHeaders && technologiesCreatedByUserItems && technologiesCreatedByUserCount && 
+                  {!drawing && <Dashboard />}
+                  {/*!drawing && technologiesCreatedByUserHeaders && technologiesCreatedByUserItems && technologiesCreatedByUserCount && 
                     technologiesCreatedByUserLastCreationDate && technologiesCreatedByUserLastMonthActions && <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
                       <Typography variant='h6'>Статистика</Typography>
                       <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
@@ -227,12 +229,9 @@ function Main() {
                           <Typography variant='h6'>Активность</Typography>
                           <Card variant="outlined" style={{ width: '100%', maxWidth: '600px', height: '100%' }}>
                             <CardContent>                        
-                              {/* Описание */}
                               <Typography color="text.secondary">
                                 Количество выполненных действий за месяц
                               </Typography>
-                              
-                              {/* Сам график */}
                               <BarChart
                                 width={600}
                                 height={370}
@@ -280,7 +279,7 @@ function Main() {
                         </TableContainer>
                       </Box>
                     </Box>                    
-                  </Box>}
+                  </Box>*/}
                 </Box>            
               </Box>
               <Box component="footer" sx={{ paddingLeft: 1, paddingRight: 1, paddingBottom: 1, bgcolor: '#eaeff1' }}>
