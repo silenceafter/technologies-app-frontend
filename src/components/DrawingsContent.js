@@ -50,7 +50,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-function Content({ setSmartBackdropActive, showLoading }) {
+function DrawingsContent({ setSmartBackdropActive, showLoading }) {
   const dispatch = useDispatch();
   //объекты
   //стейты  
@@ -163,7 +163,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
     }
 
     //equipmentCode
-    if (operationFormValues.equipmentCode) {
+    /*if (operationFormValues.equipmentCode) {
       if (operationFormValues.equipmentCode.length == 0) {
         operationErrors.equipmentCode = autocompleteTextFieldMessage;
       }      
@@ -174,7 +174,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
       if (operationFormValues.toolingCode.length == 0) {
         operationErrors.toolingCode = autocompleteTextFieldMessage;
       }
-    }
+    }*/
 
     //components
     /*if (!operationFormValues.components) {
@@ -296,6 +296,7 @@ function Content({ setSmartBackdropActive, showLoading }) {
   //вывод
   return (
     <>
+    {console.log(technologiesItems)}
       {drawingExternalCode && <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -430,4 +431,4 @@ function Content({ setSmartBackdropActive, showLoading }) {
   );
 }
 
-export {Content};
+export {DrawingsContent};

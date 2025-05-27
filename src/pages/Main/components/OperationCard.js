@@ -484,13 +484,13 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    <EquipmentSearch props={{id: "equipment-2", placeholder: "Оборудование"}}
+                    {/*<EquipmentSearch props={{id: "equipment-2", placeholder: "Оборудование"}}
                       id="equipment"
                       selectedValue={localData.formValues.equipmentCode}
                       options={autocompleteOptions.equipment || null}
                       onChange={handleOptionSelect}
                       errorValue={localData.formErrors.equipmentCode}
-                    />
+                    />*/}
                   </Grid>                  
                 </Grid>
               </Grid>

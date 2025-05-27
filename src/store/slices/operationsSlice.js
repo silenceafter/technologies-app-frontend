@@ -30,8 +30,15 @@ export const setData = createAsyncThunk(
         body: JSON.stringify(payload),
         credentials: 'include'
       });
-      if (!response.ok) throw new Error('Ошибка запроса');
-      return response.ok && response.status == '200' ? true : false;
+      /*if (!response.ok) throw new Error('Ошибка запроса');
+      return response.ok && response.status == '200' ? true : false;*/
+
+      if (!response.ok) {
+        throw new Error(`Ошибка запроса: ${response.status}`);
+      }
+      //
+      const data = await response.json();
+      return data;
     } catch (error) {
       return rejectWithValue(error.message);
     }

@@ -9,7 +9,7 @@ import 'react-sortable-tree/style.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navigator from './components/Navigator';
-import { Content } from './components/Content';
+import { Content } from './components/DrawingsContent';
 import { Header } from './components/Header';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import theme from './theme';

@@ -91,11 +91,11 @@ function Dashboard() {
     // Возвращаем дату в Московском формате
     return moscowDate.toLocaleString('ru-RU', options);
   };
-
   const technologiesCreatedByUserLastMonthActionsEmpty = Array.from({ length: 30 }).map((_, i) => ({
     date: `День ${i+1}`,
     actions_count: 0,
   }));
+  const cardMessages = ['Карточка 3', 'Карточка 4', 'Карточка 5'];//временные карточки
 
   //события
   const handleDrawerToggle = () => {
@@ -112,123 +112,138 @@ function Dashboard() {
   //main
   return (
       <>
-      {console.log(user)}
-      {console.log(technologiesCreatedByUserItems)}
-                  {!drawing && /*technologiesCreatedByUserHeaders && technologiesCreatedByUserItems && technologiesCreatedByUserCount && 
-                    technologiesCreatedByUserLastCreationDate && technologiesCreatedByUserLastMonthActions &&*/ <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
-                      <Typography variant='h6'>Статистика</Typography>
-                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                        <Card sx={{ minWidth: 275 }}>
-                          <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
-                            <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-                              Создано техпроцессов
-                            </Typography>
-                            <Typography variant="h5" component="div">
-                              {technologiesCreatedByUserCount ? technologiesCreatedByUserCount : 'Нет данных' } 
-                            </Typography>                          
-                          </CardContent>
-                          <CardActions>
-                            <Button size="small">Подробнее</Button>
-                          </CardActions>
-                        </Card>                      
+        {!drawing && 
+        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
+            <Typography variant='h6'>Статистика</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+              <Card sx={{ flexGrow: 1, flexBasis: '275px' }}>
+                <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
+                  <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                    Создано техпроцессов
+                  </Typography>
+                  <Typography variant="h5" component="div">
+                    {technologiesCreatedByUserCount ? technologiesCreatedByUserCount : 'Нет данных' } 
+                  </Typography>                          
+                </CardContent>
+                <CardActions>
+                  <Button size="small">Подробнее</Button>
+                </CardActions>
+              </Card>                      
 
-                        <Card sx={{ minWidth: 275 }}>
-                          <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
-                            <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-                              Дата создания последнего техпроцесса
-                            </Typography>
-                            <Typography variant="h5" component="div">
-                              {technologiesCreatedByUserLastCreationDate 
-                                ? formatDate(technologiesCreatedByUserLastCreationDate) 
-                                : 'Нет данных' }
-                            </Typography>                          
-                          </CardContent>
-                          <CardActions>
-                            <Button size="small">Подробнее</Button>
-                          </CardActions>
-                        </Card>                  
-                      </Box>
+              <Card sx={{ flexGrow: 1, flexBasis: '275px' }}>
+                <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
+                  <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                    Дата создания последнего техпроцесса
+                  </Typography>
+                  <Typography variant="h5" component="div">
+                    {technologiesCreatedByUserLastCreationDate 
+                      ? formatDate(technologiesCreatedByUserLastCreationDate) 
+                      : 'Нет данных' }
+                  </Typography>                          
+                </CardContent>
+                <CardActions>
+                  <Button size="small">Подробнее</Button>
+                </CardActions>
+              </Card>
 
-                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          <Typography variant='h6'>Активность</Typography>
-                          { 
-                            <Card variant="outlined" style={{ width: '100%', maxWidth: '600px', height: '100%' }}>
-                              <CardContent>                        
-                                <Typography color="text.secondary">
-                                  Количество выполненных действий за месяц
-                                </Typography>                       
-                                <BarChart
-                                  width={600}
-                                  height={370}
-                                  data={
-                                    !technologiesCreatedByUserLastMonthActions 
-                                      ? technologiesCreatedByUserLastMonthActions 
-                                      : technologiesCreatedByUserLastMonthActionsEmpty
-                                    }
-                                  margin={{
-                                    top: 15,
-                                    right: 30,
-                                    left: -30,
-                                    bottom: 5,
-                                  }}
-                                >
-                                  <CartesianGrid strokeDasharray="3 3" />
-                                  <XAxis dataKey="date" />
-                                  <YAxis dataKey="actions_count" />
-                                  <Tooltip />
-                                  <Legend />
-                                  <Bar dataKey="day" name='Дата' fill="#82ca9d" activeBar={<Rectangle fill="pink" stroke="purple" />} />
-                                  <Bar dataKey="actions_count" name='Кол-во действий' fill="#8884d8" activeBar={<Rectangle fill="gold" stroke="blue" />} />
-                                </BarChart>
-                              </CardContent>
-                            </Card>                                                          
+                {cardMessages.map((message, index) => (        
+                <Card sx={{ flexGrow: 1, flexBasis: '275px' }}>
+                  <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
+                    <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                      {message}
+                    </Typography>
+                    <Typography variant="h5" component="div">
+                      Текст {index + 1}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small">Подробнее</Button>
+                  </CardActions>
+                </Card>
+              ))}                  
+            </Box>
+
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Typography variant='h6'>Активность</Typography>
+                { 
+                  <Card variant="outlined" style={{ width: '100%', maxWidth: '600px', height: '100%' }}>
+                    <CardContent>                        
+                      <Typography color="text.secondary">
+                        Количество выполненных действий за месяц
+                      </Typography>                       
+                      <BarChart
+                        width={600}
+                        height={370}
+                        data={
+                          technologiesCreatedByUserLastMonthActions 
+                            ? technologiesCreatedByUserLastMonthActions 
+                            : technologiesCreatedByUserLastMonthActionsEmpty
                           }
-                      </Box>
+                        margin={{
+                          top: 15,
+                          right: 30,
+                          left: -30,
+                          bottom: 5,
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis dataKey="actions_count" />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="day" name='Дата' fill="#82ca9d" activeBar={<Rectangle fill="pink" stroke="purple" />} />
+                        <Bar dataKey="actions_count" name='Кол-во действий' fill="#8884d8" activeBar={<Rectangle fill="gold" stroke="blue" />} />
+                      </BarChart>
+                    </CardContent>
+                  </Card>                                                          
+                }
+            </Box>
 
-                      {!technologiesCreatedByUserHeaders ? (
-                        <Box sx={{ display: 'flex', flexDirection: 'column',  gap: 2, width: '100%' }}>
-                          <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
-                          <TableContainer component={Paper} sx={{ height: '100%'}}>
-                            <Table sx={{ minWidth: 700, height: '100%' }} aria-label="customized table">
-                              <TableHead>
-                                <TableRow>
-                                  {Object.entries(technologiesCreatedByUserHeaders).map(([key, value], index) => (
-                                    <StyledTableCell key={key}>{value}</StyledTableCell>
-                                  ))}
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {technologiesCreatedByUserItems.map((row, index) => (
-                                  <StyledTableRow key={index}>
-                                    {Object.entries(technologiesCreatedByUserHeaders).map(([key, _], colIndex) => (
-                                      <StyledTableCell key={`${index}-${colIndex}`}>{key == 'creation_date' || key == 'last_modified' ? formatDate(row[key]) : row[key]}</StyledTableCell>
-                                    ))}
-                                  </StyledTableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                        </Box>
-                      ) : (<Box sx={{ display: 'flex', flexDirection: 'column',  gap: 2, width: '100%' }}>
-                          <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
-                          <Card sx={{ minWidth: 275, height: 'auto' }}>
-                          <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
-                            <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-                              Дата создания последнего техпроцесса
-                            </Typography>
-                            <Typography variant="h5" component="div">
-                            Нет данных
-                            </Typography>                          
-                          </CardContent>
-                          <CardActions>
-                            <Button size="small">Подробнее</Button>
-                          </CardActions>
-                        </Card>   
-                          </Box>)
-                      }
-                    </Box>                 
-                  </Box>}        
+            {technologiesCreatedByUserHeaders ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column',  gap: 2, width: '100%' }}>
+                <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
+                <TableContainer component={Paper} sx={{ height: '100%'}}>
+                  <Table sx={{ minWidth: 700, height: '100%' }} aria-label="customized table">
+                    <TableHead>
+                      <TableRow>
+                        {Object.entries(technologiesCreatedByUserHeaders).map(([key, value], index) => (
+                          <StyledTableCell key={key}>{value}</StyledTableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {technologiesCreatedByUserItems.map((row, index) => (
+                        <StyledTableRow key={index}>
+                          {Object.entries(technologiesCreatedByUserHeaders).map(([key, _], colIndex) => (
+                            <StyledTableCell key={`${index}-${colIndex}`}>{key == 'creation_date' || key == 'last_modified' ? formatDate(row[key]) : row[key]}</StyledTableCell>
+                          ))}
+                        </StyledTableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column',  gap: 2, width: '100%' }}>
+                <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
+                <Card sx={{ minWidth: 275, height: 'auto' }}>
+                  <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
+                    <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                      Дата создания последнего техпроцесса
+                    </Typography>
+                    <Typography variant="h5" component="div">
+                    Нет данных
+                    </Typography>                          
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small">Подробнее</Button>
+                  </CardActions>
+                </Card>   
+              </Box>
+            )}
+          </Box>                 
+        </Box>}
       </>
   );
 }

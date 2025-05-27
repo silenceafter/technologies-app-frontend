@@ -15,11 +15,11 @@ const initialState = {
   hasUnsavedChanges: false,
   expandedPanelsDefault: { 
     parameters: true,
-    equipment: true,
-    components: true,
-    materials: true,
-    tooling: true,
-    measuringTools: true
+    equipment: false,
+    components: false,
+    materials: false,
+    tooling: false,
+    measuringTools: false
   },
   newTechnologyCode: null,
   newTechnologyCodeLoading: false,
@@ -261,6 +261,7 @@ const technologiesSlice = createSlice({
       return {
         ...state,
         selectedId: [ newTechnologyId, null ],
+        hasUnsavedChanges: true,
         items: [
           ...state.items,
           {
@@ -281,6 +282,7 @@ const technologiesSlice = createSlice({
               expandedPanels: {},
               isDeleted: false,
               isNewRecord: true,
+              isUpdated: false,
             },
             drawing: {
               externalCode: drawing.externalCode,
@@ -312,6 +314,7 @@ const technologiesSlice = createSlice({
       return {
         ...state,
         selectedId: [ technology.id, newOperationId],
+        hasUnsavedChanges: true,
         items: state.items.map((item) =>
           item.id === technology.id
             ? {
@@ -333,6 +336,7 @@ const technologiesSlice = createSlice({
                       changedValues: {},
                       isDeleted: false,
                       isNewRecord: true,
+                      isUpdated: false,
                     },
                   }
                 ]                                                                                          
@@ -353,7 +357,7 @@ const technologiesSlice = createSlice({
             ? {
                 ...item,
                 content: {
-                  ...item.content,
+                  ...item.content,                  
                   formValues: {
                     ...item.content.formValues,
                     prefix: prefixValue,
@@ -362,6 +366,7 @@ const technologiesSlice = createSlice({
                     ...item.content.changedValues,
                     prefix: prefixValue,
                   },
+                  /*isUpdated: item.content.isNewRecord || item.content.isDeleted ? false : true,*/
                 },                            
               }
             : item
@@ -461,6 +466,10 @@ const technologiesSlice = createSlice({
           item.id === technology.id
             ? {
                 ...item,
+                content: {
+                  ...item.content,
+                  isUpdated: newContent.isNewRecord || newContent.isDeleted ? false : true,
+                },
                 children: item.children.map((child) =>
                   child.id === operation.id
                     ? {
@@ -473,6 +482,7 @@ const technologiesSlice = createSlice({
                           changedValues: newContent.changedValues,
                           isDeleted: newContent.isDeleted,
                           isNewRecord: newContent.isNewRecord,
+                          isUpdated: newContent.isNewRecord || newContent.isDeleted ? false : true,
                           /*validateForm: newValidateForm*/
                         }                        
                       }

@@ -7,7 +7,7 @@ import 'react-sortable-tree/style.css';
 import { createTheme, rgbToHex, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navigator from '../../components/Navigator';
-import { Content } from '../../components/Content';
+import { DrawingsContent } from '../../components/DrawingsContent';
 import { Header } from '../../components/Header';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import theme from '../../theme';
@@ -189,97 +189,8 @@ function Main() {
                   height: '46rem', /*735px*/
                   overflow: !drawing ? 'auto' : 'hidden',
                 }}>
-                  <Content setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
-                  {!drawing && <Dashboard />}
-                  {/*!drawing && technologiesCreatedByUserHeaders && technologiesCreatedByUserItems && technologiesCreatedByUserCount && 
-                    technologiesCreatedByUserLastCreationDate && technologiesCreatedByUserLastMonthActions && <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
-                      <Typography variant='h6'>Статистика</Typography>
-                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                        <Card sx={{ minWidth: 275 }}>
-                          <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
-                            <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-                              Создано техпроцессов
-                            </Typography>
-                            <Typography variant="h5" component="div">
-                              {technologiesCreatedByUserCount}
-                            </Typography>                          
-                          </CardContent>
-                          <CardActions>
-                            <Button size="small">Подробнее</Button>
-                          </CardActions>
-                        </Card>                      
-
-                        <Card sx={{ minWidth: 275 }}>
-                          <CardContent sx={{ gap: 0, paddingBottom: 0 }}>
-                            <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-                              Дата создания последнего техпроцесса
-                            </Typography>
-                            <Typography variant="h5" component="div">
-                              {formatDate(technologiesCreatedByUserLastCreationDate)}
-                            </Typography>                          
-                          </CardContent>
-                          <CardActions>
-                            <Button size="small">Подробнее</Button>
-                          </CardActions>
-                        </Card>                  
-                      </Box>
-
-                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          <Typography variant='h6'>Активность</Typography>
-                          <Card variant="outlined" style={{ width: '100%', maxWidth: '600px', height: '100%' }}>
-                            <CardContent>                        
-                              <Typography color="text.secondary">
-                                Количество выполненных действий за месяц
-                              </Typography>
-                              <BarChart
-                                width={600}
-                                height={370}
-                                data={technologiesCreatedByUserLastMonthActions}
-                                margin={{
-                                  top: 15,
-                                  right: 30,
-                                  left: -30,
-                                  bottom: 5,
-                                }}
-                              >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="date" />
-                                <YAxis dataKey="actions_count" />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="day" name='Дата' fill="#82ca9d" activeBar={<Rectangle fill="pink" stroke="purple" />} />
-                                <Bar dataKey="actions_count" name='Кол-во действий' fill="#8884d8" activeBar={<Rectangle fill="gold" stroke="blue" />} />
-                              </BarChart>
-                            </CardContent>
-                          </Card>
-                      </Box>
-
-                      <Box sx={{ display: 'flex', flexDirection: 'column',  gap: 2, width: '100%' }}>
-                        <Typography variant='h6'>Последние добавленные техпроцессы</Typography>
-                        <TableContainer component={Paper} sx={{ height: '100%'}}>
-                          <Table sx={{ minWidth: 700, height: '100%' }} aria-label="customized table">
-                            <TableHead>
-                              <TableRow>
-                                {Object.entries(technologiesCreatedByUserHeaders).map(([key, value], index) => (
-                                  <StyledTableCell key={key}>{value}</StyledTableCell>
-                                ))}
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {technologiesCreatedByUserItems.map((row, index) => (
-                                <StyledTableRow key={index}>
-                                  {Object.entries(technologiesCreatedByUserHeaders).map(([key, _], colIndex) => (
-                                    <StyledTableCell key={`${index}-${colIndex}`}>{key == 'creation_date' || key == 'last_modified' ? formatDate(row[key]) : row[key]}</StyledTableCell>
-                                  ))}
-                                </StyledTableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      </Box>
-                    </Box>                    
-                  </Box>*/}
+                  <DrawingsContent setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
+                  {!drawing && <Dashboard />}                 
                 </Box>            
               </Box>
               <Box component="footer" sx={{ paddingLeft: 1, paddingRight: 1, paddingBottom: 1, bgcolor: '#eaeff1' }}>
