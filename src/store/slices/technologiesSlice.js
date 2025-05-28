@@ -319,6 +319,10 @@ const technologiesSlice = createSlice({
           item.id === technology.id
             ? {
                 ...item,
+                content: {
+                  ...item.content,
+                  isUpdated: true, /* добавлена новая операция, технология изменена (технология точно существует) */
+                },
                 children: [
                   ...technology.children, 
                   {
@@ -458,6 +462,7 @@ const technologiesSlice = createSlice({
 
       //jobCode
       //jobName
+      const isUpdatedOperation = newContent.isNewRecord || newContent.isDeleted ? false : true;
       //
       return {
         ...state,
@@ -468,7 +473,7 @@ const technologiesSlice = createSlice({
                 ...item,
                 content: {
                   ...item.content,
-                  isUpdated: newContent.isNewRecord || newContent.isDeleted ? false : true,
+                  isUpdated: newContent.isNewRecord || newContent.isDeleted || isUpdatedOperation ? true : false,
                 },
                 children: item.children.map((child) =>
                   child.id === operation.id
@@ -482,7 +487,7 @@ const technologiesSlice = createSlice({
                           changedValues: newContent.changedValues,
                           isDeleted: newContent.isDeleted,
                           isNewRecord: newContent.isNewRecord,
-                          isUpdated: newContent.isNewRecord || newContent.isDeleted ? false : true,
+                          isUpdated: isUpdatedOperation, /* т.к. создание или удаление операции приоритетнее, чем изменение */
                           /*validateForm: newValidateForm*/
                         }                        
                       }
