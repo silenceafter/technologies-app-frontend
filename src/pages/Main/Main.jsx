@@ -174,9 +174,9 @@ function Main() {
                 onClose={handleDrawerToggle}
               />
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-              <Header onDrawerToggle={handleDrawerToggle} />              
-              <Box component="main" sx={{ flex: 1, py: 2, px: 2, bgcolor: '#eaeff1' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', overflow: 'hidden' }}>
+              <Header onDrawerToggle={handleDrawerToggle} sx={{ position: 'sticky', top: 0, zIndex: 1100, bgcolor: 'white' }} />
+              <Box component="main" sx={{ flex: 1, py: 2, px: 2, bgcolor: '#eaeff1', overflowY: 'auto' }}>
                 <Box sx={{
                   display: 'flex',
                   flexDirection: 'row',
@@ -186,12 +186,14 @@ function Main() {
                   backgroundColor: 'rgb(234, 239, 241)', /*'rgb(245,245,245)',*/
                   borderRadius: 1,          
                   boxShadow: 3,
-                  height: '46rem', /*735px*/
-                  overflow: !drawing ? 'auto' : 'hidden',
+                  /*maxHeight: '100vh',*/
+                  /*height: '46rem',*/
+                  /*overflow: !drawing ? 'auto' : 'hidden',*/
                 }}>
                   <DrawingsContent setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
-                  {!drawing && <Dashboard />}                 
-                </Box>            
+                  {!drawing && <Dashboard />}            
+                </Box>
+                
               </Box>
               <Box component="footer" sx={{ paddingLeft: 1, paddingRight: 1, paddingBottom: 1, bgcolor: '#eaeff1' }}>
                 <Copyright />

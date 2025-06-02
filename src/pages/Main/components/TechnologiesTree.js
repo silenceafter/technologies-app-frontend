@@ -574,7 +574,7 @@ const TechnologiesTree = () => {
               <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
                 <SpeedDial
                   ariaLabel="SpeedDial basic example"
-                  sx={{ position: 'absolute', bottom: 0, right: 30, transform: 'scale(0.85)', '& .MuiFab-primary': { width: 45, height: 45 } }}
+                  sx={{ position: 'absolute', bottom: -10, right: 10, transform: 'scale(0.85)', '& .MuiFab-primary': { width: 45, height: 45 } }}
                   icon={<SpeedDialIcon />}
                 >
                   {actions.map((action) => (

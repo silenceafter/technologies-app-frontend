@@ -84,6 +84,7 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
   const technologiesListLoading = technologiesListSelectors?.loading;
   const technologiesItems = useSelector((state) => state.technologies.items);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
+  const dbResponse = useSelector((state) => state.operations.response);
   
   //события
   const handleAccordeonTechnologiesTreeChange = () => {
@@ -207,7 +208,7 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
   const handleSave = async () => {   
     if (!hasUnsavedChanges) {
       //сохранение не требуется
-      dispatch(setStatus('info'));//setRequestStatus('info');
+      dispatch(setStatus({ statusValue: 'info', responseValue: dbResponse }));//setRequestStatus('info');
       showSnackbar();
       return;
     }
@@ -228,13 +229,13 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
           //dispatch(resetTabs());
           dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
           //
-          dispatch(setStatus('success'));//setStatusMessage('success');
+          dispatch(setStatus({ statusValue: 'success', responseValue: dbResponse }));//setStatusMessage('success');
         } else {
           //ошибка
-          dispatch(setStatus('error'));//setStatusMessage('error');
+          dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));//setStatusMessage('error');
         }
       } catch (error) {
-        dispatch(setStatus('error'));//setStatusMessage('error');          
+        dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));//setStatusMessage('error');          
       } finally {
         handleClose();
         showSnackbar();
@@ -249,7 +250,7 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
       }
       //
       handleClose();
-      dispatch(setStatus('warning'));//setRequestStatus('warning');
+      dispatch(setStatus({ statusValue: 'warning', responseValue: dbResponse }));//setRequestStatus('warning');
       showSnackbar();
     }
     setLoading((prev) => ({ ...prev, save: false }));
@@ -296,14 +297,12 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
   //вывод
   return (
     <>
-    {console.log(technologiesItems)}
+    {console.log(dbResponse)}
       {drawingExternalCode && <Box sx={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
-        width: '27%',/*22*/
-        height: '705px',
-        overflow: 'hidden',
+        width: '35%', /*27*/
       }}>
         <Accordion defaultExpanded
           expanded={accordionTechnologiesTreeExpanded}
@@ -418,14 +417,14 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
                 <Typography component="span">Операция</Typography>
               )}
             </AccordionSummary>
-            <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', minHeight: '100px' }}>
+            <AccordionDetails sx={{ padding: 0, overflow: 'auto', /*maxHeight: '525px', minHeight: '100px'*/ }}>
               <OperationTabPanel handleClose={handleClose} open={open} showLoading={showLoading} />
             </AccordionDetails>
           </Accordion>
         </Box>
-        <Box sx={{ paddingTop: 2 }}>
+        {<Box sx={{ paddingTop: 2 }}>
           <ButtonGroupPanel handleSave={handleSave} loading={showLoading} />
-        </Box>
+        </Box>}
       </Box>}
     </>
   );

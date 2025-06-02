@@ -202,7 +202,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
         >
           <Typography component="span">Параметры</Typography>
         </AccordionSummary>
-        <AccordionDetails sx={{ padding: 2, overflow: 'auto', minHeight: '16.5rem', maxHeight: '35rem' }}>
+        <AccordionDetails sx={{ padding: 2, overflow: 'hidden'/*, minHeight: '16.5rem', maxHeight: '35rem'*/ }}>
           <form>
             <Grid container spacing={2} columns={{xs:5}}>
               {/* Первая строка */}

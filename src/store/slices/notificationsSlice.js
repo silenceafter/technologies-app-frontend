@@ -8,7 +8,7 @@ const notificationsSlice = createSlice({
   },
   reducers: {
     setStatus: (state, action) => {
-      const statusValue = action.payload;
+      const { statusValue, responseValue } = action.payload;
       let messageValue;
       switch(statusValue) {
         case 'success':
@@ -18,6 +18,20 @@ const notificationsSlice = createSlice({
           messageValue = 'Неправильно заполнена форма';
           break;
         case 'error':
+          /*for(const responseItem of responseValue) {
+            if (responseItem == null || typeof responseItem == 'undefined') {
+              continue;
+            }
+            try {
+              if (responseItem.code != 200) {
+
+              }
+            } catch(error) {
+
+            }
+          }*/
+
+
           messageValue = 'Ошибка при отправке!';
           break;
         case 'info':

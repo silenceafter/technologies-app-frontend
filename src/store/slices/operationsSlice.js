@@ -18,6 +18,7 @@ const initialState = {
     measuringTools: true
   },
   shouldReloadTabs: false,
+  response: null, /* коды ответов от сервера (сохранения) */
 };
 
 //сохранить введенные данные
@@ -216,6 +217,7 @@ const operationsSlice = createSlice({
       .addCase(setData.fulfilled, (state, action) => {
         state.loading = false;
         state.tabs = [];
+        state.response = action.payload;
       })
       .addCase(setData.rejected, (state, action) => {
         state.loading = false;
