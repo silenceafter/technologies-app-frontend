@@ -297,7 +297,7 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
   //вывод
   return (
     <>
-    {console.log(dbResponse)}
+    {/*console.log(dbResponse)*/}
       {drawingExternalCode && <Box sx={{
         display: 'flex',
         flexDirection: 'column',

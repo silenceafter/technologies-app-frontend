@@ -676,9 +676,13 @@ const technologiesSlice = createSlice({
         state.loading = false;
         state.items = action.payload;
         state.hasUnsavedChanges = false;
-        state.selectedId = state.items.length > 0 
-          ? [state.items[0].id, state.items[0].children.length > 0 ? state.items[0].children[0].id : null] 
-          : [null, null];
+
+        //selectedId
+        if (!state.selectedId) {
+          state.selectedId = state.items.length > 0 
+            ? [state.items[0].id, state.items[0].children.length > 0 ? state.items[0].children[0].id : null] 
+            : [null, null];
+        }        
       })
       .addCase(getSavedData.rejected, (state, action) => {
         state.loading = false;

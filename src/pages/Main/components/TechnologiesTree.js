@@ -555,6 +555,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
+    {console.log(items)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}
