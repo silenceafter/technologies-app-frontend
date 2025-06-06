@@ -95,7 +95,7 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
   //
   return (
     <>
-    {console.log(user)}
+    {console.log(currentTechnology)}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'
@@ -122,6 +122,24 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
                             type="text"
                             size="small"
                             value={currentTechnology.content.formValues.technologyCode?.code || currentTechnology.label}
+                            slotProps={{
+                              formHelperText: {
+                                sx: { whiteSpace: 'nowrap' },
+                              },
+                              input: { readOnly: true }
+                            }}
+                          >
+                          </TextField>
+                        </Grid>
+                        <Grid item xs={2.4}>
+                          <TextField                       
+                            fullWidth           
+                            name='technologyName'
+                            id="technology-name-2"
+                            label="Название технологии"
+                            type="text"
+                            size="small"
+                            value={currentTechnology.content.formValues.technologyCode?.name || currentTechnology.secondaryLabel}
                             slotProps={{
                               formHelperText: {
                                 sx: { whiteSpace: 'nowrap' },

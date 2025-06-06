@@ -151,7 +151,7 @@ function Header(props) {
                       </IconButton> 
                       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <Typography>{user?.lastname} {user?.firstname} {user?.patronimic}</Typography>
-                        <Typography sx={{ fontStyle: 'italic'}}>{user?.status}</Typography>
+                        <Typography sx={{ fontStyle: 'italic'}}>{user?.taskStatusName}</Typography>
                       </Box>                    
                   </Box>
                 </MenuItem>
