@@ -8,7 +8,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import _ from 'lodash';
 
-const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
+const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, access}) => {
   //стейты
   const [localData, setLocalData] = useState({
       dbValues: { orderNumber: 1 },
@@ -224,7 +224,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
                         },
-                        input: { readOnly: false }
+                        input: { readOnly: !access }
                       }}
                     >
                     </TextField>
@@ -241,6 +241,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                       options={autocompleteOptions.operations || null}
                       onChange={handleOptionSelect}
                       errorValue={localData.formErrors.operationCode}
+                      access={access}
                     />}
                   </Grid>
                 </Grid>
@@ -265,6 +266,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
                         },
+                        input: { readOnly: !access }
                       }}
                     >
                     </TextField>
@@ -279,6 +281,12 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                       size="small"
                       onChange={handleInputChange}
                       value={localData.formValues.areaNumber || ''}
+                      slotProps={{
+                        formHelperText: {
+                          sx: { whiteSpace: 'nowrap' },
+                        },
+                        input: { readOnly: !access }
+                      }}
                     >
                     </TextField>
                   </Grid>                      
@@ -303,6 +311,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
                         },
+                        input: { readOnly: !access }
                       }}
                     >
                     </TextField>
@@ -319,6 +328,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                       options={autocompleteOptions.jobs || null}
                       onChange={handleOptionSelect} 
                       errorValue={localData.formErrors.jobCode}
+                      access={access}
                     />}
                   </Grid>
                 </Grid>
@@ -343,6 +353,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                             formHelperText: {
                               sx: { whiteSpace: 'nowrap' },
                             },
+                            input: { readOnly: !access }
                           }}
                         >
                         </TextField>
@@ -364,6 +375,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                             formHelperText: {
                               sx: { whiteSpace: 'nowrap' },
                             },
+                            input: { readOnly: !access }
                           }}
                         >
                         </TextField>
@@ -385,6 +397,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                             formHelperText: {
                               sx: { whiteSpace: 'nowrap' },
                             },
+                            input: { readOnly: !access }
                           }}
                         >
                         </TextField>
@@ -406,6 +419,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                             formHelperText: {
                               sx: { whiteSpace: 'nowrap' },
                             },
+                            input: { readOnly: !access }
                           }}
                         >
                         </TextField>
@@ -432,6 +446,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
                         },
+                        input: { readOnly: !access }
                       }}
                     >
                     </TextField>                       
@@ -453,6 +468,12 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions}) => {
                       size='small'
                       onChange={handleInputChange}
                       value={localData.formValues.operationDescription || ''}
+                      slotProps={{
+                        formHelperText: {
+                          sx: { whiteSpace: 'nowrap' },
+                        },
+                        input: { readOnly: !access }
+                      }}
                     />                  
                   </Grid>
                 </Grid>

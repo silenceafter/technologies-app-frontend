@@ -42,8 +42,8 @@ import {
   addTechnology,
   addOperation,
   deleteItems, deleteItem,
+  selectCurrentItems
 } from '../../../store/slices/technologiesSlice';
-import { fetchData } from '../../../store/slices/lists/technologiesListSlice';
 import { resetTabs } from '../../../store/slices/operationsSlice';
 import { TechnologySearch } from '../components/TechnologySearch';
 import AdjustIcon from '@mui/icons-material/Adjust';
@@ -55,9 +55,10 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RestoreIcon from '@mui/icons-material/Restore';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import EditIcon from '@mui/icons-material/Edit';
 
 //действия для SpeedDial
-const actions = [
+let actions = [
   { icon: <AssignmentIcon />, name: 'add-technology', title: 'Добавить технологию' },
   { icon: <FormatListNumberedIcon />, name: 'add-operation', title: 'Добавить операцию' },
   { icon: <ContentCopyIcon />, name: 'copy', title: 'Копировать' },
@@ -89,6 +90,9 @@ const TechnologiesTree = () => {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [newTechnology, setNewTechnology] = useState(null);
+  const [currentTechnology, setCurrentTechnology] = useState(null);
+  const [currentOperation, setCurrentOperation] = useState(null);
+  const [access, setAccess] = useState(false);
 
   //селекторы
   const dispatch = useDispatch();
@@ -98,6 +102,7 @@ const TechnologiesTree = () => {
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
   const user = useSelector((state) => state.users.user);
+  const currentItems = useSelector(selectCurrentItems);
 
   //refs
   const itemRef = useRef(null);
@@ -158,7 +163,7 @@ const TechnologiesTree = () => {
     })
   }));
 
-  function CustomLabel({ className, secondaryLabel, customLabel, type, labelRef, pp, item }) {
+  function CustomLabel({ className, secondaryLabel, customLabel, type, labelRef, pp, item, access }) {
     const dispatch = useDispatch();
     //стейты
     const [value, setValue] = useState(customLabel);
@@ -198,9 +203,7 @@ const TechnologiesTree = () => {
                 dispatch(setSelectedId([pp, item.children.length > 0 ? item.children[0].id : null]));
               } else if (type == 'operation') {
                 dispatch(setSelectedId([item.parentId, pp ]));
-              }//dispatch(setSelectedId(pp));
-
-              
+              }
             }}
           />
           <div style={{ width: '800%', display: 'flex', flexDirection: 'column' }}>
@@ -218,18 +221,12 @@ const TechnologiesTree = () => {
               </div>
             )}          
           </div>
-          {<div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
-            {/*bb && (
+          {<div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>       
+            {type == 'technology' && access && (
               <TreeItem2IconContainer>
-                {/*<EditOutlinedIcon color="success" />*//*}
-                <AdjustIcon color="primary" />
-              </TreeItem2IconContainer>
-            )*/}        
-              {/*type == 'technology' && focused && (
-                <TreeItem2IconContainer>
-                  <AdjustIcon color="primary" />
-              </TreeItem2IconContainer>
-              )*/}
+                <EditIcon sx={{ color: "#4CAF50" }} />
+            </TreeItem2IconContainer>
+            )}
           </div>}
         </div>
       </>
@@ -301,9 +298,7 @@ const TechnologiesTree = () => {
         dispatch(setSelectedId([item.id, item.children.length > 0 ? item.children[0].id : null]));
       } else if (item.type == "operation") {
         dispatch(setSelectedId([item.parentId, item.id]));
-      }
-
-        
+      }  
     };
 
     const classes = useStyles({ itemType: item.type});
@@ -316,7 +311,16 @@ const TechnologiesTree = () => {
       >
         <span>{props.label}</span>
       </Box>
-    );*/    
+    );*/
+
+    //доступ к технологии
+    let access = false;
+    if (item?.type == 'technology') {
+      const administrator = user?.idstatus == 3 || user?.idstatus == 2 && user?.taskStatusId == 2 ? true : false;
+      if (!administrator) {
+        access = user?.GID == item?.groupId ? true : false;
+      }
+    }
     //
     return (
       <>
@@ -335,6 +339,7 @@ const TechnologiesTree = () => {
             labelRef: labelRef,
             pp: props.itemId,
             item: item,
+            access: access,
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
@@ -450,6 +455,28 @@ const TechnologiesTree = () => {
     setExpandedItems(allItemIds);
   }, [items]);
 
+  useEffect(() => {
+    if (currentItems.length > 0 && currentItems[0]) {
+      setCurrentTechnology(currentItems[0]);
+      setCurrentOperation(currentItems[1]);
+    }
+  }, [currentItems]);
+
+  useEffect(() => {
+    if (currentTechnology && user) {
+      setAccess(currentTechnology?.GID == user?.groupId ? true : false);
+      const userAccess = currentTechnology?.groupId == user?.GID ? true : false;
+      actions.forEach(action => {
+        if (!('access' in action)) {
+          action.access = userAccess;
+        } else {
+          action.access = userAccess;
+        }
+      })
+      //actions.filter(item => item.access === true);
+    }    
+  }, [user, currentTechnology]);
+
   //chip для выбранной технологии
   const handleDelete = () => {
     //setTechnologyChip(null);
@@ -556,6 +583,7 @@ const TechnologiesTree = () => {
   return (
     <>
     {console.log(items)}
+    {console.log(actions)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}
@@ -578,14 +606,16 @@ const TechnologiesTree = () => {
                   sx={{ position: 'absolute', bottom: -10, right: 10, transform: 'scale(0.85)', '& .MuiFab-primary': { width: 45, height: 45 } }}
                   icon={<SpeedDialIcon />}
                 >
-                  {actions.map((action) => (
-                    <SpeedDialAction
-                      key={action.name}
-                      icon={action.icon}
-                      tooltipTitle={action.title}
-                      onClick={() => handleSpeedDialActionClick(action)}
-                    />
-                  ))}
+                  {actions.map((action) => 
+                    !action.access ? (                  
+                      <SpeedDialAction
+                        key={action.name}
+                        icon={action.icon}
+                        tooltipTitle={action.title}
+                        onClick={() => handleSpeedDialActionClick(action)}
+                      />
+                  ) : null
+                  )}
                 </SpeedDial>
               </Box>
             </Box>
