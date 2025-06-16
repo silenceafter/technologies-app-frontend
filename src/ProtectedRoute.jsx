@@ -39,7 +39,8 @@ function ProtectedRoute({ children }) {
   // Проверяем доступ к странице
   useEffect(() => {
     if (user) {
-      if (user.idstatus != 3 && user.division != 1) {
+      if ((user.idstatus != 3 && user.idstatus != 2) || 
+        (user.idstatus == 2 && user.taskStatusId != 1 && user.taskStatusId != 2) /*user.idstatus != 3 && user.division != 1*/) {
         navigate('/access-denied'); // Если нет прав доступа, переходим на страницу "доступ запрещен"
       }
     }
