@@ -58,7 +58,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 
 //действия для SpeedDial
-let actions = [
+const actions = [
   { icon: <AssignmentIcon />, name: 'add-technology', title: 'Добавить технологию' },
   { icon: <FormatListNumberedIcon />, name: 'add-operation', title: 'Добавить операцию' },
   { icon: <ContentCopyIcon />, name: 'copy', title: 'Копировать' },
@@ -463,17 +463,12 @@ const TechnologiesTree = () => {
   }, [currentItems]);
 
   useEffect(() => {
-    if (currentTechnology && user) {
-      setAccess(currentTechnology?.GID == user?.groupId ? true : false);
-      const userAccess = currentTechnology?.groupId == user?.GID ? true : false;
-      actions.forEach(action => {
-        if (!('access' in action)) {
-          action.access = userAccess;
-        } else {
-          action.access = userAccess;
-        }
-      })
-      //actions.filter(item => item.access === true);
+    if (currentTechnology && user) {      
+      if (user?.GID) {
+        setAccess(currentTechnology?.GID == user?.groupId ? true : false);
+      } else {
+        setAccess(false);
+      }
     }    
   }, [user, currentTechnology]);
 
@@ -501,22 +496,23 @@ const TechnologiesTree = () => {
   }, [technologySelector]);*/
 
   const handleSpeedDialActionClick = useCallback((action) => {
+    setOpen(true);
+    //if (!access) {  return; }
     switch(action.name) {
       case 'delete':
-        //dispatch(deleteSelectedItems(selectedItems));
-        dispatch(deleteItems());
+        //dispatch(deleteItems());
         break;
 
       case 'restoreAll':
-        dispatch(restoreItems());
+        //dispatch(restoreItems());
         break;
 
       case 'add-technology':
-        dispatch(addTechnology({ user: { UID: user?.UID }, drawing: { externalCode: drawingExternalCode } }));
+        //dispatch(addTechnology({ user: { UID: user?.UID }, drawing: { externalCode: drawingExternalCode } }));
         break;
 
       case 'add-operation':
-        dispatch(addOperation(selectedId));      
+        //dispatch(addOperation(selectedId));      
         break;
     }
   }, [/*selectedItems,*/ disabledItems, selectedId]);
@@ -583,7 +579,6 @@ const TechnologiesTree = () => {
   return (
     <>
     {console.log(items)}
-    {console.log(actions)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}
@@ -607,14 +602,12 @@ const TechnologiesTree = () => {
                   icon={<SpeedDialIcon />}
                 >
                   {actions.map((action) => 
-                    !action.access ? (                  
-                      <SpeedDialAction
-                        key={action.name}
-                        icon={action.icon}
-                        tooltipTitle={action.title}
-                        onClick={() => handleSpeedDialActionClick(action)}
-                      />
-                  ) : null
+                    <SpeedDialAction
+                      key={action.name}
+                      icon={action.icon}
+                      tooltipTitle={action.title}
+                      onClick={() => handleSpeedDialActionClick(action)}
+                    />
                   )}
                 </SpeedDial>
               </Box>
@@ -638,50 +631,18 @@ const TechnologiesTree = () => {
       </Menu>
       {<Dialog
         open={open}
-        onClose={handleDialogClose}        
-        /*slotProps={{
-          paper: {
-            component: 'form',
-            onSubmit: (event) => {
-              
-            },
-          },
-        }}*/        
-      >
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries(formData.entries());
-            const newTechnologyCode = formJson.newTechnologyCode;
-            const newTechnologyName = formJson.newTechnologyName;
-            //
-            dispatch(addItems({ code: newTechnologyCode, name: newTechnologyName }));
-            dispatch(resetTabs());
-            handleDialogClose();
-          }}
-        >
+        onClose={handleDialogClose}
+      >        
         <DialogTitle>Новая технология</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Выберите технологию из списка
           </DialogContentText>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 2, width: '500px' }}>
-            {<TechnologySearch
-              props={{id: "technology-code", name: "newTechnology", placeholder: "Технология"}}
-              selectedValue={newTechnology}
-              onChange={setNewTechnology}
-              /*onChange={(e) => handleOptionSelect('operationCode', e.target.value)}
-              selectedValue={localData.formValues.operationCode}
-              errorValue={localData.formErrors.operationCode}*/
-            />}
-          </Box>
+          <Typography>access:</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}>Отмена</Button>
-          <Button type="submit">Подтвердить</Button>
+          <Button onClick={handleDialogClose}>OK</Button>
         </DialogActions>
-        </form>
       </Dialog>}
     </>
   );
