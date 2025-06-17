@@ -150,7 +150,6 @@ function Main() {
   return (
       <>
       {console.log(user)}
-      {console.log(technologiesCreatedByUserItems)}
       <ProtectedRoute>
         <ThemeProvider theme={theme}>
           <Box sx={{ display: 'flex', minHeight: '100vh' }}>

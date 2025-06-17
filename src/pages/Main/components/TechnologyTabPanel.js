@@ -95,7 +95,6 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
   //
   return (
     <>
-    {console.log(currentTechnology)}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'

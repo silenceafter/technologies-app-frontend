@@ -93,6 +93,7 @@ const TechnologiesTree = () => {
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
   const [access, setAccess] = useState(false);
+  const [checkAccess, setCheckAccess] = useState(false);
 
   //селекторы
   const dispatch = useDispatch();
@@ -464,13 +465,16 @@ const TechnologiesTree = () => {
 
   useEffect(() => {
     if (currentTechnology && user) {      
-      if (user?.GID) {
-        setAccess(currentTechnology?.GID == user?.groupId ? true : false);
+      if (user?.idstatus === 3 || user?.taskStatusId === 2) {
+        setAccess(true);
+      } else if (currentTechnology?.groupId === user?.GID) {
+        setAccess(true);
       } else {
-        setAccess(false);
+      setAccess(false);
       }
-    }    
-  }, [user, currentTechnology]);
+    }
+    setCheckAccess(false);
+  }, [currentTechnology, checkAccess]);
 
   //chip для выбранной технологии
   const handleDelete = () => {
@@ -496,8 +500,13 @@ const TechnologiesTree = () => {
   }, [technologySelector]);*/
 
   const handleSpeedDialActionClick = useCallback((action) => {
-    setOpen(true);
-    //if (!access) {  return; }
+    setCheckAccess(true);
+    if (!access) {
+      //действие недоступно  
+      setOpen(true);
+      return; 
+    }
+    //
     switch(action.name) {
       case 'delete':
         //dispatch(deleteItems());
@@ -515,7 +524,7 @@ const TechnologiesTree = () => {
         //dispatch(addOperation(selectedId));      
         break;
     }
-  }, [/*selectedItems,*/ disabledItems, selectedId]);
+  }, [/*selectedItems,*/ disabledItems, selectedId, access]);
 
   //контекстное меню
   const handleContextMenu = (event, nodeId) => {
@@ -553,8 +562,6 @@ const TechnologiesTree = () => {
     handleContextMenuClose();
   }
 
-
-
   const handleDialogOpen = () => {
     setOpen(true);
   };
@@ -578,7 +585,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(items)}
+    {/*console.log(items)*/}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}
@@ -629,16 +636,17 @@ const TechnologiesTree = () => {
         <MenuItem onClick={() => handleContextMenuItemDelete(selectedNode)}>Удалить</MenuItem>
         {/*<MenuItem onClick={() => handleContextMenuItemRename(selectedNode)}>Переименовать</MenuItem>*/}
       </Menu>
+
+      {/* Сообщение при отсутствии прав на действие */}
       {<Dialog
         open={open}
         onClose={handleDialogClose}
       >        
-        <DialogTitle>Новая технология</DialogTitle>
+        <DialogTitle>Нет доступа</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Выберите технологию из списка
+            Нельзя выполнить действие для техпроцесса "{currentTechnology?.label}"
           </DialogContentText>
-          <Typography>access:</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>OK</Button>
