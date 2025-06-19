@@ -26,11 +26,12 @@ export const setData = createAsyncThunk(
   'technologiesTree/setData',
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/UpdateOperation.v0.php', {
+      const baseUrl = process.env.REACT_APP_API_BASE_URL;
+      const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/UpdateOperation.v0.php`, {
         method: 'POST',
         body: JSON.stringify(payload),
         credentials: 'include'
-      });
+      }); /* http://192.168.15.72/Ivc/Ogt/ExecuteScripts/UpdateOperation.v0.php */
       /*if (!response.ok) throw new Error('Ошибка запроса');
       return response.ok && response.status == '200' ? true : false;*/
 

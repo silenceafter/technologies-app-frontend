@@ -11,14 +11,15 @@ export const fetchData = createAsyncThunk(
   'technologiesTree/fetchData',
   async ({UID, ivHex, keyHex}, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost/ivc/ogt/executescripts/gettechnologiesprefix.v0.php', {
+      const baseUrl = process.env.REACT_APP_API_BASE_URL;
+      const response = await fetch('${baseUrl}/ivc/ogt/executescripts/gettechnologiesprefix.v0.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         credentials: 'include',
         body: JSON.stringify({ UID: UID, ivHex: ivHex, keyHex: keyHex }),
-      });
+      }); /* http://192.168.15.72/ivc/ogt/executescripts/gettechnologiesprefix.v0.php */
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');

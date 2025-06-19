@@ -109,8 +109,9 @@ export const getSavedData = createAsyncThunk(
     try {
       const state = getState();
       const externalCode = selectDrawingExternalCode(state);
+      const baseUrl = process.env.REACT_APP_API_BASE_URL;
       //
-      const response = await fetch(`http://localhost/Ivc/Ogt/ExecuteScripts/GetSavedData.v2.php?code=${externalCode}`);
+      const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/GetSavedData.v2.php?code=${externalCode}`); /* http://192.168.15.72/Ivc/Ogt/ExecuteScripts/GetSavedData.v2.php?code=${externalCode} */
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');

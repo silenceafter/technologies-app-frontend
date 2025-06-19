@@ -16,13 +16,15 @@ export const authenticate = createAsyncThunk(
   async ({}, { getState, rejectWithValue }) => {
     try {
         const state = getState();
-        const response = await fetch('http://localhost/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php', {
+        const baseUrl = process.env.REACT_APP_API_BASE_URL;
+        //
+        const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           credentials: 'include'
-        });
+        }); /* http://192.168.15.72/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php */
         //
         const data = await response.json();
         if (!response.ok) {
@@ -41,6 +43,7 @@ export const signIn = createAsyncThunk(
   async ({ login, password }, { getState, rejectWithValue }) => {
     try {
         const state = getState();
+        const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
         //параметры
         const formData = new URLSearchParams();
@@ -48,14 +51,14 @@ export const signIn = createAsyncThunk(
         formData.append('password', password);
 
         //запрос
-        const response = await fetch('http://localhost/Ivc/Ogt/index.php', {
+        const response = await fetch(`${baseUrl}/Ivc/Ogt/index.php`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: formData,
           credentials: 'include'
-        });
+        }); /* http://192.168.15.72/Ivc/Ogt/index.php */
         const data = await response.text();
         if (!response.ok) {
           throw new Error(data.message || 'Network response was not ok');
@@ -82,13 +85,14 @@ export const signOut = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       //запрос
-      const response = await fetch('http://localhost/Ivc/Ogt/index.php?action=signout', {
+      const baseUrl = process.env.REACT_APP_API_BASE_URL;
+      const response = await fetch(`${baseUrl}/Ivc/Ogt/index.php?action=signout`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         credentials: 'include'
-      });
+      }); /* http://192.168.15.72/Ivc/Ogt/index.php?action=signout */
       //
       const data = await response.text();
       if (!response.ok) {
