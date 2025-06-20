@@ -42,7 +42,8 @@ import {
   addTechnology,
   addOperation,
   deleteItems, deleteItem,
-  selectCurrentItems
+  selectCurrentItems,
+  setAccess,
 } from '../../../store/slices/technologiesSlice';
 import { resetTabs } from '../../../store/slices/operationsSlice';
 import { TechnologySearch } from '../components/TechnologySearch';
@@ -92,7 +93,7 @@ const TechnologiesTree = () => {
   const [newTechnology, setNewTechnology] = useState(null);
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
-  const [access, setAccess] = useState(false);
+  /*const [access, setAccess] = useState(false);*/
   const [checkAccess, setCheckAccess] = useState(false);
 
   //селекторы
@@ -104,6 +105,7 @@ const TechnologiesTree = () => {
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
   const user = useSelector((state) => state.users.user);
   const currentItems = useSelector(selectCurrentItems);
+  const hasAccess = useSelector((state) => state.technologies.hasAccess);
 
   //refs
   const itemRef = useRef(null);
@@ -466,15 +468,15 @@ const TechnologiesTree = () => {
   useEffect(() => {
     if (currentTechnology && user) {      
       if (user?.idstatus === 3 || user?.taskStatusId === 2) {
-        setAccess(true);
+        //setAccess(true);
       } else if (currentTechnology?.groupId === user?.GID) {
-        setAccess(true);
+        //setAccess(true);
       } else {
-      setAccess(false);
+      //setAccess(false);
       }
     }
     setCheckAccess(false);
-  }, [currentTechnology, checkAccess]);
+  }, [currentTechnology, currentOperation, checkAccess]);
 
   //chip для выбранной технологии
   const handleDelete = () => {
@@ -585,7 +587,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {/*console.log(items)*/}
+    {console.log(access)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}

@@ -13,6 +13,7 @@ const initialState = {
   error: null,
   newItemCnt: 1,
   hasUnsavedChanges: false,
+  hasAccess: false,
   expandedPanelsDefault: { 
     parameters: true,
     equipment: false,
@@ -666,6 +667,12 @@ const technologiesSlice = createSlice({
         checkedItems: Array.from(updatedCheckedItems),
       };
     },
+    setAccess: (state, action) => {
+      return {
+        ...state,
+        hasAccess: action.payload,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -698,7 +705,8 @@ export const {
   setSelectedId,
   restoreItems, restoreItem,
   deleteItems, deleteItem,
-  setTabs, resetTabs, addTechnology, addOperation, updateTechnology, updateOperation, updateTechnologyFormErrors, updateOperationFormErrors, setTabValue, setShouldReloadTabs, setCheckedItems
+  setTabs, resetTabs, addTechnology, addOperation, updateTechnology, updateOperation, updateTechnologyFormErrors, updateOperationFormErrors, setTabValue, setShouldReloadTabs, setCheckedItems,
+  setAccess
 } = technologiesSlice.actions;
 
 //селекторы

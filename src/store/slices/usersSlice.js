@@ -127,7 +127,7 @@ const usersSlice = createSlice({
         ...state,
         isCrud: action.payload,
       };
-    },
+    },    
   },
   extraReducers: (builder) => {
     //authenticate
