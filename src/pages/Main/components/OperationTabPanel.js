@@ -48,7 +48,6 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
   const [expanded, setExpanded] = useState('panel1');
-  const [access, setAccess] = useState(false);
 
   //селекторы
   //const currentTechnology = useSelector(selectTechnology);
@@ -62,6 +61,7 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   const selectedIds = useSelector((state) => state.technologies.selectedId);
   const currentItems = useSelector(selectCurrentItems);
   const user = useSelector((state) => state.users.user);
+  const hasAccess = useSelector((state) => state.technologies.hasAccess);
 
   //jobCode
   const jobsSelectors = useSelector(selectJobs);
@@ -153,18 +153,12 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
     if (currentItems.length > 0 && currentItems[0]) {
       setCurrentTechnology(currentItems[0]);
       setCurrentOperation(currentItems[1]);
-
-      //доступ
-      const administrator = user?.idstatus == 3 || user?.idstatus == 2 && user?.taskStatusId == 2 ? true : false;
-      if (!administrator) {
-        setAccess(user?.GID == currentItems[0]?.groupId ? true : false);
-      }
     }
   }, [currentItems]);
   //
   return (
     <>
-    {console.log(access)}
+    {/*console.log(access)*/}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'
@@ -180,7 +174,7 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
                 content={currentOperation.content}
                 onUpdate={handleOperationUpdate}
                 autocompleteOptions={autocompleteOptions}
-                access={access}
+                access={hasAccess}
               />)}
           </Box>
           )

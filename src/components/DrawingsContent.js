@@ -35,7 +35,7 @@ import { TechnologyTabPanel } from '../pages/Main/components/TechnologyTabPanel'
 
 import { 
   getSavedData as technologiesFetchData,
-  clearItems as technologiesSetItems,
+  /*clearItems as technologiesSetItems,*/
   selectCurrentItems,
   updateOperation, updateTechnologyFormErrors, updateOperationFormErrors
 } from '../store/slices/technologiesSlice';
@@ -224,10 +224,10 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
         if (result) {
           //успешно
           //dispatch(productsSetItems());
-          dispatch(technologiesSetItems()); //очистить компонент технологий
+          //dispatch(technologiesSetItems()); //очистить компонент технологий
           //dispatch(productsFetchData({limit: 50, page: 1}));            
           //dispatch(resetTabs());
-          dispatch(technologiesFetchData({})); //обновить items в technologiesSlice
+          dispatch(technologiesFetchData({ externalCode: drawingExternalCode, user: user })); //обновить items в technologiesSlice
           //
           dispatch(setStatus({ statusValue: 'success', responseValue: dbResponse }));//setStatusMessage('success');
         } else {

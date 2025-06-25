@@ -18,7 +18,6 @@ import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
 //import Tooltip from '@mui/material/Tooltip';
-import { HeaderSearchT } from '../../components/HeaderSearchT';
 import ProtectedRoute from '../../ProtectedRoute';
 import Backdrop from '@mui/material/Backdrop';
 import { selectLoading } from '../../store/slices/technologiesSlice';

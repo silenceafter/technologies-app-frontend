@@ -24,7 +24,7 @@ export const authenticate = createAsyncThunk(
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           credentials: 'include'
-        }); /* http://192.168.15.72/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php */
+        });
         //
         const data = await response.json();
         if (!response.ok) {
@@ -58,7 +58,7 @@ export const signIn = createAsyncThunk(
           },
           body: formData,
           credentials: 'include'
-        }); /* http://192.168.15.72/Ivc/Ogt/index.php */
+        });
         const data = await response.text();
         if (!response.ok) {
           throw new Error(data.message || 'Network response was not ok');

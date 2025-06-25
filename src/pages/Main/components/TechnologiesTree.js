@@ -93,7 +93,6 @@ const TechnologiesTree = () => {
   const [newTechnology, setNewTechnology] = useState(null);
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
-  /*const [access, setAccess] = useState(false);*/
   const [checkAccess, setCheckAccess] = useState(false);
 
   //селекторы
@@ -468,11 +467,11 @@ const TechnologiesTree = () => {
   useEffect(() => {
     if (currentTechnology && user) {      
       if (user?.idstatus === 3 || user?.taskStatusId === 2) {
-        //setAccess(true);
+        dispatch(setAccess(true)); //setAccess(true);
       } else if (currentTechnology?.groupId === user?.GID) {
-        //setAccess(true);
+        dispatch(setAccess(true)); //setAccess(true);
       } else {
-      //setAccess(false);
+        dispatch(setAccess(false)); //setAccess(false);
       }
     }
     setCheckAccess(false);
@@ -503,7 +502,7 @@ const TechnologiesTree = () => {
 
   const handleSpeedDialActionClick = useCallback((action) => {
     setCheckAccess(true);
-    if (!access) {
+    if (!hasAccess) {
       //действие недоступно  
       setOpen(true);
       return; 
@@ -526,7 +525,7 @@ const TechnologiesTree = () => {
         //dispatch(addOperation(selectedId));      
         break;
     }
-  }, [/*selectedItems,*/ disabledItems, selectedId, access]);
+  }, [/*selectedItems,*/ disabledItems, selectedId, hasAccess]);
 
   //контекстное меню
   const handleContextMenu = (event, nodeId) => {
@@ -587,7 +586,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(access)}
+    {console.log(hasAccess)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}

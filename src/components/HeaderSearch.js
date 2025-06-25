@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/headerSlice';
 import { setDrawing, clearDrawing, clearTechnology } from '../store/slices/drawingsSlice';
 import { fetchData as productsFetchData, setItems as productsSetItems } from '../store/slices/lists/productsListSlice';
-import { getSavedData as technologiesFetchData, clearItems as technologiesSetItems } from '../store/slices/technologiesSlice';
+import { getSavedData as technologiesFetchData /*, clearItems as technologiesSetItems*/ } from '../store/slices/technologiesSlice';
 import { debounce } from 'lodash';
 
 function HeaderSearch(props) {
@@ -29,6 +29,7 @@ function HeaderSearch(props) {
   const limit = useSelector(selectLimit);
   const page = useSelector(selectPage);
   const drawing = useSelector((state) => state.drawings.drawing);
+  const user = useSelector((state) => state.users.user);
   
   //стейты
   const [inputValue, setInputValue] = useState('');
@@ -114,9 +115,9 @@ function HeaderSearch(props) {
                   }
                   //
                   dispatch(productsSetItems());
-                  dispatch(technologiesSetItems());                
+                  //dispatch(technologiesSetItems());                
                   dispatch(productsFetchData({limit: 50, page: 1}));
-                  dispatch(technologiesFetchData({}));
+                  dispatch(technologiesFetchData({ drawing: newValue, user: user }));
                 }}
                 inputValue={inputValue}
                 loadingText="поиск данных"

@@ -106,13 +106,17 @@ const restoreElements = (items, idsToMarkToRestore) => {
 //загрузка технологий и операций по коду ДСЕ
 export const getSavedData = createAsyncThunk(
   'technologiesTree/getSavedData',
-  async ({}, { getState, rejectWithValue }) => {
+  async (payload, { getState, rejectWithValue }) => {
     try {
       const state = getState();
-      const externalCode = selectDrawingExternalCode(state);
+      const externalCode = payload.drawing.externalcode; //const externalCode = selectDrawingExternalCode(state);
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
       //
-      const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/GetSavedData.v2.php?code=${externalCode}`); /* http://192.168.15.72/Ivc/Ogt/ExecuteScripts/GetSavedData.v2.php?code=${externalCode} */
+      const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/GetSavedData.v2.php`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        credentials: 'include'
+      }); /* `${baseUrl}/Ivc/Ogt/ExecuteScripts/GetSavedData.v2.php?code=${externalCode}` */
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -149,13 +153,13 @@ const technologiesSlice = createSlice({
         items: [...state.items, { id: generateUUID(), label: action.payload.code, secondaryLabel: action.payload.name, children: [], parentId: null, type: 'technology' }]
       };
     },
-    clearItems: (state) => {
+    /*clearItems: (state) => {
       return {
         ...state,
         items: [],
         loading: LOADING_DEFAULT
       }
-    },
+    },*/
     setSelectedItems: (state, action) => {
       return {
         ...state,
@@ -679,6 +683,8 @@ const technologiesSlice = createSlice({
       .addCase(getSavedData.pending, (state) => {
         state.loading = true;
         state.error = null;
+        /* items: [],
+        loading: LOADING_DEFAULT */
       })
       .addCase(getSavedData.fulfilled, (state, action) => {
         state.loading = false;
@@ -700,7 +706,7 @@ const technologiesSlice = createSlice({
 });
 
 export const { 
-  clearItems, addItems,
+  /*clearItems,*/ addItems,
   setSelectedItems, deleteSelectedItems,
   setSelectedId,
   restoreItems, restoreItem,
