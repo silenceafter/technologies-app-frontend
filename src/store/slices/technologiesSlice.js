@@ -294,7 +294,10 @@ const technologiesSlice = createSlice({
               externalCode: drawing.externalCode,
             },
             userId: null,
+            groupId: null,
             UID: user.UID,
+            /*GID: user.GID,*/
+            hasAccess: true,
           },
         ],
       };

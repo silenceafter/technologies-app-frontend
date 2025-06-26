@@ -59,13 +59,13 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 
 //действия для SpeedDial
-const actions = [
-  { icon: <AssignmentIcon />, name: 'add-technology', title: 'Добавить технологию' },
-  { icon: <FormatListNumberedIcon />, name: 'add-operation', title: 'Добавить операцию' },
-  { icon: <ContentCopyIcon />, name: 'copy', title: 'Копировать' },
-  { icon: <DeleteIcon />, name: 'delete', title: 'Удалить' },
-  { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление' },
-];
+const ALL_ACTIONS = [
+  { icon: <AssignmentIcon />, name: 'add-technology', title: 'Добавить технологию', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: false },
+  { icon: <FormatListNumberedIcon />, name: 'add-operation', title: 'Добавить операцию', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
+  { icon: <ContentCopyIcon />, name: 'copy', title: 'Копировать', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: false },
+  { icon: <DeleteIcon />, name: 'delete', title: 'Удалить', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
+  { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
+]; /* для каких ролей действие доступно, если роль = task_user, то смотрим needAccessCheck */
 
 //добавить кастомный класс и кастомное свойство элементу Box
 const useStyles = makeStyles({
@@ -94,6 +94,7 @@ const TechnologiesTree = () => {
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
   const [checkAccess, setCheckAccess] = useState(false);
+  const [actions, setActions] = useState([]);
 
   //селекторы
   const dispatch = useDispatch();
@@ -317,11 +318,16 @@ const TechnologiesTree = () => {
 
     //доступ к технологии
     let access = false;
-    if (item?.type == 'technology') {
+    /*if (item?.type == 'technology') {
       const administrator = user?.idstatus == 3 || user?.idstatus == 2 && user?.taskStatusId == 2 ? true : false;
       if (!administrator) {
         access = user?.GID == item?.groupId ? true : false;
       }
+    }*/
+    if (item?.type == 'technology') {
+    
+        access = item?.hasAccess;
+      
     }
     //
     return (
@@ -465,14 +471,19 @@ const TechnologiesTree = () => {
   }, [currentItems]);
 
   useEffect(() => {
-    if (currentTechnology && user) {      
-      if (user?.idstatus === 3 || user?.taskStatusId === 2) {
-        dispatch(setAccess(true)); //setAccess(true);
-      } else if (currentTechnology?.groupId === user?.GID) {
-        dispatch(setAccess(true)); //setAccess(true);
-      } else {
-        dispatch(setAccess(false)); //setAccess(false);
-      }
+    if (currentTechnology && user) {
+     if (user?.role === 'admin' || user?.role === 'task_admin') {
+      setActions(ALL_ACTIONS);
+      dispatch(setAccess(true));
+     } else if (user?.role === 'task_user' && currentTechnology?.hasAccess) {
+      setActions(ALL_ACTIONS);
+      dispatch(setAccess(true));
+     } else if (user?.role === 'task_user' && !currentTechnology?.hasAccess) {
+      setActions(ALL_ACTIONS.filter((action) => action.roles.includes(user.role) && !action.needAccessCheck));
+     } else {
+      setActions([]);
+      dispatch(setAccess(false));
+     }
     }
     setCheckAccess(false);
   }, [currentTechnology, currentOperation, checkAccess]);
@@ -502,30 +513,30 @@ const TechnologiesTree = () => {
 
   const handleSpeedDialActionClick = useCallback((action) => {
     setCheckAccess(true);
-    if (!hasAccess) {
+    if (user?.role === 'read_only') {
       //действие недоступно  
       setOpen(true);
-      return; 
+      return;
     }
     //
     switch(action.name) {
       case 'delete':
-        //dispatch(deleteItems());
+        dispatch(deleteItems());
         break;
 
       case 'restoreAll':
-        //dispatch(restoreItems());
+        dispatch(restoreItems());
         break;
 
       case 'add-technology':
-        //dispatch(addTechnology({ user: { UID: user?.UID }, drawing: { externalCode: drawingExternalCode } }));
+        dispatch(addTechnology({ user: { UID: user?.UID }, drawing: { externalCode: drawingExternalCode } }));
         break;
 
       case 'add-operation':
-        //dispatch(addOperation(selectedId));      
+        dispatch(addOperation(selectedId));      
         break;
     }
-  }, [/*selectedItems,*/ disabledItems, selectedId, hasAccess]);
+  }, [disabledItems, selectedId]);
 
   //контекстное меню
   const handleContextMenu = (event, nodeId) => {
@@ -586,7 +597,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(hasAccess)}
+    {console.log(items)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}
