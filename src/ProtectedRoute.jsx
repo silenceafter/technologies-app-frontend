@@ -1,17 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { authenticate } from './store/slices/usersSlice';
 import React, { useState, useEffect } from 'react';
-import { Grid, Paper, AppBar, Toolbar, Tabs, Tab, TextField, InputAdornment, Box, Typography, Button, Link, CircularProgress } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import SortableTree from 'react-sortable-tree';
+import { Box, CircularProgress } from '@mui/material';
 import 'react-sortable-tree/style.css';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import Navigator from './components/Navigator';
-import { Content } from './components/DrawingsContent';
-import { Header } from './components/Header';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import { useNavigate } from 'react-router-dom';
 

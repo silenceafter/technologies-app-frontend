@@ -271,7 +271,7 @@ const technologiesSlice = createSlice({
         items: [
           ...state.items,
           {
-            id: newTechnologyId,            
+            id: newTechnologyId,
             label: newTechnologyId.split('-')[0],
             secondaryLabel: `Новая технология ${state.items.length + 1}`,
             parentId: null,
@@ -296,7 +296,7 @@ const technologiesSlice = createSlice({
             userId: null,
             groupId: null,
             UID: user.UID,
-            /*GID: user.GID,*/
+            GID: user.GID,
             hasAccess: true,
           },
         ],
