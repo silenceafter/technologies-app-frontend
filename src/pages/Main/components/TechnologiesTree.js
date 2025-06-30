@@ -74,15 +74,6 @@ const useStyles = makeStyles({
   }
 });
 
-function getItemDescendantsIds(item) {
-  const ids = [];
-  item.children?.forEach((child) => {
-    ids.push(child.id);
-    ids.push(...getItemDescendantsIds(child));
-  });
-  return ids;
-}
-
 const TechnologiesTree = () => {
   //стейты
   const [expandedItems, setExpandedItems] = useState([]);
@@ -409,33 +400,6 @@ const TechnologiesTree = () => {
     toggledItemRef.current[itemId] = isSelected;
   }, []);
 
-  /*const handleSelectedItemsChange = useCallback((event, newSelectedItems) => {
-    dispatch(setSelectedItems(newSelectedItems));
-    const itemsToSelect = [];
-    const itemsToUnSelect = {};
-    Object.entries(toggledItemRef.current).forEach(([itemId, isSelected]) => {
-      const item = apiRef.current.getItem(itemId);
-      //
-      if (isSelected) {
-        itemsToSelect.push(...getItemDescendantsIds(item));
-      } else {
-        getItemDescendantsIds(item).forEach((descendantId) => {
-          itemsToUnSelect[descendantId] = true;
-        });
-      }
-    });
-    //
-    const newSelectedItemsWithChildren = Array.from(
-      new Set(
-        [...newSelectedItems, ...itemsToSelect].filter(
-          (itemId) => !itemsToUnSelect[itemId],
-        ),
-      ),
-    );
-    dispatch(setSelectedItems(newSelectedItemsWithChildren));
-    toggledItemRef.current = {};
-  }, [apiRef, dispatch, getItemDescendantsIds]);*/
-
   //selected, CustomTreeItem
   const handleCustomTreeItemClick = (event, itemId) => {
   };
@@ -488,28 +452,11 @@ const TechnologiesTree = () => {
     setCheckAccess(false);
   }, [currentTechnology, currentOperation, checkAccess]);
 
-  //chip для выбранной технологии
-  const handleDelete = () => {
-    //setTechnologyChip(null);
-  };
-
-  /*useEffect(() => {
-    setTechnologyChip(`${technologySelector.name}: ${technologySelector.code}`);
-  }, [technologySelector]);*/
-
-  /*useEffect(() => {
-    dispatch(fetchData({search: '', limit: 50, page: 1}));
-  }, [dispatch]);*/
-
   useEffect(() => {
     if (items.length > 0 && !selectedId /*&& !hasUnsavedChanges*/) {
       dispatch(setSelectedId([items[0].id, items[0].children.length > 0 ? items[0].children[0].id : null]));
     }
   }, [items, dispatch]);
-
-  /*const technologyChip = useMemo(() => {
-    return '111';//return `${technologySelector.name}: ${technologySelector.code}`;
-  }, [technologySelector]);*/
 
   const handleSpeedDialActionClick = useCallback((action) => {
     setCheckAccess(true);
@@ -620,13 +567,15 @@ const TechnologiesTree = () => {
                   sx={{ position: 'absolute', bottom: -10, right: 10, transform: 'scale(0.85)', '& .MuiFab-primary': { width: 45, height: 45 } }}
                   icon={<SpeedDialIcon />}
                 >
-                  {actions.map((action) => 
-                    <SpeedDialAction
-                      key={action.name}
-                      icon={action.icon}
-                      tooltipTitle={action.title}
-                      onClick={() => handleSpeedDialActionClick(action)}
-                    />
+                  {actions
+                    .filter(action => action && action.icon && action.title)
+                    .map((action) => 
+                      <SpeedDialAction
+                        key={action.name}
+                        icon={action.icon}
+                        tooltipTitle={action.title}
+                        onClick={() => handleSpeedDialActionClick(action)}
+                      />
                   )}
                 </SpeedDial>
               </Box>
