@@ -151,8 +151,8 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
     if (!currentItems) { return; }
     if (!currentItems[0]) { return; }
     if (currentItems.length > 0 && currentItems[0]) {
-      setCurrentTechnology(currentItems[0]);
-      setCurrentOperation(currentItems[1]);
+      setCurrentTechnology(currentItems.includes(0) ? currentItems[0] : null);
+      setCurrentOperation(currentItems.includes(1) ? currentItems[1] : null);
     }
   }, [currentItems]);
   //

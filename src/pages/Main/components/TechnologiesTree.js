@@ -57,6 +57,7 @@ import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RestoreIcon from '@mui/icons-material/Restore';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
+import { useAccessActions } from '../../../hooks/useAccessActions';
 
 //действия для SpeedDial
 const ALL_ACTIONS = [
@@ -66,13 +67,6 @@ const ALL_ACTIONS = [
   { icon: <DeleteIcon />, name: 'delete', title: 'Удалить', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
   { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
 ]; /* для каких ролей действие доступно, если роль = task_user, то смотрим needAccessCheck */
-
-//добавить кастомный класс и кастомное свойство элементу Box
-const useStyles = makeStyles({
-  technologyCustomClass: {
-    'component-type': (props) => props.itemType
-  }
-});
 
 const TechnologiesTree = () => {
   //стейты
@@ -85,7 +79,7 @@ const TechnologiesTree = () => {
   const [currentTechnology, setCurrentTechnology] = useState(null);
   const [currentOperation, setCurrentOperation] = useState(null);
   const [checkAccess, setCheckAccess] = useState(false);
-  const [actions, setActions] = useState([]);
+  //const [actions, setActions] = useState([]);
 
   //селекторы
   const dispatch = useDispatch();
@@ -98,10 +92,13 @@ const TechnologiesTree = () => {
   const currentItems = useSelector(selectCurrentItems);
   const hasAccess = useSelector((state) => state.technologies.hasAccess);
 
-  //refs
+  //рефы
   const itemRef = useRef(null);
   const toggledItemRef = React.useRef({});
   const apiRef = useTreeViewApiRef();
+
+  //хуки
+  const actions = useAccessActions({ user, currentTechnology });
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -252,60 +249,16 @@ const TechnologiesTree = () => {
     //эффекты
     useEffect(() => {
       setExpanded(expandedItems.includes(props.itemId));
-      /*setDisabled(disabledItems.includes(props.itemId));*/
-      /*setSelected(selectedItems.includes(props.itemId));*/
-    }, [expandedItems, /*disabledItems,*/ /*selectedItems,*/, props.itemId]);
-
-    //expanded
-    /*const handleRootClick = (e) => {
-      handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию  
-      //dispatch(setTechnology({ name: item.label, code: item.secondaryLabel } item));
-      const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
-      if (isIconClick) {
-        e.stopPropagation();
-        setExpanded((prev) => !prev);           
-        handleItemExpansionToggle(null, props.itemId, !expanded);
-        return;
-      }
-    };
-  
-    const handleChildClick = (e) => {
-      if (dataLoaded) return;
-      e.stopPropagation();
-      handleCustomTreeItemClick(e, props.itemId);
-    };*/
+    }, [expandedItems, props.itemId]);
 
     const handleClick = (e) => {
       e.stopPropagation();
-      //handleCustomTreeItemClick(e, props.itemId);//записать выбранную технологию  
-      //dispatch(setTechnology(/*{ name: item.label, code: item.secondaryLabel }*/ item));
-      
-      /*const isIconClick = e.target.closest(`.${treeItemClasses.iconContainer}`);//развернуть только при клике на иконку
-      if (isIconClick) {
-        e.stopPropagation();
-        setExpanded((prev) => !prev);           
-        handleItemExpansionToggle(null, props.itemId, !expanded);                
-        return;
-      }*/
-
       if (item.type == "technology") {
         dispatch(setSelectedId([item.id, item.children.length > 0 ? item.children[0].id : null]));
       } else if (item.type == "operation") {
         dispatch(setSelectedId([item.parentId, item.id]));
       }  
     };
-
-    const classes = useStyles({ itemType: item.type});
-    //дополнительный код
-    /*const additionalItem = (
-      <Box 
-        className={classes.technologyCustomClass} 
-        key={props.itemId} 
-        sx={{ display: 'flex', alignItems: 'center', width: '100%'}}
-      >
-        <span>{props.label}</span>
-      </Box>
-    );*/
 
     //доступ к технологии
     let access = false;
@@ -315,10 +268,8 @@ const TechnologiesTree = () => {
         access = user?.GID == item?.groupId ? true : false;
       }
     }*/
-    if (item?.type == 'technology') {
-    
-        access = item?.hasAccess;
-      
+    if (item?.type == 'technology') {    
+      access = item?.hasAccess;    
     }
     //
     return (
@@ -396,14 +347,6 @@ const TechnologiesTree = () => {
     });
   }, [setExpandedItems]);
 
-  const handleItemSelectionToggle = useCallback((event, itemId, isSelected) => {
-    toggledItemRef.current[itemId] = isSelected;
-  }, []);
-
-  //selected, CustomTreeItem
-  const handleCustomTreeItemClick = (event, itemId) => {
-  };
-
   //эффекты
   //анимация загрузки вкладки
   useEffect(() => {
@@ -429,23 +372,23 @@ const TechnologiesTree = () => {
 
   useEffect(() => {
     if (currentItems.length > 0 && currentItems[0]) {
-      setCurrentTechnology(currentItems[0]);
-      setCurrentOperation(currentItems[1]);
+      setCurrentTechnology(currentItems.includes(0) ? currentItems[0] : null);
+      setCurrentOperation(currentItems.includes(1) ? currentItems[1] : null);
     }
   }, [currentItems]);
 
   useEffect(() => {
     if (currentTechnology && user) {
      if (user?.role === 'admin' || user?.role === 'task_admin') {
-      setActions(ALL_ACTIONS);
+      //setActions(ALL_ACTIONS);
       dispatch(setAccess(true));
      } else if (user?.role === 'task_user' && currentTechnology?.hasAccess) {
-      setActions(ALL_ACTIONS);
+      //setActions(ALL_ACTIONS);
       dispatch(setAccess(true));
      } else if (user?.role === 'task_user' && !currentTechnology?.hasAccess) {
-      setActions(ALL_ACTIONS.filter((action) => action.roles.includes(user.role) && !action.needAccessCheck));
+      //setActions(ALL_ACTIONS.filter((action) => action.roles.includes(user.role) && !action.needAccessCheck));
      } else {
-      setActions([]);
+      //setActions([]);
       dispatch(setAccess(false));
      }
     }
@@ -453,7 +396,7 @@ const TechnologiesTree = () => {
   }, [currentTechnology, currentOperation, checkAccess]);
 
   useEffect(() => {
-    if (items.length > 0 && !selectedId /*&& !hasUnsavedChanges*/) {
+    if (items.length > 0 && !selectedId) {
       dispatch(setSelectedId([items[0].id, items[0].children.length > 0 ? items[0].children[0].id : null]));
     }
   }, [items, dispatch]);
@@ -517,10 +460,6 @@ const TechnologiesTree = () => {
     handleContextMenuClose();*/
   };
 
-  const handleContextMenuItemRename = (node) => {
-    handleContextMenuClose();
-  }
-
   const handleDialogOpen = () => {
     setOpen(true);
   };
@@ -544,7 +483,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(items)}
+    {/*console.log(actions)*/}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}
@@ -595,7 +534,6 @@ const TechnologiesTree = () => {
       >
         <MenuItem onClick={() => handleContextMenuItemRestore(selectedNode)}>Отменить удаление</MenuItem>
         <MenuItem onClick={() => handleContextMenuItemDelete(selectedNode)}>Удалить</MenuItem>
-        {/*<MenuItem onClick={() => handleContextMenuItemRename(selectedNode)}>Переименовать</MenuItem>*/}
       </Menu>
 
       {/* Сообщение при отсутствии прав на действие */}
