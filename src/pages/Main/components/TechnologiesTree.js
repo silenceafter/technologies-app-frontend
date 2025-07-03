@@ -42,7 +42,7 @@ import {
   addTechnology,
   addOperation,
   deleteItems, deleteItem,
-  selectCurrentItems,
+  selectCurrentItems, selectCurrentTechnology, selectCurrentOperation,
   setAccess,
 } from '../../../store/slices/technologiesSlice';
 import { resetTabs } from '../../../store/slices/operationsSlice';
@@ -76,8 +76,8 @@ const TechnologiesTree = () => {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [newTechnology, setNewTechnology] = useState(null);
-  const [currentTechnology, setCurrentTechnology] = useState(null);
-  const [currentOperation, setCurrentOperation] = useState(null);
+  /*const [currentTechnology, setCurrentTechnology] = useState(null);
+  const [currentOperation, setCurrentOperation] = useState(null);*/
   const [checkAccess, setCheckAccess] = useState(false);
   //const [actions, setActions] = useState([]);
 
@@ -89,7 +89,9 @@ const TechnologiesTree = () => {
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
   const user = useSelector((state) => state.users.user);
-  const currentItems = useSelector(selectCurrentItems);
+  //const currentItems = useSelector(selectCurrentItems);
+  const currentTechnology = useSelector(selectCurrentTechnology);
+  const currentOperation = useSelector(selectCurrentOperation);
   const hasAccess = useSelector((state) => state.technologies.hasAccess);
 
   //рефы
@@ -370,12 +372,12 @@ const TechnologiesTree = () => {
     setExpandedItems(allItemIds);
   }, [items]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (currentItems.length > 0 && currentItems[0]) {
       setCurrentTechnology(currentItems.includes(0) ? currentItems[0] : null);
       setCurrentOperation(currentItems.includes(1) ? currentItems[1] : null);
     }
-  }, [currentItems]);
+  }, [currentItems]);*/
 
   useEffect(() => {
     if (currentTechnology && user) {
@@ -483,7 +485,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {/*console.log(actions)*/}
+    {console.log(selectedId)}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}

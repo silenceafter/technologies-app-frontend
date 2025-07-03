@@ -9,6 +9,8 @@ const initialState = {
   disabledItems: [], /* помеченные на удаление */
   editedItems: [], /* редактируемые элементы */
   selectedId: null,
+  currentTechnology: null,
+  currentOperation: null,
   loading: LOADING_DEFAULT,
   error: null,
   newItemCnt: 1,
@@ -56,7 +58,7 @@ const findNodeById = (items, targetId) => {
       }
     }
   }
-  return undefined; //ничего не нашли
+  return null; //ничего не нашли null
 };
 
 const markElementsAsDeleted = (items, idsToMarkAsDeleted) => {
@@ -240,9 +242,14 @@ const technologiesSlice = createSlice({
       };      
     },
     setSelectedId: (state, action) => {
+      const newSelectedId = action.payload;
+      const bb = findNodeById(state.items, newSelectedId[0]);
+      const bb1 = findNodeById(state.items, newSelectedId[1]);
       return {
         ...state,
-        selectedId: action.payload,
+        selectedId: newSelectedId,
+        currentTechnology: findNodeById(state.items, newSelectedId[0]),
+        currentOperation: findNodeById(state.items, newSelectedId[1]),
       };
     },
     setTabs: (state, action) => {
@@ -680,6 +687,7 @@ const technologiesSlice = createSlice({
         hasAccess: action.payload,
       };
     },
+
   },
   extraReducers: (builder) => {
     builder
@@ -729,6 +737,16 @@ export const selectCurrentItems = (state) => {
     return [technology, operation];
   }
   return [null, null];
+};
+export const selectCurrentTechnology = (state) => {
+  return state.technologies.items && state.technologies.selectedId
+    ? findNodeById(state.technologies.items, state.technologies.selectedId[0])
+    : null;
+};
+export const selectCurrentOperation = (state) => {
+  return state.technologies.items && state.technologies.selectedId
+    ? findNodeById(state.technologies.items, state.technologies.selectedId[1])
+    : null;
 };
 
 export default technologiesSlice.reducer;
