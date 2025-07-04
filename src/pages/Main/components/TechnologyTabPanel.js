@@ -14,7 +14,7 @@ import {
 import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading,
-  setTabs, setTabValue, setShouldReloadTabs, selectCurrentItems, selectCurrentTechnology, selectCurrentOperation, updateTechnology,
+  setTabs, setTabValue, setShouldReloadTabs, selectCurrentItems, updateTechnology,
 } from '../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import { fetchData as technologiesPrefixFetchData} from '../../../store/slices/technologiesPrefixSlice';
@@ -34,8 +34,8 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
 
   //стейты
   const [loadingTimer, setLoadingTimer] = useState(false);
-  /*const [currentTechnology, setCurrentTechnology] = useState(null);
-  const [currentOperation, setCurrentOperation] = useState(null);*/
+  const [currentTechnology, setCurrentTechnology] = useState(null);
+  const [currentOperation, setCurrentOperation] = useState(null);
   const [prefixList, setPrefixList] = useState('');
   const [prefixHasError, setPrefixHasError] = useState(false);
   const [technologyCreationDate, setTechnologyCreationDate] = useState(null);
@@ -43,8 +43,6 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
   //селекторы
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const currentItems = useSelector(selectCurrentItems);
-  const currentTechnology = useSelector((state) => state.technologies.currentTechnology);
-  const currentOperation = useSelector((state) => state.technologies.currentOperation);
   const technologiesPrefixItems = useSelector((state) => state.technologiesPrefix.items);
   const technologiesPrefixLoading = useSelector((state) => state.technologiesPrefix.loading);
   const user = useSelector((state) => state.users.user);
@@ -65,12 +63,15 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
     }
   }, [drawingExternalCode]);
 
-  /*useEffect(() => {
-    if (currentItems.length > 0 && currentItems[0]) {
-      setCurrentTechnology(currentItems.includes(0) ? currentItems[0] : null);
-      setCurrentOperation(currentItems.includes(1) ? currentItems[1] : null);
-    }
-  }, [currentItems]);*/
+  useEffect(() => {
+    if (!currentItems) { return; }
+    try {
+      setCurrentTechnology(currentItems[0]);
+      setCurrentOperation(currentItems[1]);
+    } catch (e) {
+      console.error('Ошибка при получении данных из хранилища', e);
+    }      
+  }, [currentItems, currentTechnology]);
 
   useEffect(() => {
     if (user) {

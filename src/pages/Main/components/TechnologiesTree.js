@@ -42,7 +42,7 @@ import {
   addTechnology,
   addOperation,
   deleteItems, deleteItem,
-  selectCurrentItems, selectCurrentTechnology, selectCurrentOperation,
+  selectCurrentItems,
   setAccess,
 } from '../../../store/slices/technologiesSlice';
 import { resetTabs } from '../../../store/slices/operationsSlice';
@@ -59,15 +59,6 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAccessActions } from '../../../hooks/useAccessActions';
 
-//действия для SpeedDial
-const ALL_ACTIONS = [
-  { icon: <AssignmentIcon />, name: 'add-technology', title: 'Добавить технологию', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: false },
-  { icon: <FormatListNumberedIcon />, name: 'add-operation', title: 'Добавить операцию', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
-  { icon: <ContentCopyIcon />, name: 'copy', title: 'Копировать', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: false },
-  { icon: <DeleteIcon />, name: 'delete', title: 'Удалить', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
-  { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
-]; /* для каких ролей действие доступно, если роль = task_user, то смотрим needAccessCheck */
-
 const TechnologiesTree = () => {
   //стейты
   const [expandedItems, setExpandedItems] = useState([]);
@@ -76,8 +67,8 @@ const TechnologiesTree = () => {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [newTechnology, setNewTechnology] = useState(null);
-  /*const [currentTechnology, setCurrentTechnology] = useState(null);
-  const [currentOperation, setCurrentOperation] = useState(null);*/
+  const [currentTechnology, setCurrentTechnology] = useState(null);
+  const [currentOperation, setCurrentOperation] = useState(null);
   const [checkAccess, setCheckAccess] = useState(false);
   //const [actions, setActions] = useState([]);
 
@@ -89,14 +80,11 @@ const TechnologiesTree = () => {
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
   const user = useSelector((state) => state.users.user);
-  //const currentItems = useSelector(selectCurrentItems);
-  const currentTechnology = useSelector(selectCurrentTechnology);
-  const currentOperation = useSelector(selectCurrentOperation);
+  const currentItems = useSelector(selectCurrentItems);
   const hasAccess = useSelector((state) => state.technologies.hasAccess);
 
   //рефы
   const itemRef = useRef(null);
-  const toggledItemRef = React.useRef({});
   const apiRef = useTreeViewApiRef();
 
   //хуки
@@ -232,18 +220,15 @@ const TechnologiesTree = () => {
       itemId: props.itemId,
       children: props.children,
     });
-    const {
+    /*const {
       status: { focused , editable, editing }, 
-    } = useTreeItem2(props);
+    } = useTreeItem2(props);*/
     const item = publicAPI.getItem(props.itemId);
 
     //стейты
     const [isProcessing, setIsProcessing] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [expanded, setExpanded] = useState(false);
-    const [disabled, setDisabled] = useState(false);
-    const [selected, setSelected] = useState(false);
-    const [isFocused, setIsFocused] = useState(false);
 
     //рефы
     const labelRef = useRef(null);
@@ -264,13 +249,7 @@ const TechnologiesTree = () => {
 
     //доступ к технологии
     let access = false;
-    /*if (item?.type == 'technology') {
-      const administrator = user?.idstatus == 3 || user?.idstatus == 2 && user?.taskStatusId == 2 ? true : false;
-      if (!administrator) {
-        access = user?.GID == item?.groupId ? true : false;
-      }
-    }*/
-    if (item?.type == 'technology') {    
+    if (item?.type == 'technology' && (user?.role !== 'admin' && user?.role !== 'task_admin')) {
       access = item?.hasAccess;    
     }
     //
@@ -284,8 +263,6 @@ const TechnologiesTree = () => {
         slotProps={{
           label: { 
             secondaryLabel: item?.secondaryLabel || '',
-            /*onLabelClick: (e) => console.log('onLabelClick'),
-            onSecondaryLabelClick: (e) => console.log('onSecondaryLabelClick')*/
             customLabel: item?.label || '',
             type: item?.type,
             labelRef: labelRef,
@@ -295,7 +272,6 @@ const TechnologiesTree = () => {
           },
         }}
         id={`StyledTreeItem2-${props.itemId}`}
-        /*label={additionalItem}*/
         expanded={expanded}
         ref={ref}
         data-component-type={item.type}
@@ -318,7 +294,7 @@ const TechnologiesTree = () => {
         ) : (                
           props.children                             
         )}
-      </StyledTreeItem2>      
+      </StyledTreeItem2>
       </>
     );
   });
@@ -372,25 +348,23 @@ const TechnologiesTree = () => {
     setExpandedItems(allItemIds);
   }, [items]);
 
-  /*useEffect(() => {
-    if (currentItems.length > 0 && currentItems[0]) {
-      setCurrentTechnology(currentItems.includes(0) ? currentItems[0] : null);
-      setCurrentOperation(currentItems.includes(1) ? currentItems[1] : null);
+  useEffect(() => {
+    if (!currentItems) { return; }
+    try {
+      setCurrentTechnology(currentItems[0]);
+      setCurrentOperation(currentItems[1]);
+    } catch (e) {
+      console.error('Ошибка при получении данных из хранилища', e);
     }
-  }, [currentItems]);*/
+  }, [currentItems]);
 
   useEffect(() => {
     if (currentTechnology && user) {
      if (user?.role === 'admin' || user?.role === 'task_admin') {
-      //setActions(ALL_ACTIONS);
       dispatch(setAccess(true));
      } else if (user?.role === 'task_user' && currentTechnology?.hasAccess) {
-      //setActions(ALL_ACTIONS);
       dispatch(setAccess(true));
-     } else if (user?.role === 'task_user' && !currentTechnology?.hasAccess) {
-      //setActions(ALL_ACTIONS.filter((action) => action.roles.includes(user.role) && !action.needAccessCheck));
-     } else {
-      //setActions([]);
+     } else if (user?.role === 'read_only') {
       dispatch(setAccess(false));
      }
     }
@@ -485,7 +459,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(selectedId)}
+    {/*console.log(selectedId)*/}
       <MemoizedRichTreeView
         multiSelect
         apiRef={apiRef}
@@ -505,7 +479,7 @@ const TechnologiesTree = () => {
               <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
                 <SpeedDial
                   ariaLabel="SpeedDial basic example"
-                  sx={{ position: 'absolute', bottom: -10, right: 10, transform: 'scale(0.85)', '& .MuiFab-primary': { width: 45, height: 45 } }}
+                  sx={{ height: 'auto', position: 'absolute', bottom: 15, right: 15, /*transform: 'scale(0.85)',*/ '& .MuiFab-primary': { width: 45, height: 45 } }}
                   icon={<SpeedDialIcon />}
                 >
                   {actions

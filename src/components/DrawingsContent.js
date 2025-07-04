@@ -36,7 +36,7 @@ import { TechnologyTabPanel } from '../pages/Main/components/TechnologyTabPanel'
 import { 
   getSavedData as technologiesFetchData,
   /*clearItems as technologiesSetItems,*/
-  selectCurrentItems, selectCurrentTechnology, selectCurrentOperation,
+  selectCurrentItems,
   updateOperation, updateTechnologyFormErrors, updateOperationFormErrors
 } from '../store/slices/technologiesSlice';
 import { setData, setShouldReloadTabs } from '../store/slices/operationsSlice';
@@ -61,8 +61,8 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
   const [accordionOperationTabPanelExpanded, setAccordionOperationTabPanelExpanded] = useState(true);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState({ save: false });
-  /*const [currentTechnology, setCurrentTechnology] = useState(null);
-  const [currentOperation, setCurrentOperation] = useState(null);*/
+  const [currentTechnology, setCurrentTechnology] = useState(null);
+  const [currentOperation, setCurrentOperation] = useState(null);
   const [newTechnology, setNewTechnology] = useState(null);
   const [autocompleteOptions, setAutocompleteOptions] = useState({});
   const [isAutocompleteLoaded, setIsAutocompleteLoaded] = useState(true);//false
@@ -78,9 +78,7 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
   const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
   const user = useSelector((state) => state.users.user);
   //const { tabs } = useSelector((state) => state.operations);
-  //const currentItems = useSelector(selectCurrentItems);
-  const currentTechnology = useSelector(selectCurrentTechnology);
-  const currentOperation = useSelector(selectCurrentOperation);
+  const currentItems = useSelector(selectCurrentItems);
   const technologiesListSelectors = useSelector(selectTechnologies);
   const technologiesListItems = technologiesListSelectors?.items;
   const technologiesListLoading = technologiesListSelectors?.loading;
@@ -266,14 +264,16 @@ function DrawingsContent({ setSmartBackdropActive, showLoading }) {
   }, []);
 
   //эффекты
-  /*useEffect(() => {
+  useEffect(() => {
     if (!currentItems) { return; }
     if (!currentItems[0]) { return; }
-    if (currentItems.length > 0 && currentItems[0]) {
+    try {
       setCurrentTechnology(currentItems[0]);
       setCurrentOperation(currentItems[1]);
+    } catch (e) {
+      console.error('Ошибка при получении данных из хранилища', e);
     }
-  }, [currentItems]);*/
+  }, [currentItems]);
 
   useEffect(() => {
     if (currentTechnology) {

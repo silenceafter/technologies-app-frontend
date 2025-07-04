@@ -28,7 +28,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading,
-  setTabs, updateOperation, setTabValue, setShouldReloadTabs, selectCurrentItems, selectCurrentTechnology, selectCurrentOperation,
+  setTabs, updateOperation, setTabValue, setShouldReloadTabs, selectCurrentItems,
 } from '../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
@@ -45,8 +45,8 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   const [isUserClosedAllTabs, setIsUserClosedAllTabs] = useState(false);
   //const [validateForm, setValidateForm] = useState(() => () => true);
   const [loadingTimer, setLoadingTimer] = useState(false);
-  /*const [currentTechnology, setCurrentTechnology] = useState(null);
-  const [currentOperation, setCurrentOperation] = useState(null);*/
+  const [currentTechnology, setCurrentTechnology] = useState(null);
+  const [currentOperation, setCurrentOperation] = useState(null);
   const [expanded, setExpanded] = useState('panel1');
 
   //селекторы
@@ -59,9 +59,7 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   const operationsItems = operationsSelectors?.items;
   const operationsLoading = operationsSelectors?.loading;
   const selectedIds = useSelector((state) => state.technologies.selectedId);
-  //const currentItems = useSelector(selectCurrentItems);
-  const currentTechnology = useSelector(selectCurrentTechnology);
-  const currentOperation = useSelector(selectCurrentOperation);
+  const currentItems = useSelector(selectCurrentItems);
   const user = useSelector((state) => state.users.user);
   const hasAccess = useSelector((state) => state.technologies.hasAccess);
 
@@ -149,14 +147,16 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
     return undefined; //ничего не нашли
   }
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (!currentItems) { return; }
     if (!currentItems[0]) { return; }
-    if (currentItems.length > 0 && currentItems[0]) {
-      setCurrentTechnology(currentItems.includes(0) ? currentItems[0] : null);
-      setCurrentOperation(currentItems.includes(1) ? currentItems[1] : null);
+    try {
+      setCurrentTechnology(currentItems[0]);
+      setCurrentOperation(currentItems[1]);
+    } catch (e) {
+      console.error('Ошибка при получении данных из хранилища', e);
     }
-  }, [currentItems]);*/
+  }, [currentItems]);
   //
   return (
     <>
