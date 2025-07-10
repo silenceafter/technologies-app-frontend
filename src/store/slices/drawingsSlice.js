@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { logout } from './logoutSlice';
 
 //данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {
@@ -42,6 +43,12 @@ const drawingsSlice = createSlice({
       state.operation.name = action.payload.name;
       state.operation.code = action.payload.code;
     },
+  },
+  extraReducers: (builder) => {
+    //logout
+    builder.addCase(logout, (state) => {
+      Object.keys(state).forEach(key => delete state[key]);
+    });
   },
 });
 

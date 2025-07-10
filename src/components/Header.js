@@ -8,6 +8,9 @@ import { AppBar, Avatar, Button, Grid, IconButton, Link, Toolbar, Tooltip, Typog
 import { HeaderSearch } from './HeaderSearch';
 import { useSelector, useDispatch } from 'react-redux';
 import { signOut } from '../store/slices/usersSlice';
+import { logout, purgeStore } from '../store/slices/logoutSlice';
+import { persistStore } from 'redux-persist';
+import { store } from '../store/store';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -48,6 +51,7 @@ function stringAvatar(name) {
 function Header(props) {
   const { onDrawerToggle } = props;
   const dispatch = useDispatch();
+  const persistor = persistStore(store);
 
   //стейты
   const [anchorEl, setAnchorEl] = useState(null);
@@ -68,6 +72,10 @@ function Header(props) {
   const handleUserExitClose = async () => {
     //Учетная запись -> Выйти
     dispatch(signOut());
+    dispatch(logout()); // очистка redux
+    //store.dispatch({ type: 'LOGOUT' });
+    await persistor.purge();
+    //dispatch(purgeStore()); // очистка persist
     setAnchorEl(null);
   };
   //

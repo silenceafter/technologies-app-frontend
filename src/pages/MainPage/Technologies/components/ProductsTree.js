@@ -20,8 +20,8 @@ import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, fetchItemDetails, setItems, setPage, setSearch, selectItems } from '../../../store/slices/lists/productsListSlice';
-import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
+import { fetchData, fetchItemDetails, setItems, setPage, setSearch, selectItems } from '../../../../store/slices/lists/productsListSlice';
+import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice';
 import { split } from 'lodash';
 import CircularProgress from '@mui/material/CircularProgress';
 import Skeleton from '@mui/material/Skeleton';

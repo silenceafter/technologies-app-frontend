@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { logout } from './logoutSlice';
 import { property } from 'lodash';
 
 const LOADING_DEFAULT = false;
@@ -83,6 +84,11 @@ const dashboardSlice = createSlice({
     builder.addCase(getTechnologiesCreatedByUser.rejected, (state, action) => {
       state.technologiesCreatedByUserLoading = false;
       state.technologiesCreatedByUserError = action.payload.errorMessage;
+    });
+
+    //logout
+    builder.addCase(logout, (state) => {
+      Object.keys(state).forEach(key => delete state[key]);
     });
   },
 });

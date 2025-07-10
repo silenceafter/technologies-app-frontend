@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { logout } from '../logoutSlice';
 
 const initialState = {
   items: [],
@@ -69,6 +70,11 @@ const operationsListSlice = createSlice({
         state.hasMore = false;
         state.error = action.payload;
       });
+
+    //logout
+    /*builder.addCase(logout, (state) => {
+      Object.keys(state).forEach(key => delete state[key]);
+    });*/
   },
 });
 

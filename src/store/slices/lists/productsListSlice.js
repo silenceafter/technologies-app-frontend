@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 //import { selectSearch } from './headerSlice';
 import { selectDrawingExternalCode } from '../drawingsSlice';
+import { logout } from '../logoutSlice';
 
 const LIMIT_DEFAULT = 50;
 const PAGE_DEFAULT = 1;
@@ -139,6 +140,11 @@ const productsListSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+
+    //logout
+    /*builder.addCase(logout, (state) => {
+      Object.keys(state).forEach(key => delete state[key]);
+    });*/
   },
 });
 

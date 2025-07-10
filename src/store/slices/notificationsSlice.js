@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { logout } from './logoutSlice';
 
 const notificationsSlice = createSlice({
   name: 'notifications',
@@ -47,6 +48,12 @@ const notificationsSlice = createSlice({
         message: messageValue,
       };
     },
+  },
+  extraReducers: (builder) => {
+    //logout
+    builder.addCase(logout, (state) => {
+      Object.keys(state).forEach(key => delete state[key]);
+    });
   },
 });
 

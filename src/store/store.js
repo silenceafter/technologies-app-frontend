@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
 import { thunk } from 'redux-thunk'; // Middleware для асинхронных действий
@@ -23,6 +23,7 @@ import unsavedChangesReducer from './slices/unsavedChangesSlice';
 import technologiesPrefixReducer from './slices/technologiesPrefixSlice';
 import notificationsReducer from './slices/notificationsSlice';
 import dashboardReducer from './slices/dashboardSlice';
+import logoutReducer, { logout } from './slices/logoutSlice';
 import { Dashboard } from '@mui/icons-material';
 
 //корневой редьюсер
@@ -46,22 +47,35 @@ const rootReducer = combineReducers({
   users: usersReducer, /* храним обязательно */  
   notifications: notificationsReducer,
   dashboard: dashboardReducer,
+  logout: logoutReducer,
 });
 
 //конфигурация persist
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['users']
+  whitelist: ['users'],
+  /*blacklist: ['users', 'header', 'drawings', 'technologies', 'technologiesPrefix', 'operations', 'dashboard'],*/
   /*stateReconciler: autoMergeLevel2,*/
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 //хранилище redux
-const store = configureStore({
-  reducer: persistedReducer, /*rootReducer,*/
+/*rootReducer,*/
+/*const store = configureStore({
+  reducer: persistedReducer, 
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck:false}).concat(thunk),
+});*/
+
+const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }).concat(thunk),
 });
 
 const persistor = persistStore(store);

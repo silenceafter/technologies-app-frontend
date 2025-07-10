@@ -112,7 +112,6 @@ function Dashboard() {
   //main
   return (
       <>
-        {!drawing && 
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
             <Typography variant='h6'>Статистика</Typography>
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
@@ -243,7 +242,7 @@ function Dashboard() {
               </Box>
             )}
           </Box>                 
-        </Box>}
+        </Box>
       </>
   );
 }

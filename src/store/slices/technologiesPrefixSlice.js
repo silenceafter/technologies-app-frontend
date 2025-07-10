@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { logout } from './logoutSlice';
 
 const initialState = {
   items: [],
@@ -12,7 +13,7 @@ export const fetchData = createAsyncThunk(
   async ({UID, ivHex, keyHex}, { rejectWithValue }) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      const response = await fetch('${baseUrl}/ivc/ogt/executescripts/gettechnologiesprefix.v0.php', {
+      const response = await fetch(`${baseUrl}/ivc/ogt/executescripts/gettechnologiesprefix.v0.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -48,7 +49,12 @@ const technologiesPrefixSlice = createSlice({
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });                    
+      });
+
+    //logout
+    builder.addCase(logout, (state) => {
+      Object.keys(state).forEach(key => delete state[key]);
+    });
   },
 });
 

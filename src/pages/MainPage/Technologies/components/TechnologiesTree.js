@@ -31,7 +31,7 @@ import {
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
+import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice'; //'../../../../../store/slices/drawingsSlice';
 import {  
   addItems,
   setSelectedItems, 
@@ -44,9 +44,9 @@ import {
   deleteItems, deleteItem,
   selectCurrentItems,
   setAccess,
-} from '../../../store/slices/technologiesSlice';
-import { resetTabs } from '../../../store/slices/operationsSlice';
-import { TechnologySearch } from '../components/TechnologySearch';
+} from '../../../../store/slices/technologiesSlice';
+import { resetTabs } from '../../../../store/slices/operationsSlice';
+import { TechnologySearch } from './TechnologySearch';
 import AdjustIcon from '@mui/icons-material/Adjust';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
@@ -57,7 +57,7 @@ import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RestoreIcon from '@mui/icons-material/Restore';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
-import { useAccessActions } from '../../../hooks/useAccessActions';
+import { useAccessActions } from '../../../../hooks/useAccessActions';
 
 const TechnologiesTree = () => {
   //стейты

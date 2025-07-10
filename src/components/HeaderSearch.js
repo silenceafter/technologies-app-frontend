@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import { 
     AppBar,
@@ -20,6 +21,7 @@ import { getSavedData as technologiesFetchData /*, clearItems as technologiesSet
 import { debounce } from 'lodash';
 
 function HeaderSearch(props) {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { key, ...restProps } = props;
   
@@ -108,7 +110,8 @@ function HeaderSearch(props) {
 
                   //обновить выбранное значение в redux
                   if (newValue) {
-                    dispatch(setDrawing(newValue));              
+                    dispatch(setDrawing(newValue));
+                    navigate('/technologies');
                   } else {
                     dispatch(clearDrawing());
                     dispatch(clearTechnology());

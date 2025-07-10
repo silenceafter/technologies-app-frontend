@@ -9,7 +9,7 @@ import {
     TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setPage } from '../../../store/slices/lists/equipmentListSlice';
+import { fetchData, setPage } from '../../../../store/slices/lists/equipmentListSlice';
 
 const EquipmentSearch = React.memo(({props, id, selectedValue, options, onChange, errorValue }) => {
   const dispatch = useDispatch();

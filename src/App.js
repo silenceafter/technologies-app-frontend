@@ -1,9 +1,9 @@
 import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Container } from '@mui/material';
-import { Main } from './pages/Main/Main';
+import { MainPage } from './pages/MainPage/MainPage';
 import { AccessDenied } from './pages/AccessDenied';
 import { LoginPage } from './pages/LoginPage';
 import { CrudPage } from './pages/CrudPage';
@@ -20,7 +20,9 @@ function App() {
       {/*<Container maxWidth="xs"> вернуть для dashboard*/}            
         <main>
           <Routes>
-            <Route index element={<Main />} />
+          <Route exact path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<MainPage page="dashboard" />} />
+            <Route path="/technologies" element={<MainPage page="technologies" />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/crud" element={<CrudPage />} />
             <Route path="/access-denied" element={<AccessDenied />} />

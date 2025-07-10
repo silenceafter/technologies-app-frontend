@@ -7,7 +7,7 @@ import 'react-sortable-tree/style.css';
 import { createTheme, rgbToHex, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navigator from '../../components/Navigator';
-import { DrawingsContent } from '../../components/DrawingsContent';
+import { Technologies } from './Technologies/Technologies';
 import { Header } from '../../components/Header';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import theme from '../../theme';
@@ -38,10 +38,13 @@ function Copyright() {
   );
 }
 
-function Main() {
+function MainPage({ page }) {
   //константы
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
   const drawerWidth = 256;
+  
+  //переменные
+  let content;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -144,6 +147,17 @@ function Main() {
       dispatch(getTechnologiesCreatedByUser({ user: user }));
     }
   }, [user]);
+
+  switch (page) {
+    case 'dashboard':
+      content = <Dashboard />;
+      break;
+    case 'technologies':
+      content = <Technologies />;
+      break;
+    default:
+      content = <Dashboard />;
+  }
   
   //main
   return (
@@ -188,10 +202,10 @@ function Main() {
                   /*height: '46rem',*/
                   /*overflow: !drawing ? 'auto' : 'hidden',*/
                 }}>
-                  <DrawingsContent setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
-                  {!drawing && <Dashboard />}            
-                </Box>
-                
+                  {/*<Technologies setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />
+                  !drawing && <Dashboard />*/}
+                  {content}
+                </Box>                
               </Box>
               <Box component="footer" sx={{ paddingLeft: 1, paddingRight: 1, paddingBottom: 1, bgcolor: '#eaeff1' }}>
                 <Copyright />
@@ -219,4 +233,4 @@ function Main() {
   );
 }
 
-export {Main};
+export {MainPage};

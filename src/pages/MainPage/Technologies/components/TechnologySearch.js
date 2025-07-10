@@ -9,7 +9,7 @@ import {
     TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage } from '../../../store/slices/lists/technologiesListSlice';
+import { fetchData, setSearch, setPage } from '../../../../store/slices/lists/technologiesListSlice';
 import { debounce } from 'lodash';
 
 const TechnologySearch = React.memo(({ props, selectedValue, onChange, options, content, errorValue}) => {

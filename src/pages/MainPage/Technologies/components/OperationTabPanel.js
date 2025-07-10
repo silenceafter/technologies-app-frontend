@@ -17,11 +17,11 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from "@mui/icons-material/Close";
-import { Notifications } from '../components/Notifications';
-import { OperationCard } from '../components/OperationCard';
-import { MemoizedTabPanel as TabPanel } from '../components/TabPanel';
-import { TechnologyBreadcrumbs } from '../components/TechnologyBreadcrumbs';
-import { MemoizedTabs } from '../components/MemoizedTabs';
+import { Notifications } from './Notifications';
+import { OperationCard } from './OperationCard';
+import { MemoizedTabPanel as TabPanel } from './TabPanel';
+import { TechnologyBreadcrumbs } from './TechnologyBreadcrumbs';
+import { MemoizedTabs } from './MemoizedTabs';
 import Toolbar from '@mui/material/Toolbar';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -29,12 +29,12 @@ import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading,
   setTabs, updateOperation, setTabValue, setShouldReloadTabs, selectCurrentItems,
-} from '../../../store/slices/technologiesSlice';
-import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
-import { selectOperations, fetchData } from '../../../store/slices/lists/operationsListSlice';
-import { selectJobs, fetchData as jobsFetchData } from '../../../store/slices/lists/jobsListSlice';
-import { selectEquipment, fetchData as equipmentFetchData } from '../../../store/slices/lists/equipmentListSlice';
-import { selectTooling, fetchData as toolingFetchData } from '../../../store/slices/lists/toolingListSlice';
+} from '../../../../store/slices/technologiesSlice';
+import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice';
+import { selectOperations, fetchData } from '../../../../store/slices/lists/operationsListSlice';
+import { selectJobs, fetchData as jobsFetchData } from '../../../../store/slices/lists/jobsListSlice';
+import { selectEquipment, fetchData as equipmentFetchData } from '../../../../store/slices/lists/equipmentListSlice';
+import { selectTooling, fetchData as toolingFetchData } from '../../../../store/slices/lists/toolingListSlice';
 
 function OperationTabPanel({ handleClose, open, showLoading }) {
   const dispatch = useDispatch();

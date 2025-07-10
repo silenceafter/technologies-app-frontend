@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { logout } from './logoutSlice';
 
 const unsavedChangesSlice = createSlice({
   name: 'unsavedChanges',
@@ -9,6 +10,12 @@ const unsavedChangesSlice = createSlice({
     setUnsavedChanges: (state, action) => {
       state.hasUnsavedChanges = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    //logout
+    builder.addCase(logout, (state) => {
+      Object.keys(state).forEach(key => delete state[key]);
+    });
   },
 });
 

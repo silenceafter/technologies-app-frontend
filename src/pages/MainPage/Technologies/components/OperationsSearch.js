@@ -8,7 +8,7 @@ import {
     TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setPage } from '../../../store/slices/lists/operationsListSlice';
+import { fetchData, setPage } from '../../../../store/slices/lists/operationsListSlice';
 
 const OperationsSearch = React.memo(({props, id, selectedValue, options, onChange, errorValue, access }) => {
   const dispatch = useDispatch();
