@@ -181,7 +181,7 @@ function HeaderSearch(props) {
                     padding: '8px 16px'
                   },
                 }}
-                value={value || null}
+                value={value || drawing || null}
               />}
             </Grid>        
           </Grid>

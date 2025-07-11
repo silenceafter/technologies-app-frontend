@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -17,32 +18,36 @@ import SettingsInputComponentIcon from '@mui/icons-material/SettingsInputCompone
 import TimerIcon from '@mui/icons-material/Timer';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PhonelinkSetupIcon from '@mui/icons-material/PhonelinkSetup';
+import EngineeringIcon from '@mui/icons-material/Engineering';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
 const categories = [
   {
     id: 'Build',
     children: [
       {
-        id: 'Authentication',
-        icon: <PeopleIcon />,
+        id: 'Технологии',
+        icon: <EngineeringIcon />,
+        route: '/technologies',
         active: true,
       },
-      { id: 'Database', icon: <DnsRoundedIcon /> },
-      { id: 'Storage', icon: <PermMediaOutlinedIcon /> },
-      { id: 'Hosting', icon: <PublicIcon /> },
-      { id: 'Functions', icon: <SettingsEthernetIcon /> },
+      { id: 'Database', icon: <DnsRoundedIcon />, route: '/', },
+      { id: 'Storage', icon: <PermMediaOutlinedIcon />, route: '/', },
+      { id: 'Hosting', icon: <PublicIcon />, route: '/', },
+      { id: 'Functions', icon: <SettingsEthernetIcon />, route: '/', },
       {
         id: 'Machine learning',
         icon: <SettingsInputComponentIcon />,
+        route: '/',
       },
     ],
   },
   {
     id: 'Quality',
     children: [
-      { id: 'Analytics', icon: <SettingsIcon /> },
-      { id: 'Performance', icon: <TimerIcon /> },
-      { id: 'Test Lab', icon: <PhonelinkSetupIcon /> },
+      { id: 'Analytics', icon: <SettingsIcon />, route: '/', },
+      { id: 'Performance', icon: <TimerIcon />, route: '/', },
+      { id: 'Test Lab', icon: <PhonelinkSetupIcon />, route: '/', },
     ],
   },
 ];
@@ -64,6 +69,7 @@ const itemCategory = {
 
 export default function Navigator(props) {
   const { ...other } = props;
+  const navigate = useNavigate();
 
   return (
     <Drawer variant="persistent" {...other}>
@@ -72,19 +78,22 @@ export default function Navigator(props) {
           Навигация
         </ListItem>
         <ListItem sx={{ ...item, ...itemCategory }}>
-          <ListItemIcon>
-            <HomeIcon />
-          </ListItemIcon>
-          <ListItemText>Главная страница</ListItemText>
+          <ListItemButton onClick={() => navigate('/')}>
+            <ListItemIcon>
+              <DashboardIcon />
+            </ListItemIcon>
+            <ListItemText>Главная страница</ListItemText>
+          </ListItemButton>          
         </ListItem>
+
         {categories.map(({ id, children }) => (
           <Box key={id} sx={{ bgcolor: '#101F33' }}>
             <ListItem sx={{ py: 2, px: 3 }}>
               <ListItemText sx={{ color: '#fff' }}>{id}</ListItemText>
             </ListItem>
-            {children.map(({ id: childId, icon, active }) => (
+            {children.map(({ id: childId, icon, active, route }) => (
               <ListItem disablePadding key={childId}>
-                <ListItemButton selected={active} sx={item}>
+                <ListItemButton selected={active} sx={item} onClick={() => navigate(route)}>
                   <ListItemIcon>{icon}</ListItemIcon>
                   <ListItemText>{childId}</ListItemText>
                 </ListItemButton>

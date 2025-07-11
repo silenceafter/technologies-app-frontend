@@ -304,6 +304,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
+        height: '100%',
         width: '35%', /*27*/
       }}>
         <Accordion defaultExpanded
@@ -320,7 +321,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
           >
             <Typography component="span">Технологии и операции</Typography>
           </AccordionSummary>
-          <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', /*border: '1px solid rgba(0, 0, 0, 0.12)'*/ }}>
+          <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', color: 'black', marginLeft: 2, marginTop: 2, /*border: '1px solid rgba(0, 0, 0, 0.12)'*/ }}>
             <Box sx={{ height: '100%', /*, display: 'flex', flexDirection: 'column', gap: 2*/ }}>
               <TechnologiesTree />
             </Box>              
@@ -356,8 +357,9 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
       {drawingExternalCode && <Box sx={{
         display: 'flex',
         flexDirection: 'column',
+        flex: 1,
         alignItems: 'flex-start',
-        backgroundColor: 'rgb(234, 239, 241)', /*'rgb(245,245,245)',*/
+        backgroundColor: 'rgb(234, 239, 241)',
         borderRadius: 1,          
         boxShadow: 0,
         width: '100%',
@@ -370,12 +372,12 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-start',
-            backgroundColor: 'rgb(234, 239, 241)', /*'rgb(245,245,245)',*/
+            backgroundColor: 'rgb(234, 239, 241)',
             borderRadius: 1,          
             boxShadow: 0,
             width: '100%',
             height: '95%',
-            overflowY:'hidden'
+            overflowY:'hidden',
           }}
         >
           <Accordion defaultExpanded
@@ -424,7 +426,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
             </AccordionDetails>
           </Accordion>
         </Box>
-        {<Box sx={{ paddingTop: 2 }}>
+        {<Box sx={{ paddingTop: 2, }}>
           <ButtonGroupPanel handleSave={handleSave} loading={showLoading} />
         </Box>}
       </Box>}

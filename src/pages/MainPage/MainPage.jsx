@@ -198,6 +198,7 @@ function MainPage({ page }) {
                   backgroundColor: 'rgb(234, 239, 241)', /*'rgb(245,245,245)',*/
                   borderRadius: 1,          
                   boxShadow: 3,
+                  height: '100%',
                   /*maxHeight: '100vh',*/
                   /*height: '46rem',*/
                   /*overflow: !drawing ? 'auto' : 'hidden',*/
