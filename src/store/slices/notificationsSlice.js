@@ -1,12 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { logout } from './logoutSlice';
 
+const initialState = {
+  message: '',
+  status: false,
+};
+
 const notificationsSlice = createSlice({
   name: 'notifications',
-  initialState: {
-    message: '',
-    status: false,
-  },
+  initialState,
   reducers: {
     setStatus: (state, action) => {
       const { statusValue, responseValue } = action.payload;
@@ -48,6 +50,7 @@ const notificationsSlice = createSlice({
         message: messageValue,
       };
     },
+    resetNotifications: () => initialState,
   },
   extraReducers: (builder) => {
     //logout
@@ -57,5 +60,5 @@ const notificationsSlice = createSlice({
   },
 });
 
-export const { setStatus } = notificationsSlice.actions;
+export const { setStatus, resetNotifications } = notificationsSlice.actions;
 export default notificationsSlice.reducer;

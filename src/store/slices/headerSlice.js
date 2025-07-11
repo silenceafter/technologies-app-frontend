@@ -44,7 +44,8 @@ const headerSlice = createSlice({
     },
     setPage: (state, action) => {
        state.page = action.payload;
-    }
+    },
+    resetHeader: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -84,5 +85,5 @@ export const selectSearch = (state) => state.header.search;
 export const selectLimit = (state) => state.header.limit;
 export const selectPage = (state) => state.header.page;
 
-export const { setSearch, setLimit, setPage } = headerSlice.actions;
+export const { setSearch, setLimit, setPage, resetHeader } = headerSlice.actions;
 export default headerSlice.reducer;

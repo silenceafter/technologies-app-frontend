@@ -1,15 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { logout } from './logoutSlice';
 
+const initialState = {
+  hasUnsavedChanges: false,
+};
+
 const unsavedChangesSlice = createSlice({
   name: 'unsavedChanges',
-  initialState: {
-    hasUnsavedChanges: false,
-  },
+  initialState,
   reducers: {
     setUnsavedChanges: (state, action) => {
       state.hasUnsavedChanges = action.payload;
     },
+    resetUnsavedChanges: () => initialState,
   },
   extraReducers: (builder) => {
     //logout
@@ -19,5 +22,5 @@ const unsavedChangesSlice = createSlice({
   },
 });
 
-export const { setUnsavedChanges } = unsavedChangesSlice.actions;
+export const { setUnsavedChanges, resetUnsavedChanges } = unsavedChangesSlice.actions;
 export default unsavedChangesSlice.reducer;

@@ -44,27 +44,9 @@ export const getTechnologiesCreatedByUser = createAsyncThunk(
 const dashboardSlice = createSlice({
   name: 'dashboardSlice',
   initialState,
-  /*reducers: {
-    setTokens: (state) => {
-      const enterid = localStorage.getItem('enterid');
-      const usrhash = localStorage.getItem('usrhash');
-      //
-      return {
-        ...state,
-        user: {
-          ...state.user,
-          enterid: enterid,
-          usrhash: usrhash,
-        },
-      };
-    },
-    setCrud: (state, action) => {
-      return {
-        ...state,
-        isCrud: action.payload,
-      };
-    },
-  },*/
+  reducers: {
+    resetDashboard: () => initialState,
+  },
   extraReducers: (builder) => {
     //getTechnologiesCreatedByUser
     builder.addCase(getTechnologiesCreatedByUser.pending, (state) => {
@@ -93,5 +75,5 @@ const dashboardSlice = createSlice({
   },
 });
 
-//export const { setTokens, setCrud } = dashboardSlice.actions;
+export const { resetDashboard } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

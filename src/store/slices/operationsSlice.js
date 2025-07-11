@@ -209,6 +209,7 @@ const operationsSlice = createSlice({
         shouldReloadTabs: action.payload
       };
     },
+    resetOperations: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -233,5 +234,5 @@ const operationsSlice = createSlice({
     },
 });
 
-export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs } = operationsSlice.actions;
+export const { setTabs, resetTabs, addTab, removeTab, updateTab, setTabValue, setShouldReloadTabs, resetOperations } = operationsSlice.actions;
 export default operationsSlice.reducer;

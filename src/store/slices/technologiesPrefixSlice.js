@@ -35,6 +35,9 @@ export const fetchData = createAsyncThunk(
 const technologiesPrefixSlice = createSlice({
   name: 'technologiesPrefix',
   initialState,
+  reducers: {
+    resetTechnologiesPrefix: () => initialState,
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchData.pending, (state) => {
@@ -63,4 +66,5 @@ export const selectItems = (state) => state.technologiesPrefix.items || [];
 export const selectLoading = (state) => state.technologiesPrefix.loading;
 export const selectError = (state) => state.technologiesPrefix.error;
 
+export const { resetTechnologiesPrefix } = technologiesPrefixSlice.actions;
 export default technologiesPrefixSlice.reducer;

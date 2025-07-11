@@ -682,7 +682,7 @@ const technologiesSlice = createSlice({
         hasAccess: action.payload,
       };
     },
-
+    resetTechnologies: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -723,7 +723,8 @@ export const {
   restoreItems, restoreItem,
   deleteItems, deleteItem,
   setTabs, resetTabs, addTechnology, addOperation, updateTechnology, updateOperation, updateTechnologyFormErrors, updateOperationFormErrors, setTabValue, setShouldReloadTabs, setCheckedItems,
-  setAccess
+  setAccess,
+  resetTechnologies
 } = technologiesSlice.actions;
 
 //селекторы

@@ -128,7 +128,8 @@ const usersSlice = createSlice({
         ...state,
         isCrud: action.payload,
       };
-    },    
+    }, 
+    resetUsers: () => initialState,
   },
   extraReducers: (builder) => {
     //authenticate
@@ -202,5 +203,5 @@ const usersSlice = createSlice({
   },
 });
 
-export const { setTokens, setCrud } = usersSlice.actions;
+export const { setTokens, setCrud, resetUsers } = usersSlice.actions;
 export default usersSlice.reducer;

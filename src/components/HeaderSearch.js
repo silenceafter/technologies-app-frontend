@@ -18,6 +18,7 @@ import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } 
 import { setDrawing, clearDrawing, clearTechnology } from '../store/slices/drawingsSlice';
 import { fetchData as productsFetchData, setItems as productsSetItems } from '../store/slices/lists/productsListSlice';
 import { getSavedData as technologiesFetchData /*, clearItems as technologiesSetItems*/ } from '../store/slices/technologiesSlice';
+import { useResetStates } from '../hooks/useResetStates';
 import { debounce } from 'lodash';
 
 function HeaderSearch(props) {
@@ -45,6 +46,9 @@ function HeaderSearch(props) {
   const debouncedFetchData = debounce(() => {
     dispatch(fetchData({ search: inputValue, limit, page: 1 }));
   }, 500); //задержка в 500 мс
+
+  //хуки
+  const resetUserData = useResetStates();
 
   //эффекты
   useEffect(() => {
@@ -113,14 +117,15 @@ function HeaderSearch(props) {
                     dispatch(setDrawing(newValue));
                     navigate('/technologies');
                   } else {
-                    dispatch(clearDrawing());
-                    dispatch(clearTechnology());
+                    /*dispatch(clearDrawing());
+                    dispatch(clearTechnology());*/
+                    resetUserData();
                   }
                   //
-                  dispatch(productsSetItems());
+                  //dispatch(productsSetItems());
                   //dispatch(technologiesSetItems());                
-                  dispatch(productsFetchData({limit: 50, page: 1}));
-                  dispatch(technologiesFetchData({ drawing: newValue, user: user }));
+                  //dispatch(productsFetchData({limit: 50, page: 1}));
+                  //dispatch(technologiesFetchData({ drawing: newValue, user: user }));
                 }}
                 inputValue={inputValue}
                 loadingText="поиск данных"

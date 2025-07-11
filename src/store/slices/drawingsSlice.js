@@ -43,6 +43,7 @@ const drawingsSlice = createSlice({
       state.operation.name = action.payload.name;
       state.operation.code = action.payload.code;
     },
+    resetDrawings: () => initialState,
   },
   extraReducers: (builder) => {
     //logout
@@ -56,5 +57,5 @@ export const selectDrawingExternalCode = (state) => state?.drawings?.drawing?.ex
 export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 
-export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation } = drawingsSlice.actions;
+export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation, resetDrawings } = drawingsSlice.actions;
 export default drawingsSlice.reducer;

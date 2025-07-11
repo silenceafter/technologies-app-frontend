@@ -84,6 +84,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   const technologiesListLoading = technologiesListSelectors?.loading;
   const technologiesItems = useSelector((state) => state.technologies.items);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
+  const drawing = useSelector((state) => state.drawings.drawing);
   const dbResponse = useSelector((state) => state.operations.response);
   
   //события
@@ -265,6 +266,12 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
 
   //эффекты
   useEffect(() => {
+    if (drawing) {
+      dispatch(technologiesFetchData({ drawing: drawing, user: user }));
+    }
+  }, [drawing]);
+
+  useEffect(() => {
     if (!currentItems) { return; }
     if (!currentItems[0]) { return; }
     try {
@@ -299,7 +306,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   //вывод
   return (
     <>
-    {console.log(drawingExternalCode)}
+    {console.log(currentTechnology)}
       {drawingExternalCode && <Box sx={{
         display: 'flex',
         flexDirection: 'column',
