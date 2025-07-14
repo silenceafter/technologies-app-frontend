@@ -20,19 +20,19 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import PhonelinkSetupIcon from '@mui/icons-material/PhonelinkSetup';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import EventIcon from '@mui/icons-material/Event';
 
 const categories = [
   {
-    id: 'Build',
+    id: 'Производство',
     children: [
       {
         id: 'Технологии',
         icon: <EngineeringIcon />,
         route: '/technologies',
         active: true,
-      },
-      { id: 'Database', icon: <DnsRoundedIcon />, route: '/', },
-      { id: 'Storage', icon: <PermMediaOutlinedIcon />, route: '/', },
+      },      
       { id: 'Hosting', icon: <PublicIcon />, route: '/', },
       { id: 'Functions', icon: <SettingsEthernetIcon />, route: '/', },
       {
@@ -43,8 +43,20 @@ const categories = [
     ],
   },
   {
-    id: 'Quality',
+    id: 'Система',
     children: [
+      { 
+        id: 'Администрирование', 
+        icon: <AdminPanelSettingsIcon />, 
+        route: '/admin/accounts', 
+        active: false 
+      },
+      { 
+        id: 'Журнал событий', 
+        icon: <EventIcon />, 
+        route: '/admin/logs', 
+        active: false 
+      },
       { id: 'Analytics', icon: <SettingsIcon />, route: '/', },
       { id: 'Performance', icon: <TimerIcon />, route: '/', },
       { id: 'Test Lab', icon: <PhonelinkSetupIcon />, route: '/', },

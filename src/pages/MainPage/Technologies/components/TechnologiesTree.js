@@ -460,62 +460,75 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(items)}   
-      <MemoizedRichTreeView
-        multiSelect
-        apiRef={apiRef}
-        slots={{ item: renderCustomTreeItem }}
-        items={items}
-        /*disabledItems={disabledItems}*/
-        expandedItems={expandedItems}
-        onItemExpansionToggle={handleItemExpansionToggle}
-        isItemDisabled={(item) => disabledItems.includes(item.id)}
-        disabledItemsFocusable={true}                        
-        expansionTrigger='iconContainer'
-      />                        
-      <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
-        {drawingExternalCode && (
-          <>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
-                <SpeedDial
-                  ariaLabel="SpeedDial basic example"
-                  sx={{ height: 'auto', position: 'absolute', bottom: 15, right: 15, /*transform: 'scale(0.85)',*/ '& .MuiFab-primary': { width: 45, height: 45 } }}
-                  icon={<SpeedDialIcon />}
-                  hidden={items && items.length > 0 ? false : true}
-                >
-                  {actions
-                    .filter(action => action && action.icon && action.title)
-                    .map((action) => 
-                      <SpeedDialAction
-                        key={action.name}
-                        icon={action.icon}
-                        tooltipTitle={action.title}
-                        onClick={() => handleSpeedDialActionClick(action)}
-                      />
-                  )}
-                </SpeedDial>
-              </Box>
-            </Box>
-          </>
-        )}
-      </Stack>
-      <Menu
-        open={contextMenu !== null}
-        onClose={handleContextMenuClose}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenu !== null
-            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-            : undefined
-        }
-      >
-        <MenuItem onClick={() => handleContextMenuItemRestore(selectedNode)}>Отменить удаление</MenuItem>
-        <MenuItem onClick={() => handleContextMenuItemDelete(selectedNode)}>Удалить</MenuItem>
-      </Menu>
+    {/*console.log(items)*/}   
+      {items.length > 0 ? (
+        <>
+          <MemoizedRichTreeView
+            multiSelect
+            apiRef={apiRef}
+            slots={{ item: renderCustomTreeItem }}
+            items={items}
+            /*disabledItems={disabledItems}*/
+            expandedItems={expandedItems}
+            onItemExpansionToggle={handleItemExpansionToggle}
+            isItemDisabled={(item) => disabledItems.includes(item.id)}
+            disabledItemsFocusable={true}                        
+            expansionTrigger='iconContainer'
+          />                        
+          <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
+            {drawingExternalCode && (
+              <>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
+                    <SpeedDial
+                      ariaLabel="SpeedDial basic example"
+                      sx={{ height: 'auto', position: 'absolute', bottom: 15, right: 15, /*transform: 'scale(0.85)',*/ '& .MuiFab-primary': { width: 45, height: 45 } }}
+                      icon={<SpeedDialIcon />}
+                      hidden={items && items.length > 0 ? false : true}
+                    >
+                      {actions
+                        .filter(action => action && action.icon && action.title)
+                        .map((action) => 
+                          <SpeedDialAction
+                            key={action.name}
+                            icon={action.icon}
+                            tooltipTitle={action.title}
+                            onClick={() => handleSpeedDialActionClick(action)}
+                          />
+                      )}
+                    </SpeedDial>
+                  </Box>
+                </Box>
+              </>
+            )}
+          </Stack>
+          {/*<Menu
+            open={contextMenu !== null}
+            onClose={handleContextMenuClose}
+            anchorReference="anchorPosition"
+            anchorPosition={
+              contextMenu !== null
+                ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                : undefined
+            }
+          >
+            <MenuItem onClick={() => handleContextMenuItemRestore(selectedNode)}>Отменить удаление</MenuItem>
+            <MenuItem onClick={() => handleContextMenuItemDelete(selectedNode)}>Удалить</MenuItem>
+          </Menu>*/}
+        </>
+        ) : (
+        <>
+          <Box
+            sx={{ display: 'flex', flexDirection: 'row', gap: 2}}
+          >
+            <WarningIcon color='warning' />
+            <Typography>Нет записей</Typography>
+          </Box>
+        </>
+      )}
 
       {/* Сообщение при отсутствии прав на действие */}
-      {<Dialog
+      {/*<Dialog
         open={open}
         onClose={handleDialogClose}
       >        
@@ -528,7 +541,7 @@ const TechnologiesTree = () => {
         <DialogActions>
           <Button onClick={handleDialogClose}>OK</Button>
         </DialogActions>
-      </Dialog>}
+      </Dialog>*/}
     </>
   );
 };

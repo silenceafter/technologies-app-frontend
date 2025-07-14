@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { selectLoading as itemsLoading } from './technologiesSlice';
-import { logout } from './logoutSlice';
 
 //данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {
@@ -226,11 +225,6 @@ const operationsSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
-
-    //logout
-    builder.addCase(logout, (state) => {
-      Object.keys(state).forEach(key => delete state[key]);
-    });
     },
 });
 

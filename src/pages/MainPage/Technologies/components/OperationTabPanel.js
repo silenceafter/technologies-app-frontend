@@ -24,6 +24,7 @@ import { TechnologyBreadcrumbs } from './TechnologyBreadcrumbs';
 import { MemoizedTabs } from './MemoizedTabs';
 import Toolbar from '@mui/material/Toolbar';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import WarningIcon from '@mui/icons-material/Warning';
 
 import {
   selectItems as technologiesSelectItems, 
@@ -149,10 +150,10 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
 
   useEffect(() => {
     if (!currentItems) { return; }
-    if (!currentItems[0]) { return; }
+    /*if (!currentItems[0]) { return; }*/
     try {
-      setCurrentTechnology(currentItems[0]);
-      setCurrentOperation(currentItems[1]);
+      setCurrentTechnology(currentItems[0] ? currentItems[0] : null);
+      setCurrentOperation(currentItems[1] ? currentItems[1] : null);
     } catch (e) {
       console.error('Ошибка при получении данных из хранилища', e);
     }
@@ -171,13 +172,28 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
             </Box>
           ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', margin: 2/*, height: '90%'*/ }}>
-            {currentOperation && (
+            {currentOperation ? (
               <OperationCard
                 content={currentOperation.content}
                 onUpdate={handleOperationUpdate}
                 autocompleteOptions={autocompleteOptions}
                 access={hasAccess}
-              />)}
+              />) : (
+                <>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: 2,
+                      color: 'black'            
+                    }}
+                  >
+                    <WarningIcon color='warning' />
+                    <Typography>Компонент будет доступен при выборе операции</Typography>
+                  </Box>
+                </>  
+              )
+            }
           </Box>
           )
         }        

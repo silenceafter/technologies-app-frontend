@@ -8,7 +8,7 @@ import { AppBar, Avatar, Button, Grid, IconButton, Link, Toolbar, Tooltip, Typog
 import { HeaderSearch } from './HeaderSearch';
 import { useSelector, useDispatch } from 'react-redux';
 import { signOut } from '../store/slices/usersSlice';
-import { logout, purgeStore } from '../store/slices/logoutSlice';
+import { useLogout } from '../hooks/useLogout';
 import { persistStore } from 'redux-persist';
 import { store } from '../store/store';
 import Menu from '@mui/material/Menu';
@@ -62,6 +62,10 @@ function Header(props) {
   const loading = useSelector((state) => state.users.loading);
   const error = useSelector((state) => state.users.error);
 
+  //хуки
+  const logout = useLogout();
+
+  //события
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -72,7 +76,7 @@ function Header(props) {
   const handleUserExitClose = async () => {
     //Учетная запись -> Выйти
     dispatch(signOut());
-    dispatch(logout()); // очистка redux
+    logout(); // очистка redux
     //store.dispatch({ type: 'LOGOUT' });
     await persistor.purge();
     //dispatch(purgeStore()); // очистка persist

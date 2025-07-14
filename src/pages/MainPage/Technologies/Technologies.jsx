@@ -273,10 +273,10 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
 
   useEffect(() => {
     if (!currentItems) { return; }
-    if (!currentItems[0]) { return; }
+    /*if (!currentItems[0]) { return; }*/
     try {
-      setCurrentTechnology(currentItems[0]);
-      setCurrentOperation(currentItems[1]);
+      setCurrentTechnology(currentItems[0] ? currentItems[0] : null);
+      setCurrentOperation(currentItems[1] ? currentItems[1] : null);
     } catch (e) {
       console.error('Ошибка при получении данных из хранилища', e);
     }
@@ -306,8 +306,8 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   //вывод
   return (
     <>
-    {console.log(currentTechnology)}
-      {drawingExternalCode && <Box sx={{
+    {console.log(currentOperation)}
+      {/*drawingExternalCode &&*/ <Box sx={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
@@ -361,7 +361,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
           </AccordionDetails>          
         </Accordion>
       </Box>}
-      {drawingExternalCode && <Box sx={{
+      {/*drawingExternalCode &&*/ <Box sx={{
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
@@ -370,7 +370,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
         borderRadius: 1,          
         boxShadow: 0,
         width: '100%',
-        height: '100%',
+        /*height: '100%',*/
         overflowY:'hidden'
         }}
       >
@@ -434,7 +434,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
           </Accordion>
         </Box>
         {<Box sx={{ paddingTop: 2, }}>
-          <ButtonGroupPanel handleSave={handleSave} loading={showLoading} />
+          <ButtonGroupPanel handleSave={handleSave} loading={showLoading} isDisabled={!drawing} />
         </Box>}
       </Box>}
     </>

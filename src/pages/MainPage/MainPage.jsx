@@ -153,7 +153,7 @@ function MainPage({ page }) {
       content = <Dashboard />;
       break;
     case 'technologies':
-      content = <Technologies />;
+      content = <Technologies setSmartBackdropActive={setSmartBackdropActive} showLoading={showLoading} />;
       break;
     default:
       content = <Dashboard />;

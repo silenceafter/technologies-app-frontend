@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/headerSlice';
-import { setDrawing, clearDrawing, clearTechnology } from '../store/slices/drawingsSlice';
+import { setDrawing } from '../store/slices/drawingsSlice';
 import { fetchData as productsFetchData, setItems as productsSetItems } from '../store/slices/lists/productsListSlice';
 import { getSavedData as technologiesFetchData /*, clearItems as technologiesSetItems*/ } from '../store/slices/technologiesSlice';
 import { useResetStates } from '../hooks/useResetStates';
@@ -114,11 +114,11 @@ function HeaderSearch(props) {
 
                   //обновить выбранное значение в redux
                   if (newValue) {
+                    //установить значение в redux
                     dispatch(setDrawing(newValue));
                     navigate('/technologies');
                   } else {
-                    /*dispatch(clearDrawing());
-                    dispatch(clearTechnology());*/
+                    //сбросить состояние redux до исходного
                     resetUserData();
                   }
                   //

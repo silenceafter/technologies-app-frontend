@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { selectDrawingExternalCode, setTechnology } from './drawingsSlice';
-import { logout } from './logoutSlice';
 
 const LOADING_DEFAULT = false;
 const initialState = {
@@ -194,11 +193,6 @@ const usersSlice = createSlice({
     builder.addCase(signOut.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
-    });
-
-    //logout
-    builder.addCase(logout, (state) => {
-      Object.keys(state).forEach(key => delete state[key]);
     });
   },
 });

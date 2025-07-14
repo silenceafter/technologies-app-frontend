@@ -11,11 +11,33 @@ import _ from 'lodash';
 const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, access}) => {
   //стейты
   const [localData, setLocalData] = useState({
-      dbValues: { orderNumber: 1 },
-      formValues: { orderNumber: 1 },
+      dbValues: { orderNumber: 1, },
+      formValues: { 
+        orderNumber: 0,
+        operationCode: { code: '', name: '' }, 
+        shopNumber: '', 
+        areaNumber: null, 
+        document: null, 
+        operationDescription: null,
+        grade: 0, 
+        workingConditions: 0, 
+        numberOfWorkers: 0, 
+        numberOfProcessedParts: 0, 
+        laborEffort: '', 
+        jobCode: { code: '', name: '' }, 
+        equipmentCode: { code: '', name: '' }, 
+        toolingCode: { code: '', name: '' }
+      },
       formErrors: {}, 
       changedValues: {},
-      expandedPanels: {},             
+      expandedPanels: {
+        parameters: false,
+        equipment: false,
+        components: false,
+        materials: false,
+        tooling: false,
+        measuringTools: false
+      },             
     });
 
   //список числовых полей (для последующей валидации вместо type="number")
@@ -182,7 +204,9 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
   );
 
   useEffect(() => {
+    if (content) {
       setLocalData(content);
+    }    
   }, [content]);
   //
   return (

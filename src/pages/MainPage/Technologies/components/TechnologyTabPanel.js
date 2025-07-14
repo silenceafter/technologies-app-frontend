@@ -9,7 +9,8 @@ import {
     MenuItem,
     InputLabel,
     Select,
-    TextField
+    TextField,
+    Typography
 } from '@mui/material';
 import {
   selectItems as technologiesSelectItems, 
@@ -19,6 +20,7 @@ import {
 import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice';
 import { fetchData as technologiesPrefixFetchData} from '../../../../store/slices/technologiesPrefixSlice';
 import _ from 'lodash';
+import WarningIcon from '@mui/icons-material/Warning';
 
 function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isAutocompleteLoaded }) {
   const dispatch = useDispatch();
@@ -98,7 +100,7 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
   //
   return (
     <>
-    {console.log(currentTechnology)}
+    {/*console.log(currentTechnology)*/}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'
@@ -110,7 +112,7 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
           ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', margin: 2/*, height: '90%'*/ }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 2, width: '100%' }}>
-              {currentTechnology && (
+              {currentTechnology ? (
                 <form>
                   <Grid container spacing={2} columns={{xs:5}}>
                     {/* Первая строка */}
@@ -196,6 +198,20 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
                     </Grid>
                   </Grid>
                 </form>
+              ) : (
+                <>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: 2,
+                      color: 'black'            
+                    }}
+                  >
+                    <WarningIcon color='warning' />
+                    <Typography>Компонент будет доступен при выборе кода чертежа</Typography>
+                  </Box>
+                </>
               )}
             </Box>
           </Box>

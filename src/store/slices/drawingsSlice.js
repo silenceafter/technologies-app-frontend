@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { logout } from './logoutSlice';
 
 //данные текущего сеанса (код, который выбран; технология, которая выбрана; операция, которая выбрана)
 const initialState = {
@@ -21,24 +20,24 @@ const drawingsSlice = createSlice({
         drawing: action.payload,
       };
     },
-    clearDrawing: (state) => {
+    /*clearDrawing: (state) => {
       return {
         ...state,
         drawing: null
       };
-    },
+    },*/
     setTechnology: (state, action) => {
       return {
         ...state,
         technology: action.payload,
       };
     },
-    clearTechnology: (state) => {
+    /*clearTechnology: (state) => {
       return {
         ...state,
         technology: null,
       };
-    },
+    },*/
     setOperation: (state, action) => {
       state.operation.name = action.payload.name;
       state.operation.code = action.payload.code;
@@ -46,10 +45,6 @@ const drawingsSlice = createSlice({
     resetDrawings: () => initialState,
   },
   extraReducers: (builder) => {
-    //logout
-    builder.addCase(logout, (state) => {
-      Object.keys(state).forEach(key => delete state[key]);
-    });
   },
 });
 
@@ -57,5 +52,5 @@ export const selectDrawingExternalCode = (state) => state?.drawings?.drawing?.ex
 export const selectTechnology = (state) => state?.drawings?.technology || {};
 export const selectOperation = (state) => state?.drawings?.operation || {};
 
-export const { setDrawing, clearDrawing, setTechnology, clearTechnology, setOperation, resetDrawings } = drawingsSlice.actions;
+export const { setDrawing, /*clearDrawing,*/ setTechnology, /*clearTechnology,*/ setOperation, resetDrawings } = drawingsSlice.actions;
 export default drawingsSlice.reducer;

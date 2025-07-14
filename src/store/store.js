@@ -23,7 +23,6 @@ import unsavedChangesReducer from './slices/unsavedChangesSlice';
 import technologiesPrefixReducer from './slices/technologiesPrefixSlice';
 import notificationsReducer from './slices/notificationsSlice';
 import dashboardReducer from './slices/dashboardSlice';
-import logoutReducer, { logout } from './slices/logoutSlice';
 import { Dashboard } from '@mui/icons-material';
 
 //корневой редьюсер
@@ -47,14 +46,13 @@ const rootReducer = combineReducers({
   users: usersReducer, /* храним обязательно */  
   notifications: notificationsReducer,
   dashboard: dashboardReducer,
-  logout: logoutReducer,
 });
 
 //конфигурация persist
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['users'],
+  whitelist: ['users', 'header', 'drawings', 'technologies', 'technologiesPrefix', 'operations', 'dashboard'],
   /*blacklist: ['users', 'header', 'drawings', 'technologies', 'technologiesPrefix', 'operations', 'dashboard'],*/
   /*stateReconciler: autoMergeLevel2,*/
 };

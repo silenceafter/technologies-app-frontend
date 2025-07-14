@@ -7,8 +7,9 @@ import { resetOperations } from '../store/slices/operationsSlice';
 import { resetTechnologiesPrefix } from '../store/slices/technologiesPrefixSlice';
 import { resetTechnologies } from '../store/slices/technologiesSlice';
 import { resetUnsavedChanges } from '../store/slices/unsavedChangesSlice';
+import { resetUsers } from '../store/slices/usersSlice';
 
-export const useResetStates = () => {
+export const useLogout = () => {
   const dispatch = useDispatch();
   return () => {
     dispatch(resetDashboard());
@@ -19,5 +20,6 @@ export const useResetStates = () => {
     dispatch(resetTechnologiesPrefix());
     dispatch(resetTechnologies());
     dispatch(resetUnsavedChanges());
+    dispatch(resetUsers());
   };
 };
