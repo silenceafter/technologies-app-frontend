@@ -25,7 +25,7 @@ const LoginPage = () => {
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
     //
-    const [notification, setNotification] = useState({});
+    const [notification, setNotification] = useState({ severity: null, message: '' });
     const [errors, setErrors] = useState({});
     const [userErrorLoading, setUserErrorLoading] = useState(false);
 
@@ -34,6 +34,19 @@ const LoginPage = () => {
     const loading = useSelector((state) => state.users.loading);//useSelector(selectLoading);
     //const error = null;//useSelector(selectError);
     const userError = useSelector((state) => state.users.error);
+
+    /*useEffect(() => {
+    if (userError) {
+      try {
+        // Предположим, вы хотите парсить ошибку как JSON
+        const parsedError = JSON.parse(userError);
+        console.log('Parsed error:', parsedError);
+      } catch (e) {
+        // Если это не JSON — обрабатываем как обычную строку
+        console.warn('Ошибка не является JSON:', userError);
+      }
+    }
+  }, [userError]);*/
 
     useEffect(() => {
         if (userErrorLoading) {
@@ -111,7 +124,7 @@ const LoginPage = () => {
                     </Alert>
                 )}
                 {userError && !notification.severity && (
-                    <Alert severity='error' sx={{ width: '100%', mb: 2 }} /*onClose={() => dispatch({ type: 'auth/clearError' })}*/>
+                    <Alert severity='error' sx={{ width: '100%', mb: 2 }}>
                         {userError}
                     </Alert>
                 )}
@@ -124,7 +137,7 @@ const LoginPage = () => {
                         id="login"
                         label="Логин"
                         name="login"
-                        autoComplete=""
+                        autoComplete="username"
                         autoFocus
                         value={login}
                         onChange={handleLoginChange}

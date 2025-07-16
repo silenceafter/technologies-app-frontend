@@ -26,13 +26,24 @@ export const authenticate = createAsyncThunk(
           credentials: 'include'
         });
         //
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message || 'Network response was not ok');
+        //const data = await response.json();
+        // Получаем ответ как текст
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text); // безопасный парсинг
+        } catch (e) {
+          throw new Error('Ошибка сервера: ' + text.substring(0, 100) + '...');
+        }
+        
+        // если всё ок, продолжаем работать с data
+        if (!data.success) {
+          throw new Error(data.message || 'Неизвестная ошибка');
         }
         return data;                
     } catch(error) {
-      return rejectWithValue({ isAuthenticated: false, errorMessage: error.message, user: null });
+      const message = error instanceof Error ? error.message : String(error);
+      return rejectWithValue({ isAuthenticated: false, errorMessage: message, user: null });
     }        
   }
 );
