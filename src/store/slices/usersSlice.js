@@ -36,9 +36,14 @@ export const authenticate = createAsyncThunk(
           throw new Error('Ошибка сервера: ' + text.substring(0, 100) + '...');
         }
         
-        // если всё ок, продолжаем работать с data
-        if (!data.success) {
-          throw new Error(data.message || 'Неизвестная ошибка');
+         // Проверяем, есть ли в ответе признак ошибки
+        if (data.UserMessage || (typeof data === 'object' && data !== null && 'SQLSTATE' in data)) {
+          throw new Error(data.UserMessage || 'Произошла ошибка');
+        }
+
+        // Проверяем, соответствует ли структура ожидаемой
+        if (!('UserMessage' in data) || !('UserInfoArray' in data) || !('DataState' in data)) {
+          throw new Error('Неожидаемый формат ответа');
         }
         return data;                
     } catch(error) {

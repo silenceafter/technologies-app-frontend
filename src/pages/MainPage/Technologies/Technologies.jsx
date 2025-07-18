@@ -306,7 +306,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   //вывод
   return (
     <>
-    {console.log(currentOperation)}
+    {console.log(hasUnsavedChanges)}
       {/*drawingExternalCode &&*/ <Box sx={{
         display: 'flex',
         flexDirection: 'column',

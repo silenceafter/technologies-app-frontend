@@ -52,7 +52,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['users', 'header', 'drawings', 'technologies', 'technologiesPrefix', 'operations', 'dashboard'],
+  whitelist: ['users', 'header', 'dashboard'],
   /*blacklist: ['users', 'header', 'drawings', 'technologies', 'technologiesPrefix', 'operations', 'dashboard'],*/
   /*stateReconciler: autoMergeLevel2,*/
 };

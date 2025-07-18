@@ -460,7 +460,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {/*console.log(items)*/}   
+    {console.log(items)}
       {items.length > 0 ? (
         <>
           <MemoizedRichTreeView

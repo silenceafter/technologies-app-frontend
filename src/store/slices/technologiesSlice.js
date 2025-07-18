@@ -153,13 +153,6 @@ const technologiesSlice = createSlice({
         items: [...state.items, { id: generateUUID(), label: action.payload.code, secondaryLabel: action.payload.name, children: [], parentId: null, type: 'technology' }]
       };
     },
-    /*clearItems: (state) => {
-      return {
-        ...state,
-        items: [],
-        loading: LOADING_DEFAULT
-      }
-    },*/
     setSelectedItems: (state, action) => {
       return {
         ...state,
@@ -384,11 +377,12 @@ const technologiesSlice = createSlice({
                 },                            
               }
             : item
-        )
+        ),
       };      
     },
     updateOperation: (state, action) => {
       //обновить вкладку
+      /* из OperationTabPanel/OperationCard */
       const { id, newContent/*, newValidateForm*/ } = action.payload;
 
       //найти технологию и операцию в state.items
@@ -573,6 +567,7 @@ const technologiesSlice = createSlice({
           ...state.disabledItems,
           ...ids,
         ],
+        hasUnsavedChanges: true,
       };
     },
     restoreItems: (state) => {
