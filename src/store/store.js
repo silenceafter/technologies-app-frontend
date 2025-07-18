@@ -13,7 +13,6 @@ import materialsListReducer from './slices/lists/materialsListSlice';
 import productsListReducer from './slices/lists/productsListSlice';
 import technologiesListReducer from './slices/lists/technologiesListSlice';
 import equipmentListReducer from './slices/lists/equipmentListSlice';
-import getRequestReducer from './reducers/getRequestReducer';
 import headerReducer from './slices/headerSlice';
 import drawingsReducer from './slices/drawingsSlice';
 import usersReducer from './slices/usersSlice';
@@ -37,7 +36,6 @@ const rootReducer = combineReducers({
   productsList: productsListReducer,
   equipmentList: equipmentListReducer,
   unsavedChanges: unsavedChangesReducer,
-  getRequest: getRequestReducer,
   header: headerReducer,
   drawings: drawingsReducer,
   technologies: technologiesReducer,

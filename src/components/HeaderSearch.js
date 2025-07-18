@@ -27,7 +27,6 @@ function HeaderSearch(props) {
   const { key, ...restProps } = props;
   
   //селекторы
-  const userDataRequest = useSelector((state) => state.getRequest.userDataRequest);
   const search = useSelector(selectSearch);
   const limit = useSelector(selectLimit);
   const page = useSelector(selectPage);

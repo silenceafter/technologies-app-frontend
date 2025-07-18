@@ -35,7 +35,6 @@ import { TechnologyTabPanel } from './components/TechnologyTabPanel';
 
 import { 
   getSavedData as technologiesFetchData,
-  /*clearItems as technologiesSetItems,*/
   selectCurrentItems,
   updateOperation, updateTechnologyFormErrors, updateOperationFormErrors
 } from '../../../store/slices/technologiesSlice';
