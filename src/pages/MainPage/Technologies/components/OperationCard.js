@@ -248,7 +248,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
                         },
-                        input: { readOnly: !access }
+                        input: { readOnly: true /*!access*/ }
                       }}
                     >
                     </TextField>

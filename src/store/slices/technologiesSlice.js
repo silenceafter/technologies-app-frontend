@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { selectDrawingExternalCode } from './drawingsSlice';
 
 const LOADING_DEFAULT = false;
 const initialState = {
@@ -22,17 +21,6 @@ const initialState = {
     tooling: false,
     measuringTools: false
   },
-  newTechnologyCode: null,
-  newTechnologyCodeLoading: false,
-  newTechnologyCodeError: null,
-  //
-  tabs: [],
-  tabValue: 0,
-  tabCnt: 1,
-  validateForm: false,
-  loadingTabs: false,
-  errorTabs: null,
-  shouldReloadTabs: false,
 };
 
 const generateUUID = () => {
@@ -146,112 +134,11 @@ const technologiesSlice = createSlice({
   name: 'technologies',
   initialState,
   reducers: {
-    addItems: (state, action) => {
-      return {
-        ...state,
-        newItemCnt: state.newItemCnt + 1,
-        items: [...state.items, { id: generateUUID(), label: action.payload.code, secondaryLabel: action.payload.name, children: [], parentId: null, type: 'technology' }]
-      };
-    },
-    setSelectedItems: (state, action) => {
-      return {
-        ...state,
-        selectedItems: action.payload
-      };
-    },
-    deleteSelectedItems: (state, action) => {
-      const targetItemIds = Array.isArray(action.payload) ? action.payload : [action.payload];
-
-      // Функция для поиска всех потомков для заданного itemId
-      const findDescendants = (items, itemId, result = []) => {
-        for (const item of items) {
-          if (item.id === itemId) {
-            result.push(item.id); // Добавляем текущий элемент
-            if (item.children) {
-              item.children.forEach(child => result.push(child.id)); // Добавляем всех детей
-            }
-          } else if (item.children) {
-            // Рекурсивно ищем среди детей
-            findDescendants(item.children, itemId, result);
-          }
-        }
-        return result;
-      };
-    
-      // Функция для проверки, остались ли дети у родительского элемента
-      const hasRemainingChildren = (parentId, disabledItems) => {
-        const parent = state.items.find(item => item.id === parentId);
-        if (parent && parent.children) {
-          // Проверяем, есть ли у родителя хотя бы один ребенок, который не в disabledItems
-          return parent.children.some(child => !disabledItems.includes(child.id));
-        }
-        return false; // Если детей нет, или все они уже в disabledItems
-      };
-    
-      // Находим все id, которые нужно исключить (потомки и их родитель)
-      const itemsToDisable = targetItemIds.reduce((acc, itemId) => {
-        const descendants = findDescendants(state.items, itemId); // Находим потомков
-        return [...acc, ...descendants]; // Добавляем найденные id в аккумулятор
-      }, []);
-    
-      // Также проверяем, все ли дети родителя удалены
-      const parentsToDisable = targetItemIds.reduce((acc, itemId) => {
-        const parentId = state.items.find(item => item.children?.some(child => child.id === itemId))?.id;
-        if (parentId && !hasRemainingChildren(parentId, state.disabledItems)) {
-          // Если у родителя нет других детей, добавляем его в список на удаление
-          acc.push(parentId);
-        }
-        return acc;
-      }, []);
-    
-      // Объединяем ids для удаления: дочерние элементы + родительские элементы, если все дети удалены
-      const allItemsToDisable = [...itemsToDisable, ...parentsToDisable];
-    
-      // Важно: убираем их из selectedItems и добавляем в disabledItems
-      return {
-        ...state,
-        // Добавляем все элементы и их потомков в disabledItems
-        disabledItems: [...new Set([...state.disabledItems, ...allItemsToDisable])],
-    
-        // Очищаем selectedItems для указанных элементов и их потомков
-        selectedItems: state.selectedItems.filter(id => !allItemsToDisable.includes(id)),
-    
-        // Обновляем состояние selected для элементов и их детей
-        items: state.items.map(item => {
-          const isDisabled = allItemsToDisable.includes(item.id);
-          return {
-            ...item,
-            selected: isDisabled ? false : item.selected, // Снимаем selected
-            children: item.children
-              ? item.children.map(child => ({
-                  ...child,
-                  selected: isDisabled ? false : child.selected // Снимаем selected у детей
-                }))
-              : item.children
-          };
-        })
-      };      
-    },
     setSelectedId: (state, action) => {
       const newSelectedId = action.payload;
       return {
         ...state,
         selectedId: newSelectedId,
-      };
-    },
-    setTabs: (state, action) => {
-      return {
-        ...state,
-        tabs: action.payload,
-        tabCnt: action.payload.length + 1,
-        activeTabId: action.payload.length > 0 ? action.payload[0].id : null
-      };
-    },
-    resetTabs: (state) => {
-      return {
-        ...state,
-        tabs: [],
-        tabCnt: 1,
       };
     },
     addTechnology: (state, action) => {
@@ -612,18 +499,6 @@ const technologiesSlice = createSlice({
         disabledItems: filteredDisabledItems,
       };
     },
-    setTabValue: (state, action) => {
-      return {
-        ...state,
-        tabValue: action.payload,
-      }
-    },
-    setShouldReloadTabs: (state, action) => {
-      return {
-        ...state,
-        shouldReloadTabs: action.payload
-      };
-    },
     setCheckedItems: (state, action) => {
       const id = action.payload;
       const updatedCheckedItems = new Set(state.checkedItems);
@@ -676,6 +551,13 @@ const technologiesSlice = createSlice({
         hasAccess: action.payload,
       };
     },
+    copyItems: (state, action) => {
+      //просмотр отмеченных элементов
+      for(const checkedItem of state.checkedItems) {
+        const technology = findNodeById(state.technologies.items, checkedItem);
+        const operation = findNodeById(state.technologies.items, checkedItem);
+      }
+    },
     resetTechnologies: () => initialState,
   },
   extraReducers: (builder) => {
@@ -683,12 +565,14 @@ const technologiesSlice = createSlice({
       .addCase(getSavedData.pending, (state) => {
         state.loading = true;
         state.error = null;
-        /* items: [],
-        loading: LOADING_DEFAULT */
       })
       .addCase(getSavedData.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        //state.items = action.payload;
+        state.items = action.payload.map(item => ({
+          ...item,
+          children: item.children.map(child => ({ ...child }))
+        }));
         state.hasUnsavedChanges = false;
 
         //selectedId
@@ -705,13 +589,11 @@ const technologiesSlice = createSlice({
   },
 });
 
-export const { 
-  /*clearItems,*/ addItems,
-  setSelectedItems, deleteSelectedItems,
+export const {
   setSelectedId,
   restoreItems, restoreItem,
   deleteItems, deleteItem,
-  setTabs, resetTabs, addTechnology, addOperation, updateTechnology, updateOperation, updateTechnologyFormErrors, updateOperationFormErrors, setTabValue, setShouldReloadTabs, setCheckedItems,
+  addTechnology, addOperation, updateTechnology, updateOperation, updateTechnologyFormErrors, updateOperationFormErrors, setCheckedItems,
   setAccess,
   resetTechnologies
 } = technologiesSlice.actions;

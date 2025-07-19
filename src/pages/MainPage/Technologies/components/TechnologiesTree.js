@@ -32,11 +32,8 @@ import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice'; //'../../../../../store/slices/drawingsSlice';
-import {  
-  addItems,
-  setSelectedItems, 
+import { 
   setSelectedId,
-  deleteSelectedItems,
   restoreItems, restoreItem,
   setCheckedItems,
   addTechnology,
@@ -402,6 +399,9 @@ const TechnologiesTree = () => {
       case 'add-operation':
         dispatch(addOperation(selectedId));      
         break;
+
+      case 'copy':
+        break;
     }
   }, [disabledItems, selectedId]);
 
@@ -433,8 +433,6 @@ const TechnologiesTree = () => {
   const handleContextMenuItemDelete = (node) => {
     dispatch(deleteItem(node));
     handleContextMenuClose();
-    /*dispatch(deleteSelectedItems(node));
-    handleContextMenuClose();*/
   };
 
   const handleDialogOpen = () => {

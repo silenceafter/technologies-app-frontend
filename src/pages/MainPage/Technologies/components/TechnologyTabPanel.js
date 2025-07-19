@@ -15,7 +15,7 @@ import {
 import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading,
-  setTabs, setTabValue, setShouldReloadTabs, selectCurrentItems, updateTechnology,
+  selectCurrentItems, updateTechnology,
 } from '../../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice';
 import { fetchData as technologiesPrefixFetchData} from '../../../../store/slices/technologiesPrefixSlice';

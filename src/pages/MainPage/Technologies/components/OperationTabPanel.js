@@ -27,7 +27,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import {
   selectItems as technologiesSelectItems, 
   selectLoading as technologiesSelectLoading,
-  setTabs, updateOperation, setTabValue, setShouldReloadTabs, selectCurrentItems,
+  updateOperation, selectCurrentItems,
 } from '../../../../store/slices/technologiesSlice';
 import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../../store/slices/lists/operationsListSlice';
@@ -120,14 +120,6 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
   }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading, toolingItems, toolingLoading]);
-
-  //очистить стейт вкладок/карточек
-  useEffect(() => {
-    if (!drawingExternalCode) {
-      //setTabValue(0);
-      //setTabs([]);
-    }
-  }, [drawingExternalCode]);
 
   const findNodeById = (items, targetId) => {
     for (let item of items) {

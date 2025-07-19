@@ -161,7 +161,7 @@ function MainPage({ page }) {
   //main
   return (
       <>
-      {console.log(user)}
+      {/*console.log(user)*/}
       <ProtectedRoute>
         <ThemeProvider theme={theme}>
           <Box sx={{ display: 'flex', minHeight: '100vh' }}>

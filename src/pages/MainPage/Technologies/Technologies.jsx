@@ -16,7 +16,8 @@ import {
   Tabs, 
   Tab, 
   Typography, 
-  Snackbar
+  Snackbar,
+  rgbToHex
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -36,14 +37,16 @@ import { TechnologyTabPanel } from './components/TechnologyTabPanel';
 import { 
   getSavedData as technologiesFetchData,
   selectCurrentItems,
-  updateOperation, updateTechnologyFormErrors, updateOperationFormErrors
+  updateOperation, updateTechnologyFormErrors, updateOperationFormErrors,
+  resetTechnologies
 } from '../../../store/slices/technologiesSlice';
-import { setData, setShouldReloadTabs } from '../../../store/slices/operationsSlice';
+import { setData } from '../../../store/slices/operationsSlice';
 import { fetchData, selectTechnologies } from '../../../store/slices/lists/technologiesListSlice';
 import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { setStatus } from '../../../store/slices/notificationsSlice';
+import { useResetStates } from '../../../hooks/useResetStates';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -86,6 +89,9 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   const drawing = useSelector((state) => state.drawings.drawing);
   const dbResponse = useSelector((state) => state.operations.response);
   
+  //хуки
+  const resetUserData = useResetStates();
+
   //события
   const handleAccordeonTechnologiesTreeChange = () => {
     setAccordionTechnologiesTreeExpanded(!accordionTechnologiesTreeExpanded);
@@ -226,8 +232,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
           //dispatch(productsSetItems());
           //dispatch(technologiesSetItems()); //очистить компонент технологий
           //dispatch(productsFetchData({limit: 50, page: 1}));            
-          //dispatch(resetTabs());
-          dispatch(technologiesFetchData({ externalCode: drawingExternalCode, user: user })); //обновить items в technologiesSlice
+          dispatch(technologiesFetchData({ drawing: drawing, user: user })); //обновить items в technologiesSlice
           //
           dispatch(setStatus({ statusValue: 'success', responseValue: dbResponse }));//setStatusMessage('success');
         } else {
@@ -235,7 +240,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
           dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));//setStatusMessage('error');
         }
       } catch (error) {
-        dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));//setStatusMessage('error');          
+        dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));//setStatusMessage('error');
       } finally {
         handleClose();
         showSnackbar();
@@ -305,7 +310,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   //вывод
   return (
     <>
-    {console.log(hasUnsavedChanges)}
+    {/*console.log(hasUnsavedChanges)*/}
       {/*drawingExternalCode &&*/ <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -320,12 +325,12 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
           sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
         >
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
+            expandIcon={<ExpandMoreIcon sx={{ color: 'white'}} />}
             aria-controls="panel1-content"
             id="panel1-header"
-            sx={{ backgroundColor: 'primary.main' }}
+            sx={{ backgroundColor: "primary.main", }}
           >
-            <Typography component="span">Технологии и операции</Typography>
+            <Typography component="span">Список технологий</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', color: 'black', marginLeft: 2, marginTop: 2, /*border: '1px solid rgba(0, 0, 0, 0.12)'*/ }}>
             <Box sx={{ height: '100%', /*, display: 'flex', flexDirection: 'column', gap: 2*/ }}>
@@ -346,7 +351,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
           sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
         >
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
+            expandIcon={<ExpandMoreIcon sx={{ color: 'white'}} />}
             aria-controls="panel2-content"
             id="panel2-header"
             sx={{ backgroundColor: 'primary.main' }}
@@ -393,7 +398,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
             sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={<ExpandMoreIcon sx={{ color: 'white'}} />}
               aria-controls="panel3-content"
               id="panel3-header"
               sx={{ backgroundColor: 'primary.main' }}
@@ -416,7 +421,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
             sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={<ExpandMoreIcon sx={{ color: 'white'}} />}
               aria-controls="panel4-content"
               id="panel4-header"
               sx={{ backgroundColor: 'primary.main' }}
