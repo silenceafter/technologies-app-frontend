@@ -402,8 +402,8 @@ const TechnologiesTree = () => {
         break;
 
       case 'copy':
-
-          dispatch(copyItems({ user: user }));
+        console.log(error);
+        dispatch(copyItems({ user: user }));
 
         break;
     }
