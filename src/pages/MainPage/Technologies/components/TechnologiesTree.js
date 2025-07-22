@@ -41,6 +41,7 @@ import {
   deleteItems, deleteItem,
   selectCurrentItems,
   setAccess,
+  copyItems,
 } from '../../../../store/slices/technologiesSlice';
 import { resetTabs } from '../../../../store/slices/operationsSlice';
 import { TechnologySearch } from './TechnologySearch';
@@ -377,11 +378,11 @@ const TechnologiesTree = () => {
 
   const handleSpeedDialActionClick = useCallback((action) => {
     setCheckAccess(true);
-    if (user?.role === 'read_only') {
+    /*if (user?.role === 'read_only') {
       //действие недоступно  
       setOpen(true);
       return;
-    }
+    }*/
     //
     switch(action.name) {
       case 'delete':
@@ -401,6 +402,9 @@ const TechnologiesTree = () => {
         break;
 
       case 'copy':
+
+          dispatch(copyItems({ user: user }));
+
         break;
     }
   }, [disabledItems, selectedId]);
@@ -526,20 +530,18 @@ const TechnologiesTree = () => {
       )}
 
       {/* Сообщение при отсутствии прав на действие */}
-      {/*<Dialog
+      {<Dialog
         open={open}
         onClose={handleDialogClose}
       >        
         <DialogTitle>Нет доступа</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Нельзя выполнить действие для техпроцесса "{currentTechnology?.label}"
-          </DialogContentText>
+          <DialogContentText>{error}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>OK</Button>
         </DialogActions>
-      </Dialog>*/}
+      </Dialog>}
     </>
   );
 };

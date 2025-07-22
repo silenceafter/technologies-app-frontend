@@ -553,9 +553,80 @@ const technologiesSlice = createSlice({
     },
     copyItems: (state, action) => {
       //просмотр отмеченных элементов
-      for(const checkedItem of state.checkedItems) {
-        const technology = findNodeById(state.technologies.items, checkedItem);
-        const operation = findNodeById(state.technologies.items, checkedItem);
+      //копирование технологии
+      try {
+        const checkedNodes = state.checkedItems
+          .map(id => findNodeById(state.items, id))
+          .filter(node => node != null && node.type === 'technology');        
+        //          
+        if (checkedNodes.length !== 1) { 
+          return { 
+            ...state, 
+            error: 
+            { 
+              message: 'Выберите только одну технологию, которую нужно копировать!', 
+              code: 0, 
+              timestamp: Date.now() 
+            },
+          };
+        }
+   
+        //создание новой технологии
+        const technology = checkedNodes[0];
+        const { user } = action.payload;
+        const newTechnologyId = generateUUID();
+        const newShortTechnologyId = newTechnologyId.split('-')[0];
+        const newDate = new Date();
+        return {
+          ...state,
+          selectedId: [ newTechnologyId, null ],
+          hasUnsavedChanges: true,
+          error: null,
+          checkedItems: [],
+          items: [
+            ...state.items,
+            {
+              id: newTechnologyId,
+              label: newShortTechnologyId,
+              secondaryLabel: `Новая технология ${state.items.length + 1}`,
+              parentId: null,
+              type: 'technology',
+              children: technology.children.map(child => ({
+                ...child,
+                id: generateUUID(),
+                parentId: newTechnologyId,
+                proxy: {},
+                content: {
+                  ...child.content,                    
+                  isDeleted: false,
+                  isNewRecord: true,
+                  isUpdated: false,
+                },
+              })),
+              creationDate: newDate,
+              lastModified: newDate,
+              proxy: {},
+              content: {
+                ...technology.content,
+                dbValues: { technologyCode: null },
+                formValues: { technologyCode: null, prefix: null },
+                isDeleted: false,
+                isNewRecord: true,
+                isUpdated: false,
+              },
+              userId: null,
+              groupId: null,
+              UID: user.UID,
+              GID: user.GID,
+              hasAccess: true,
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          ...state,
+          error: error,
+        };
       }
     },
     resetTechnologies: () => initialState,
@@ -590,6 +661,7 @@ const technologiesSlice = createSlice({
 });
 
 export const {
+  copyItems,
   setSelectedId,
   restoreItems, restoreItem,
   deleteItems, deleteItem,
