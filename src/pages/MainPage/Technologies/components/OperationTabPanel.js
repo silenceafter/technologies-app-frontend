@@ -17,7 +17,6 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from "@mui/icons-material/Close";
-import { Notifications } from './Notifications';
 import { OperationCard } from './OperationCard';
 import { TechnologyBreadcrumbs } from './TechnologyBreadcrumbs';
 import Toolbar from '@mui/material/Toolbar';
@@ -51,7 +50,6 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   //селекторы
   //const currentTechnology = useSelector(selectTechnology);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
-  const { tabs, tabValue, tabCnt, expandedPanelsDefault, shouldReloadTabs } = useSelector((state) => state.technologies);
   const technologiesItems = useSelector(technologiesSelectItems);
   const technologiesLoading = useSelector(technologiesSelectLoading);
   const operationsSelectors = useSelector(selectOperations);
@@ -186,8 +184,7 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
             }
           </Box>
           )
-        }        
-        <Notifications handleClose={handleClose} open={open} />
+        }
       </Box>
     </>
   );

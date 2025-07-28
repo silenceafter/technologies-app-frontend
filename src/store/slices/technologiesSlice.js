@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const LOADING_DEFAULT = false;
 const initialState = {
   items: [], /* основные элементы дерева */
   selectedItems: [], /* выделенные элементы */
@@ -8,19 +7,14 @@ const initialState = {
   disabledItems: [], /* помеченные на удаление */
   editedItems: [], /* редактируемые элементы */
   selectedId: null,
-  loading: LOADING_DEFAULT,
-  error: null,
-  newItemCnt: 1,
   hasUnsavedChanges: false,
   hasAccess: false,
-  expandedPanelsDefault: { 
-    parameters: true,
-    equipment: false,
-    components: false,
-    materials: false,
-    tooling: false,
-    measuringTools: false
-  },
+  expandedPanelsDefault: { parameters: true, equipment: false, components: false, materials: false, tooling: false, measuringTools: false },
+  getSavedDataLoading: false,
+  getSavedDataError: null,
+  setDataLoading: false,
+  setDataError: null,
+  setDataResponse: null,
 };
 
 const generateUUID = () => {
@@ -124,6 +118,29 @@ export const getSavedData = createAsyncThunk(
       });
       /*console.log(data.map(processItem));*/
       return data.map(processItem);
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const setData = createAsyncThunk(
+  'technologiesTree/setData',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const baseUrl = process.env.REACT_APP_API_BASE_URL;
+      const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/UpdateOperation.v0.php`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка запроса: ${response.status}`);
+      }
+      //
+      const data = await response.json();
+      return data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -528,7 +545,7 @@ const technologiesSlice = createSlice({
         }
     
         //проверяем, остались ли еще выбраны все дети — если да, включаем родителя, иначе — убираем
-        state.items.forEach(parent => {
+        /*state.items.forEach(parent => {
           if (parent.children?.some(child => child.id === id)) {
             const allChildrenSelected = parent.children.every(child => updatedCheckedItems.has(child.id));
             if (allChildrenSelected) {
@@ -537,7 +554,7 @@ const technologiesSlice = createSlice({
               updatedCheckedItems.delete(parent.id);
             }
           }
-        });
+        });*/
       }
       //
       return {
@@ -562,7 +579,7 @@ const technologiesSlice = createSlice({
         if (checkedNodes.length !== 1) { 
           return { 
             ...state, 
-            error: 
+            getSavedDataError: 
             { 
               message: 'Выберите только одну технологию, которую нужно копировать!', 
               code: 0, 
@@ -581,7 +598,7 @@ const technologiesSlice = createSlice({
           ...state,
           selectedId: [ newTechnologyId, null ],
           hasUnsavedChanges: true,
-          error: null,
+          getSavedDataError: null,
           checkedItems: [],
           items: [
             ...state.items,
@@ -625,43 +642,56 @@ const technologiesSlice = createSlice({
       } catch (error) {
         return {
           ...state,
-          error: error,
+          getSavedDataError: error,
         };
       }
     },
     clearError: (state) => {
       return {
         ...state,
-        error: null,
+        getSavedDataError: null,
       };
     },
     resetTechnologies: () => initialState,
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(getSavedData.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(getSavedData.fulfilled, (state, action) => {
-        state.loading = false;
-        //state.items = action.payload;
-        state.items = action.payload.map(item => ({
-          ...item,
-          children: item.children.map(child => ({ ...child }))
-        }));
-        state.hasUnsavedChanges = false;
+    //getSavedData
+    builder.addCase(getSavedData.pending, (state) => {
+      state.getSavedDataLoading = true;
+      state.getSavedDataError = null;
+    });
+    builder.addCase(getSavedData.fulfilled, (state, action) => {
+      state.getSavedDataLoading = false;        
+      state.items = action.payload.map(item => ({
+        ...item,
+        children: item.children.map(child => ({ ...child }))
+      }));
+      state.hasUnsavedChanges = false;
 
-        //selectedId
-        if (!state.selectedId) {
-          state.selectedId = state.items.length > 0 
-            ? [state.items[0].id, state.items[0].children.length > 0 ? state.items[0].children[0].id : null] 
-            : [null, null];
-        }        
-      })
-      .addCase(getSavedData.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+      //selectedId
+      if (!state.selectedId) {
+        state.selectedId = state.items.length > 0 
+          ? [state.items[0].id, state.items[0].children.length > 0 ? state.items[0].children[0].id : null] 
+          : [null, null];
+      }        
+    });
+    builder.addCase(getSavedData.rejected, (state, action) => {
+      state.getSavedDataLoading = false;
+      state.getSavedDataError = action.payload;
+    });
+
+    //setData
+    builder.addCase(setData.pending, (state) => {
+      state.setDataLoading = true;
+      state.setDataError = null;
+    });
+    builder.addCase(setData.fulfilled, (state, action) => {
+      state.setDataLoading = false;
+      state.setDataResponse = action.payload;
+    });
+    builder.addCase(setData.rejected, (state, action) => {
+      state.setDataLoading = false;
+      state.setDataError = action.payload;
     });
   },
 });
@@ -679,7 +709,7 @@ export const {
 //селекторы
 export const selectItems = (state) => state.technologies.items || [];
 export const selectSelectedItems = (state) => state.technologies.selectedItems || [];
-export const selectLoading = (state) => state.technologies.loading;
+export const selectLoading = (state) => state.technologies.getSavedDataLoading;
 export const selectCurrentItems = (state) => {
   if (state.technologies.items && state.technologies.selectedId) {
     const technology = findNodeById(state.technologies.items, state.technologies.selectedId[0]);

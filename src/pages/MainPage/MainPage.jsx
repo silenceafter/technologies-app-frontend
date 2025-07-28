@@ -61,7 +61,7 @@ function MainPage({ page }) {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [backdropVisible, setBackdropVisible] = useState(false);
   const [smartBackdropActive, setSmartBackdropActive] = useState(false);
-  const { tabs, tabValue } = useSelector((state) => state.operations);
+  //const { tabs, tabValue } = useSelector((state) => state.operations);
   const technologiesCreatedByUserItems = useSelector((state) => state.dashboard.technologiesCreatedByUserItems);
   const technologiesCreatedByUserLoading = useSelector((state) => state.dashboard.technologiesCreatedByUserLoading);
   const technologiesCreatedByUserHeaders = useSelector((state) => state.dashboard.technologiesCreatedByUserHeaders);
@@ -127,7 +127,7 @@ function MainPage({ page }) {
     const checkDone = () => {
       const now = Date.now();
       const minTimePassed = now - startTime >= 1000;
-      const isStillLoading = technologiesLoading || tabs.length === 0 || !tabs[tabValue];
+      const isStillLoading = technologiesLoading/*|| tabs.length === 0 || !tabs[tabValue]*/;
       //
       if (!isStillLoading && minTimePassed) {
         setBackdropVisible(false);

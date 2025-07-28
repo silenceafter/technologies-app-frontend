@@ -24,27 +24,25 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { ButtonGroupPanel } from './components/ButtonGroupPanel';
 import TechnologiesTree from './components/TechnologiesTree';
 import ProductsTree from './components/ProductsTree';
-import { OperationsSearch } from './components/OperationsSearch';
-import { ProfessionsSearch } from './components/JobsSearch';
-import { MeasuringToolsSearch } from './components/MeasuringToolsSearch';
-import { ToolingSearch } from './components/ToolingSearch';
-import { ComponentsSearch } from './components/ComponentsSearch';
-import { MaterialsSearch } from './components/MaterialsSearch';
+import { OperationsSearch } from './components/search/OperationsSearch';
+import { ProfessionsSearch } from './components/search/JobsSearch';
+import { MeasuringToolsSearch } from './components/search/MeasuringToolsSearch';
+import { ToolingSearch } from './components/search/ToolingSearch';
+import { ComponentsSearch } from './components/search/ComponentsSearch';
+import { MaterialsSearch } from './components/search/MaterialsSearch';
 import { OperationTabPanel } from './components/OperationTabPanel';
 import { TechnologyTabPanel } from './components/TechnologyTabPanel';
 
 import { 
   getSavedData as technologiesFetchData,
+  setData as technologiesSetData,
   selectCurrentItems,
   updateOperation, updateTechnologyFormErrors, updateOperationFormErrors,
   resetTechnologies
 } from '../../../store/slices/technologiesSlice';
-import { setData } from '../../../store/slices/operationsSlice';
 import { fetchData, selectTechnologies } from '../../../store/slices/lists/technologiesListSlice';
 import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
-
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { setStatus } from '../../../store/slices/notificationsSlice';
 import { useResetStates } from '../../../hooks/useResetStates';
 import { useSnackbar } from 'notistack';
 
@@ -87,8 +85,8 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   const technologiesItems = useSelector((state) => state.technologies.items);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const drawing = useSelector((state) => state.drawings.drawing);
-  const dbResponse = useSelector((state) => state.operations.response);
-  const technologiesError = useSelector((state) => state.technologies.error);
+  //const dbResponse = useSelector((state) => state.operations.response);
+  const technologiesError = useSelector((state) => state.technologies.getSavedDataError);
   
   //хуки
   const resetUserData = useResetStates();
@@ -229,7 +227,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
     if (isValid) {
       try {
         //обновление
-        const result = await dispatch(setData({ user: user, technologies: technologiesItems })).unwrap();
+        const result = await dispatch(technologiesSetData({ user: user, technologies: technologiesItems })).unwrap();
         if (result) {
           //успешно
           //dispatch(productsSetItems());

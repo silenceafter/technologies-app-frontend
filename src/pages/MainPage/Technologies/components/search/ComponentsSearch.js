@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { 
     Autocomplete, 
-    Box,
+    Box, 
     Chip,
     CircularProgress, 
     ListItem, 
@@ -9,14 +9,14 @@ import {
     TextField
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../../store/slices/lists/materialsListSlice';
+//import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../../../../store/slices/lists/componentsListSlice';
 import { debounce } from 'lodash';
 
-function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
+function ComponentsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const dispatch = useDispatch();
 
   //TextField
-  const [inputValue, setInputValue] = useState('');
+  /*const [inputValue, setInputValue] = useState('');
   
   //запросы
   const search = useSelector(selectSearch);
@@ -24,7 +24,7 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
   const page = useSelector(selectPage);
 
   //запросы для прокрутки списка
-  const { items, loading, error, hasMore } = useSelector((state) => state.materials);
+  const { items, loading, error, hasMore } = useSelector((state) => state.components);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
@@ -59,10 +59,10 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
         dispatch(fetchData({ search, limit, page: page + 1 }));
       }
     }
-  };
+  };*/
   return (
     <>
-        <Autocomplete
+        {/*<Autocomplete
           multiple
           options={items || []}
           getOptionLabel={(option) => `${option.code} ${option.name}`}
@@ -120,10 +120,10 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
                 {...params}
                 required
                 fullWidth
-                id="materials-16"
+                id="components-15"
                 error={!!errorValue}
                 helperText={errorValue}
-                placeholder="Материалы"
+                placeholder="Комплектующие"
                 variant="outlined"
                 sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                 size='small'
@@ -133,7 +133,7 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
             tagValue.map((option, index) => (
               <Chip
                 key={index}
-                label={option.name || option.label}
+                label={`${option.name} ${option.type ? option.type : ''}` || option.label}
                 {...getTagProps({ index })}         
               />
             ))
@@ -148,9 +148,9 @@ function MaterialsSearch({ id, selectedValue, onOptionSelect, errorValue }) {
               },
           }}
           value={selectedValue}
-            />
+        />*/}
     </>
   );
 }
 
-export { MaterialsSearch };
+export { ComponentsSearch };

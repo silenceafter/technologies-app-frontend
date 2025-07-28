@@ -17,16 +17,13 @@ import headerReducer from './slices/headerSlice';
 import drawingsReducer from './slices/drawingsSlice';
 import usersReducer from './slices/usersSlice';
 import technologiesReducer from './slices/technologiesSlice';
-import operationsReducer from './slices/operationsSlice';
 import unsavedChangesReducer from './slices/unsavedChangesSlice';
 import technologiesPrefixReducer from './slices/technologiesPrefixSlice';
-import notificationsReducer from './slices/notificationsSlice';
 import dashboardReducer from './slices/dashboardSlice';
 import { Dashboard } from '@mui/icons-material';
 
 //корневой редьюсер
 const rootReducer = combineReducers({  
-  /*technologiesList: technologiesListReducer,*/
   operationsList: operationsListReducer,
   jobsList: jobsListReducer,
   measuringToolsList: measuringToolsListReducer,
@@ -40,9 +37,7 @@ const rootReducer = combineReducers({
   drawings: drawingsReducer,
   technologies: technologiesReducer,
   technologiesPrefix: technologiesPrefixReducer,
-  operations: operationsReducer,
   users: usersReducer, /* храним обязательно */  
-  notifications: notificationsReducer,
   dashboard: dashboardReducer,
 });
 

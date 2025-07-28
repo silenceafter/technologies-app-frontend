@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Accordion, Button, Grid, TextField, Typography } from '@mui/material';
-import { OperationsSearch } from './OperationsSearch';
-import { JobsSearch } from './JobsSearch';
-import { EquipmentSearch } from './EquipmentSearch';
+import { OperationsSearch } from './search/OperationsSearch';
+import { JobsSearch } from './search/JobsSearch';
+import { EquipmentSearch } from './search/EquipmentSearch';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

@@ -43,8 +43,6 @@ import {
   setAccess,
   copyItems, clearError,
 } from '../../../../store/slices/technologiesSlice';
-import { resetTabs } from '../../../../store/slices/operationsSlice';
-import { TechnologySearch } from './TechnologySearch';
 import AdjustIcon from '@mui/icons-material/Adjust';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
@@ -77,8 +75,8 @@ const TechnologiesTree = () => {
 
   //селекторы
   const items = useSelector((state) => state.technologies.items);
-  const loading = useSelector((state) => state.technologies.loading);
-  const error = useSelector((state) => state.technologies.error);
+  const loading = useSelector((state) => state.technologies.getSavedDataLoading);
+  const error = useSelector((state) => state.technologies.getSavedDataError);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
   const user = useSelector((state) => state.users.user);
