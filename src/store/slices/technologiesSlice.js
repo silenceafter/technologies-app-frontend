@@ -629,6 +629,12 @@ const technologiesSlice = createSlice({
         };
       }
     },
+    clearError: (state) => {
+      return {
+        ...state,
+        error: null,
+      };
+    },
     resetTechnologies: () => initialState,
   },
   extraReducers: (builder) => {
@@ -661,7 +667,7 @@ const technologiesSlice = createSlice({
 });
 
 export const {
-  copyItems,
+  copyItems, clearError,
   setSelectedId,
   restoreItems, restoreItem,
   deleteItems, deleteItem,

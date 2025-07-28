@@ -15,8 +15,7 @@ import {
   Paper, 
   Tabs, 
   Tab, 
-  Typography, 
-  Snackbar,
+  Typography,
   rgbToHex
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
@@ -47,6 +46,7 @@ import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { setStatus } from '../../../store/slices/notificationsSlice';
 import { useResetStates } from '../../../hooks/useResetStates';
+import { useSnackbar } from 'notistack';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -54,7 +54,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 function Technologies({ setSmartBackdropActive, showLoading }) {
   const dispatch = useDispatch();
-  //объекты
+
   //стейты  
   //const [validateForm, setValidateForm] = useState(() => () => false);
   const [accordionTechnologiesTreeExpanded, setAccordionTechnologiesTreeExpanded] = useState(true);
@@ -88,9 +88,11 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const drawing = useSelector((state) => state.drawings.drawing);
   const dbResponse = useSelector((state) => state.operations.response);
+  const technologiesError = useSelector((state) => state.technologies.error);
   
   //хуки
   const resetUserData = useResetStates();
+  const { enqueueSnackbar } = useSnackbar();
 
   //события
   const handleAccordeonTechnologiesTreeChange = () => {
@@ -214,8 +216,9 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   const handleSave = async () => {   
     if (!hasUnsavedChanges) {
       //сохранение не требуется
-      dispatch(setStatus({ statusValue: 'info', responseValue: dbResponse }));//setRequestStatus('info');
-      showSnackbar();
+      enqueueSnackbar(`Сохранение не требуется`, { variant: 'info' });
+      //dispatch(setStatus({ statusValue: 'info', responseValue: dbResponse }));
+      //showSnackbar();
       return;
     }
 
@@ -234,16 +237,16 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
           //dispatch(productsFetchData({limit: 50, page: 1}));            
           dispatch(technologiesFetchData({ drawing: drawing, user: user })); //обновить items в technologiesSlice
           //
-          dispatch(setStatus({ statusValue: 'success', responseValue: dbResponse }));//setStatusMessage('success');
+          enqueueSnackbar(`Сохранено успешно`, { variant: 'success' }); //dispatch(setStatus({ statusValue: 'success', responseValue: dbResponse }));
         } else {
           //ошибка
-          dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));//setStatusMessage('error');
+          enqueueSnackbar(`Ошибка: ${technologiesError}`, { variant: 'error' }); //dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));
         }
       } catch (error) {
-        dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));//setStatusMessage('error');
+        enqueueSnackbar(`Ошибка: ${error}`, { variant: 'error' }); //dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));
       } finally {
         handleClose();
-        showSnackbar();
+        //showSnackbar();
       }
     } else {
       //обновить ошибки в redux
@@ -255,18 +258,18 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
       }
       //
       handleClose();
-      dispatch(setStatus({ statusValue: 'warning', responseValue: dbResponse }));//setRequestStatus('warning');
-      showSnackbar();
+      enqueueSnackbar(`Незаполнена форма!`, { variant: 'warning' }); //dispatch(setStatus({ statusValue: 'warning', responseValue: dbResponse }));
+      //showSnackbar();
     }
     setLoading((prev) => ({ ...prev, save: false }));
     setSmartBackdropActive(false);
   };
 
-  const showSnackbar = useCallback(() => {
+  /*const showSnackbar = useCallback(() => {
     setTimeout(() => {
       setOpen(true); 
     }, 300);
-  }, []);
+  }, []);*/
 
   //эффекты
   useEffect(() => {

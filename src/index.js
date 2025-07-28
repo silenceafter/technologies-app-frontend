@@ -8,6 +8,8 @@ import { Provider } from 'react-redux';
 import { store, persistor } from './store/store';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { PersistGate } from 'redux-persist/integration/react';
+//import { NotificationProvider } from './hooks/useNotification';
+import { SnackbarProvider } from 'notistack';
 
 const theme = createTheme();
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -16,7 +18,16 @@ root.render(
     <ThemeProvider theme={theme}>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <App />
+          <SnackbarProvider
+            maxSnack={5}
+            autoHideDuration={5000}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+          >
+            <App />
+          </SnackbarProvider>          
         </PersistGate>        
       </Provider>
     </ThemeProvider>    

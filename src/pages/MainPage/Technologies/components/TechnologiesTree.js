@@ -41,7 +41,7 @@ import {
   deleteItems, deleteItem,
   selectCurrentItems,
   setAccess,
-  copyItems,
+  copyItems, clearError,
 } from '../../../../store/slices/technologiesSlice';
 import { resetTabs } from '../../../../store/slices/operationsSlice';
 import { TechnologySearch } from './TechnologySearch';
@@ -56,9 +56,12 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAccessActions } from '../../../../hooks/useAccessActions';
+import { useSnackbar } from 'notistack';
 import WarningIcon from '@mui/icons-material/Warning';
 
 const TechnologiesTree = () => {
+  const dispatch = useDispatch();
+
   //стейты
   const [expandedItems, setExpandedItems] = useState([]);
   const [contextMenu, setContextMenu] = useState(null);
@@ -70,9 +73,9 @@ const TechnologiesTree = () => {
   const [currentOperation, setCurrentOperation] = useState(null);
   const [checkAccess, setCheckAccess] = useState(false);
   //const [actions, setActions] = useState([]);
+  const [currentTechnologyLabel, setCurrentTechnologyLabel] = useState('');
 
   //селекторы
-  const dispatch = useDispatch();
   const items = useSelector((state) => state.technologies.items);
   const loading = useSelector((state) => state.technologies.loading);
   const error = useSelector((state) => state.technologies.error);
@@ -88,6 +91,7 @@ const TechnologiesTree = () => {
 
   //хуки
   const actions = useAccessActions({ user, currentTechnology });
+  const { enqueueSnackbar } = useSnackbar();
 
   const StyledTreeItem2 = styled(TreeItem2)(({ theme, hasSecondaryLabel }) => ({
     color: theme.palette.grey[200],
@@ -241,6 +245,7 @@ const TechnologiesTree = () => {
       e.stopPropagation();
       if (item.type == "technology") {
         dispatch(setSelectedId([item.id, item.children.length > 0 ? item.children[0].id : null]));
+        setCurrentTechnologyLabel(item.label);
       } else if (item.type == "operation") {
         dispatch(setSelectedId([item.parentId, item.id]));
       }  
@@ -376,6 +381,14 @@ const TechnologiesTree = () => {
     }
   }, [items, dispatch]);
 
+  useEffect(() => {
+    //следим за ошибками
+    if (typeof error === 'object' && error !== null && error.hasOwnProperty('message')) {
+      enqueueSnackbar(`Ошибка: ${error.message}`, { variant: 'error' });
+      dispatch(clearError());
+    }
+  }, [error, enqueueSnackbar]);
+
   const handleSpeedDialActionClick = useCallback((action) => {
     setCheckAccess(true);
     /*if (user?.role === 'read_only') {
@@ -387,24 +400,30 @@ const TechnologiesTree = () => {
     switch(action.name) {
       case 'delete':
         dispatch(deleteItems());
+        enqueueSnackbar(`Технология удалена`, { variant: 'info' });
         break;
 
-      case 'restoreAll':
+      case 'restore-all':
         dispatch(restoreItems());
+        enqueueSnackbar(`Технология восстановлена`, { variant: 'info' });
         break;
 
       case 'add-technology':
         dispatch(addTechnology({ user: { UID: user?.UID }, drawing: { externalCode: drawingExternalCode } }));
+        enqueueSnackbar(`Технология добавлена`, { variant: 'info' });        
         break;
 
       case 'add-operation':
-        dispatch(addOperation(selectedId));      
+        dispatch(addOperation(selectedId));
+        enqueueSnackbar(`Операция добавлена`, { variant: 'info' });
+        
         break;
 
       case 'copy':
-        console.log(error);
         dispatch(copyItems({ user: user }));
-
+        if (currentTechnologyLabel) {
+          enqueueSnackbar(`Технология ${currentTechnologyLabel} скопирована`, { variant: 'info' });
+        }      
         break;
     }
   }, [disabledItems, selectedId]);
@@ -462,7 +481,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(items)}
+    {console.log(currentTechnology)}
       {items.length > 0 ? (
         <>
           <MemoizedRichTreeView

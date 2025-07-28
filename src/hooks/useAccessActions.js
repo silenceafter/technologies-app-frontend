@@ -14,7 +14,7 @@ export const useAccessActions = ({ user, currentTechnology }) => {
     { icon: <FormatListNumberedIcon />, name: 'add-operation', title: 'Добавить операцию', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
     { icon: <ContentCopyIcon />, name: 'copy', title: 'Копировать', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: false },
     { icon: <DeleteIcon />, name: 'delete', title: 'Удалить', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
-    { icon: <RestoreIcon />, name: 'restoreAll', title: 'Отменить удаление', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
+    { icon: <RestoreIcon />, name: 'restore-all', title: 'Отменить удаление', roles: ['admin', 'task_admin', 'task_user'], needAccessCheck: true },
   ];
 
   return useMemo(() => {
