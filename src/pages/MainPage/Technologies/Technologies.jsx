@@ -77,7 +77,6 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
   const user = useSelector((state) => state.users.user);
-  //const { tabs } = useSelector((state) => state.operations);
   const currentItems = useSelector(selectCurrentItems);
   const technologiesListSelectors = useSelector(selectTechnologies);
   const technologiesListItems = technologiesListSelectors?.items;
@@ -85,7 +84,6 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   const technologiesItems = useSelector((state) => state.technologies.items);
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const drawing = useSelector((state) => state.drawings.drawing);
-  //const dbResponse = useSelector((state) => state.operations.response);
   const technologiesError = useSelector((state) => state.technologies.getSavedDataError);
   
   //хуки

@@ -16,7 +16,6 @@ import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
 import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
-import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
@@ -26,7 +25,6 @@ import { split } from 'lodash';
 import CircularProgress from '@mui/material/CircularProgress';
 import Skeleton from '@mui/material/Skeleton';
 import { current } from '@reduxjs/toolkit';
-import InfiniteLoader from 'react-window-infinite-loader';
 import AddIcon from '@mui/icons-material/Add';
 
 export default function ProductsTree() {

@@ -3,7 +3,6 @@ import { Navigate } from 'react-router-dom';
 import { authenticate } from './store/slices/usersSlice';
 import React, { useState, useEffect } from 'react';
 import { Box, CircularProgress } from '@mui/material';
-import 'react-sortable-tree/style.css';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import { useNavigate } from 'react-router-dom';

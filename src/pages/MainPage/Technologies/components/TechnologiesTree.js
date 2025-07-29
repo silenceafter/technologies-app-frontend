@@ -21,7 +21,6 @@ import {
   TextField, 
   Typography 
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { styled, alpha } from '@mui/material/styles';
 import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { 
@@ -29,7 +28,6 @@ import {
   TreeItem2IconContainer
 } from '@mui/x-tree-view/TreeItem2';
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
-import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice'; //'../../../../../store/slices/drawingsSlice';
 import { 

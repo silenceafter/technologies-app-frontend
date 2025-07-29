@@ -20,7 +20,6 @@ import technologiesReducer from './slices/technologiesSlice';
 import unsavedChangesReducer from './slices/unsavedChangesSlice';
 import technologiesPrefixReducer from './slices/technologiesPrefixSlice';
 import dashboardReducer from './slices/dashboardSlice';
-import { Dashboard } from '@mui/icons-material';
 
 //корневой редьюсер
 const rootReducer = combineReducers({  
@@ -66,7 +65,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(thunk),
+    })
 });
 
 const persistor = persistStore(store);

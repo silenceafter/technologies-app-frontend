@@ -8,13 +8,6 @@ function TechnologyBreadcrumbs(props) {
   const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const currentTechnology = useSelector(selectTechnology);
   const currentOperation = useSelector(selectOperation);
-
-  /*const {tabs, tabValue } = useSelector((state) => state.operationsTabs);
-
-  useEffect(() => {
-    const bb = tabs.
-  }, [tabs, tabValue]);*/
-
   //
   return (
     <Breadcrumbs aria-label="breadcrumb">

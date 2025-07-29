@@ -2,8 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Grid, Paper, Card, CardActions, CardContent, AppBar, Toolbar, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, InputAdornment, Box, Typography, Button, Link, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import SortableTree from 'react-sortable-tree';
-import 'react-sortable-tree/style.css';
 import { createTheme, rgbToHex, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -41,7 +39,6 @@ function Dashboard() {
   const [loadingTimer, setLoadingTimer] = useState(false);
   const [backdropVisible, setBackdropVisible] = useState(false);
   const [smartBackdropActive, setSmartBackdropActive] = useState(false);
-  const { tabs, tabValue } = useSelector((state) => state.operations);
   const technologiesCreatedByUserItems = useSelector((state) => state.dashboard.technologiesCreatedByUserItems);
   const technologiesCreatedByUserLoading = useSelector((state) => state.dashboard.technologiesCreatedByUserLoading);
   const technologiesCreatedByUserHeaders = useSelector((state) => state.dashboard.technologiesCreatedByUserHeaders);

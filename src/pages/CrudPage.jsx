@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Paper, AppBar, Toolbar, Tabs, Tab, TextField, InputAdornment, Box, Typography, Button, Link, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import SortableTree from 'react-sortable-tree';
-import 'react-sortable-tree/style.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navigator from '../components/Navigator';
