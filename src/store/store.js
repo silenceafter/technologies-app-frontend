@@ -45,7 +45,7 @@ const persistConfig = {
   key: 'root',
   storage,
   whitelist: ['users', 'header', 'dashboard'],
-  /*blacklist: ['users', 'header', 'drawings', 'technologies', 'technologiesPrefix', 'operations', 'dashboard'],*/
+  blacklist: ['drawings', 'technologies', 'technologiesPrefix'],
   /*stateReconciler: autoMergeLevel2,*/
 };
 

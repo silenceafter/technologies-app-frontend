@@ -17,13 +17,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/headerSlice';
 import { setDrawing } from '../store/slices/drawingsSlice';
 import { fetchData as productsFetchData, setItems as productsSetItems } from '../store/slices/lists/productsListSlice';
-import { useResetStates } from '../hooks/useResetStates';
 import { debounce } from 'lodash';
 
-function HeaderSearch(props) {
+function HeaderSearch({onReset}) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { key, ...restProps } = props;
   
   //селекторы
   const search = useSelector(selectSearch);
@@ -46,7 +44,6 @@ function HeaderSearch(props) {
   }, 500); //задержка в 500 мс
 
   //хуки
-  const resetUserData = useResetStates();
 
   //эффекты
   useEffect(() => {
@@ -79,9 +76,31 @@ function HeaderSearch(props) {
       }
     }
   };
+
+  //autocomplete -> onChange
+  const handleValueSelect = (value) => {
+    setValue(value);
+    //обновить выбранное значение в redux
+    if (value) {
+      //установить значение в redux
+      dispatch(setDrawing(value));
+      navigate('/technologies');
+    } else {
+      handleValueClear();
+    }
+  };
+
+  const handleValueClear = () => {
+    //сбросить состояние redux до исходного
+    //resetUserData();
+    if (onReset && typeof onReset === 'function') {
+      onReset();
+    }
+  };
   //
   return (
     <>
+    {console.log(drawing)}
       <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0, paddingBottom: '0.5rem' }}>
         <Toolbar>
           <Grid container spacing={0} sx={{ alignItems: 'center' }}>
@@ -89,7 +108,7 @@ function HeaderSearch(props) {
               {/*<SearchIcon color="inherit" sx={{ display: 'block' }} />*/}
             </Grid>
             <Grid item xs>
-              {<Autocomplete
+              <Autocomplete
                 disableListWrap                
                 autoComplete={false}
                 autoHighlight={false}
@@ -98,7 +117,6 @@ function HeaderSearch(props) {
                 getOptionLabel={(option) => option.externalcode || option.label}
                 filterOptions={(options, state) => {
                   const { inputValue } = state;
-
                   return options.filter(option =>
                     option.externalcode.toLowerCase().includes(inputValue.toLowerCase()) ||
                     option.name.toLowerCase().includes(inputValue.toLowerCase())
@@ -108,18 +126,7 @@ function HeaderSearch(props) {
                   setInputValue(newInputValue);
                 }}
                 onChange={(event, newValue) => {
-                  setValue(newValue);              
-
-                  //обновить выбранное значение в redux
-                  if (newValue) {
-                    //установить значение в redux
-                    dispatch(setDrawing(newValue));
-                    navigate('/technologies');
-                  } else {
-                    //сбросить состояние redux до исходного
-                    resetUserData();
-                  }
-                  //
+                  handleValueSelect(newValue);
                   //dispatch(productsSetItems());
                   //dispatch(technologiesSetItems());                
                   //dispatch(productsFetchData({limit: 50, page: 1}));
@@ -171,8 +178,7 @@ function HeaderSearch(props) {
                     placeholder="код/наименование чертежа"
                     variant="outlined"
                     sx={{ backgroundColor: '#fff', borderRadius: 1, width: '30%' }}
-                    size='small'
-                    
+                    size='small'                    
                   />
                 )}
                 sx={{
@@ -185,7 +191,7 @@ function HeaderSearch(props) {
                   },
                 }}
                 value={value || drawing || null}
-              />}
+              />
             </Grid>        
           </Grid>
         </Toolbar>

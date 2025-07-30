@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -22,6 +23,7 @@ import EngineeringIcon from '@mui/icons-material/Engineering';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import EventIcon from '@mui/icons-material/Event';
+import { useSafeReset } from '../hooks/useSafeReset';
 
 const categories = [
   {
@@ -82,6 +84,22 @@ const itemCategory = {
 export default function Navigator(props) {
   const { ...other } = props;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  //селекторы
+  const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
+
+  //хуки
+  const { safeResetAndExecute, ConfirmationDialog } = useSafeReset();
+
+  //события
+  const handleSafeNavigation = (route) => async () => {
+    await safeResetAndExecute({
+      title: 'Есть несохранённые изменения!',
+      message: 'Вы хотите покинуть страницу? Все несохранённые изменения будут потеряны.'
+    });    
+    navigate(route);    
+  };
 
   return (
     <Drawer variant="persistent" {...other}>
@@ -90,7 +108,9 @@ export default function Navigator(props) {
           Навигация
         </ListItem>
         <ListItem sx={{ ...item, ...itemCategory }}>
-          <ListItemButton onClick={() => navigate('/')}>
+          <ListItemButton onClick={() => {
+            handleSafeNavigation('/')();
+          }}>
             <ListItemIcon>
               <DashboardIcon />
             </ListItemIcon>
@@ -105,7 +125,7 @@ export default function Navigator(props) {
             </ListItem>
             {children.map(({ id: childId, icon, active, route }) => (
               <ListItem disablePadding key={childId}>
-                <ListItemButton selected={active} sx={item} onClick={() => navigate(route)}>
+                <ListItemButton selected={active} sx={item} onClick={() => handleSafeNavigation(route)()}>
                   <ListItemIcon>{icon}</ListItemIcon>
                   <ListItemText>{childId}</ListItemText>
                 </ListItemButton>
@@ -114,6 +134,7 @@ export default function Navigator(props) {
             <Divider sx={{ mt: 2 }} />
           </Box>
         ))}
+        {ConfirmationDialog}
       </List>
     </Drawer>
   );

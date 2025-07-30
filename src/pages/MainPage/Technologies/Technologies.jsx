@@ -18,7 +18,6 @@ import {
   Typography,
   rgbToHex
 } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { ButtonGroupPanel } from './components/ButtonGroupPanel';
@@ -43,18 +42,12 @@ import {
 import { fetchData, selectTechnologies } from '../../../store/slices/lists/technologiesListSlice';
 import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useResetStates } from '../../../hooks/useResetStates';
 import { useSnackbar } from 'notistack';
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
 
 function Technologies({ setSmartBackdropActive, showLoading }) {
   const dispatch = useDispatch();
 
   //стейты  
-  //const [validateForm, setValidateForm] = useState(() => () => false);
   const [accordionTechnologiesTreeExpanded, setAccordionTechnologiesTreeExpanded] = useState(true);
   const [accordionProductsTreeExpanded, setAccordionProductsTreeExpanded] = useState(true);
   const [accordionTechnologyTabPanelExpanded, setAccordionTechnologyTabPanelExpanded] = useState(true);
@@ -87,7 +80,6 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   const technologiesError = useSelector((state) => state.technologies.getSavedDataError);
   
   //хуки
-  const resetUserData = useResetStates();
   const { enqueueSnackbar } = useSnackbar();
 
   //события
@@ -260,12 +252,6 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
     setLoading((prev) => ({ ...prev, save: false }));
     setSmartBackdropActive(false);
   };
-
-  /*const showSnackbar = useCallback(() => {
-    setTimeout(() => {
-      setOpen(true); 
-    }, 300);
-  }, []);*/
 
   //эффекты
   useEffect(() => {

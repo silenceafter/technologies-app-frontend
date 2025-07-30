@@ -18,6 +18,7 @@ import Divider from '@mui/material/Divider';
 import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
+import { useSafeReset } from '../hooks/useSafeReset';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -64,6 +65,7 @@ function Header(props) {
 
   //хуки
   const logout = useLogout();
+  const { safeResetAndExecute, ConfirmationDialog } = useSafeReset();
 
   //события
   const handleClick = (event) => {
@@ -73,13 +75,18 @@ function Header(props) {
     setAnchorEl(null);
   };
 
+  const handleSearchReset = async () => {
+    await safeResetAndExecute({
+      title: 'Есть несохранённые изменения',
+      message: 'Текущий поиск будет очищен.'
+    });
+  };
+
   const handleUserExitClose = async () => {
     //Учетная запись -> Выйти
     dispatch(signOut());
     logout(); // очистка redux
-    //store.dispatch({ type: 'LOGOUT' });
     await persistor.purge();
-    //dispatch(purgeStore()); // очистка persist
     setAnchorEl(null);
   };
   //
@@ -208,7 +215,8 @@ function Header(props) {
           </Grid>
         </Toolbar>
       </AppBar>
-      <HeaderSearch props={props} />      
+      <HeaderSearch onReset={handleSearchReset} />
+      {ConfirmationDialog}      
     </>
   );
 }
