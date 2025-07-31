@@ -114,18 +114,18 @@ function Technologies({ showLoading }) {
     }
 
     // Сбрасываем предыдущий таймаут
-    clearSaveTimeout();
+    //clearSaveTimeout();
 
     try {
       // Сначала не активируем затемнение, а только через 300мс (для быстрых операций)
-      setIsSaving(false);
+      setIsSaving(true);
 
       // Для очень быстрых операций не показываем индикатор
-      saveTimeoutRef.current = setTimeout(() => {
+      /*saveTimeoutRef.current = setTimeout(() => {
         if (isMountedRef.current) {
           setIsSaving(true);
         }
-      }, 300);
+      }, 300);*/
 
       const { isValid, technologyErrors, operationErrors } = validateForm(); // валидация
       if (isValid) {      
@@ -136,7 +136,7 @@ function Technologies({ showLoading }) {
         })).unwrap();
 
         // Очищаем таймаут, если операция завершилась быстро
-        clearSaveTimeout();
+        //clearSaveTimeout();
         
         if (result) {
           //успешно
@@ -153,7 +153,7 @@ function Technologies({ showLoading }) {
         }   
       } else {
         // Очищаем таймаут, так как мы не будем сохранять
-        clearSaveTimeout();
+        //clearSaveTimeout();
 
         //обработка ошибок валидации
         if (currentTechnology) {
@@ -172,13 +172,11 @@ function Technologies({ showLoading }) {
       }
     } catch (error) {
       // Очищаем таймаут при ошибке
-      clearSaveTimeout();
+      //clearSaveTimeout();
       enqueueSnackbar(`Ошибка: ${technologiesSaveError}`, { variant: 'error' });
     } finally {  
       // Убедимся, что устанавливаем состояние только если компонент всё ещё смонтирован
-      if (isMountedRef.current) {
-        setIsSaving(false);
-      }
+      setIsSaving(false);
       handleClose();
     }
   };
@@ -229,12 +227,9 @@ function Technologies({ showLoading }) {
   }, [isSaving, showLoading]);
 
   useEffect(() => {
-    // Отслеживаем, смонтирован ли компонент
     return () => {
-      isMountedRef.current = false;
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
+      // Просто сбрасываем состояние при размонтировании
+      setIsSaving(false);
     };
   }, []);
 
@@ -481,8 +476,8 @@ function Technologies({ showLoading }) {
       <Backdrop
         sx={{ 
           color: '#fff', 
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          transition: 'opacity 300ms'
+          zIndex: (theme) => theme.zIndex.drawer + 10,
+          /*transition: 'opacity 300ms'*/
         }}
         open={isSaving}
       >
