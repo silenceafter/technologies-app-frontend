@@ -14,8 +14,7 @@ import {
     Toolbar
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchData, setSearch, setPage, selectSearch, selectLimit, selectPage } from '../store/slices/headerSlice';
-import { setDrawing } from '../store/slices/drawingsSlice';
+import { fetchData as drawingsFetchData, setSearch, setPage, setDrawing } from '../store/slices/drawingsSlice';
 import { fetchData as productsFetchData, setItems as productsSetItems } from '../store/slices/lists/productsListSlice';
 import { debounce } from 'lodash';
 
@@ -24,32 +23,36 @@ function HeaderSearch({onReset}) {
   const dispatch = useDispatch();
   
   //селекторы
-  const search = useSelector(selectSearch);
-  const limit = useSelector(selectLimit);
-  const page = useSelector(selectPage);
-  const drawing = useSelector((state) => state.drawings.drawing);
-  const user = useSelector((state) => state.users.user);
+  const { 
+    items, 
+    loading, 
+    error, 
+    hasMore, 
+    search, 
+    limit, 
+    page, 
+    drawing
+  } = useSelector((state) => state.drawings);
   
   //стейты
   const [inputValue, setInputValue] = useState('');
   const [value, setValue] = useState(null);
 
   //запросы для прокрутки списка
-  const { items, loading, error, hasMore } = useSelector((state) => state.header);
+  
   const memoizedItems = useMemo(() => items, [items]);
   const listRef = useRef(null);
 
   const debouncedFetchData = debounce(() => {
-    dispatch(fetchData({ search: inputValue, limit, page: 1 }));
+    dispatch(drawingsFetchData({ search: inputValue, limit, page: 1 }));
   }, 500); //задержка в 500 мс
 
   //хуки
-
   //эффекты
   useEffect(() => {
     //загрузка данных при пустом поисковом запросе
     if (!search) {
-      dispatch(fetchData({ search: '', limit, page: 1 }));
+      dispatch(drawingsFetchData({ search: '', limit, page: 1 }));
     }
   }, [dispatch, search, limit, page]);
 
@@ -72,7 +75,7 @@ function HeaderSearch({onReset}) {
       const { scrollTop, scrollHeight, clientHeight } = event.target;
       if (scrollTop + clientHeight >= scrollHeight - 50 && !loading && !hasMore) {
         dispatch(setPage(page + 1));
-        dispatch(fetchData({ search, limit, page: page + 1 }));
+        dispatch(drawingsFetchData({ search, limit, page: page + 1 }));
       }
     }
   };

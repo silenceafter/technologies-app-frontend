@@ -17,12 +17,11 @@ import {
   selectLoading as technologiesSelectLoading,
   selectCurrentItems, updateTechnology,
 } from '../../../../store/slices/technologiesSlice';
-import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice';
 import { fetchData as technologiesPrefixFetchData} from '../../../../store/slices/technologiesPrefixSlice';
 import _ from 'lodash';
 import WarningIcon from '@mui/icons-material/Warning';
 
-function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isAutocompleteLoaded }) {
+function TechnologyTabPanel({ showLoading, isAutocompleteLoaded }) {
   const dispatch = useDispatch();
   const dateOptions = {
     year: 'numeric',
@@ -43,7 +42,7 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
   const [technologyCreationDate, setTechnologyCreationDate] = useState(null);
 
   //селекторы
-  const drawingExternalCode = useSelector(selectDrawingExternalCode);
+  const drawing = useSelector((state) => state.drawings.drawing);
   const currentItems = useSelector(selectCurrentItems);
   const technologiesPrefixItems = useSelector((state) => state.technologiesPrefix.items);
   const technologiesPrefixLoading = useSelector((state) => state.technologiesPrefix.loading);
@@ -57,13 +56,13 @@ function TechnologyTabPanel({ handleClose, showLoading, autocompleteOptions, isA
   //эффекты
   //анимация загрузки вкладки
   useEffect(() => {
-    if (drawingExternalCode != '') {
+    if (drawing) {
       setLoadingTimer(true);
       setTimeout(() => {
         setLoadingTimer(false);
       }, 1000); 
     }
-  }, [drawingExternalCode]);
+  }, [drawing]);
 
   useEffect(() => {
     if (!currentItems) { return; }

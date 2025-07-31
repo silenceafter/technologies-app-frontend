@@ -28,13 +28,12 @@ import {
   selectLoading as technologiesSelectLoading,
   updateOperation, selectCurrentItems,
 } from '../../../../store/slices/technologiesSlice';
-import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice';
 import { selectOperations, fetchData } from '../../../../store/slices/lists/operationsListSlice';
 import { selectJobs, fetchData as jobsFetchData } from '../../../../store/slices/lists/jobsListSlice';
 import { selectEquipment, fetchData as equipmentFetchData } from '../../../../store/slices/lists/equipmentListSlice';
 import { selectTooling, fetchData as toolingFetchData } from '../../../../store/slices/lists/toolingListSlice';
 
-function OperationTabPanel({ handleClose, open, showLoading }) {
+function OperationTabPanel({ showLoading }) {
   const dispatch = useDispatch();
 
   //стейты
@@ -49,7 +48,7 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
 
   //селекторы
   //const currentTechnology = useSelector(selectTechnology);
-  const drawingExternalCode = useSelector(selectDrawingExternalCode);
+  const drawing = useSelector((state) => state.drawings.drawing);
   const technologiesItems = useSelector(technologiesSelectItems);
   const technologiesLoading = useSelector(technologiesSelectLoading);
   const operationsSelectors = useSelector(selectOperations);
@@ -88,13 +87,13 @@ function OperationTabPanel({ handleClose, open, showLoading }) {
   //эффекты
   //анимация загрузки вкладки
   useEffect(() => {
-    if (drawingExternalCode != '') {
+    if (drawing) {
       setLoadingTimer(true);
       setTimeout(() => {
         setLoadingTimer(false);
       }, 1000);
     }
-  }, [drawingExternalCode]);
+  }, [drawing]);
 
   useEffect(() => {
     dispatch(fetchData({ search: '', limit: 10, page: 1 }));

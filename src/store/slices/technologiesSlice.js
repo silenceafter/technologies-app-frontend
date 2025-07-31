@@ -135,14 +135,24 @@ export const setData = createAsyncThunk(
         credentials: 'include'
       });
 
-      if (!response.ok) {
-        throw new Error(`Ошибка запроса: ${response.status}`);
-      }
-      //
       const data = await response.json();
+      if (!response.ok || (data.code && data.code >= 400)) {
+        // Создаем объект ошибки с подробной информацией
+        const error = {
+          message: data.message || 'Ошибка сохранения данных',
+          code: data.code || response.status,
+          detailedErrors: data.detailedErrors || [],
+          response: data.response || []
+        };        
+        throw new Error(error.message);
+      }
       return data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue({
+        message: error.message,
+        code: error.code || 500,
+        detailedErrors: error.detailedErrors || []
+      });
     }
   }
 );
@@ -691,7 +701,39 @@ const technologiesSlice = createSlice({
     });
     builder.addCase(setData.rejected, (state, action) => {
       state.setDataLoading = false;
-      state.setDataError = action.payload;
+
+      //ошибка
+      if (action.payload) {
+        // Если у нас есть payload с деталями ошибки
+        /*
+        {
+          message: action.payload.message,
+          code: action.payload.code,
+          detailedErrors: action.payload.detailedErrors
+        };
+        */
+        state.setDataError = action.payload.message;
+      } else if (action.error.message) {
+        // Если ошибка пришла без payload
+        /*
+        {
+          message: action.error.message,
+          code: 500,
+          detailedErrors: []
+        };
+        */
+        state.setDataError = action.error.message;
+      } else {
+        // Общая ошибка
+        /*
+        {
+          message: 'Неизвестная ошибка при сохранении',
+          code: 500,
+          detailedErrors: []
+        };
+        */
+        state.setDataError = 'Неизвестная ошибка при сохранении';
+      }
     });
   },
 });

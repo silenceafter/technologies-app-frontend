@@ -13,7 +13,6 @@ import materialsListReducer from './slices/lists/materialsListSlice';
 import productsListReducer from './slices/lists/productsListSlice';
 import technologiesListReducer from './slices/lists/technologiesListSlice';
 import equipmentListReducer from './slices/lists/equipmentListSlice';
-import headerReducer from './slices/headerSlice';
 import drawingsReducer from './slices/drawingsSlice';
 import usersReducer from './slices/usersSlice';
 import technologiesReducer from './slices/technologiesSlice';
@@ -32,7 +31,6 @@ const rootReducer = combineReducers({
   productsList: productsListReducer,
   equipmentList: equipmentListReducer,
   unsavedChanges: unsavedChangesReducer,
-  header: headerReducer,
   drawings: drawingsReducer,
   technologies: technologiesReducer,
   technologiesPrefix: technologiesPrefixReducer,
@@ -44,8 +42,8 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['users', 'header', 'dashboard'],
-  blacklist: ['drawings', 'technologies', 'technologiesPrefix'],
+  whitelist: ['users', 'dashboard', 'drawings'],
+  blacklist: ['technologies', 'technologiesPrefix'],
   /*stateReconciler: autoMergeLevel2,*/
 };
 

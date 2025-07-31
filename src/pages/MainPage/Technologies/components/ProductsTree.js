@@ -20,7 +20,6 @@ import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
 import { styled, alpha } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData, fetchItemDetails, setItems, setPage, setSearch, selectItems } from '../../../../store/slices/lists/productsListSlice';
-import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice';
 import { split } from 'lodash';
 import CircularProgress from '@mui/material/CircularProgress';
 import Skeleton from '@mui/material/Skeleton';
@@ -308,7 +307,7 @@ export default function ProductsTree() {
   };*/
 
   //запросы
-  const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
+  //const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
   //const search = useSelector(drawing);
   //const { items, loading, error } = useSelector((state) => state.drawingsAllTree);
 

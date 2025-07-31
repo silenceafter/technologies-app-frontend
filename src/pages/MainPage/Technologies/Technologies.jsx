@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
   Accordion, 
@@ -40,11 +40,10 @@ import {
   resetTechnologies
 } from '../../../store/slices/technologiesSlice';
 import { fetchData, selectTechnologies } from '../../../store/slices/lists/technologiesListSlice';
-import { selectDrawingExternalCode } from '../../../store/slices/drawingsSlice';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useSnackbar } from 'notistack';
 
-function Technologies({ setSmartBackdropActive, showLoading }) {
+function Technologies({ showLoading }) {
   const dispatch = useDispatch();
 
   //стейты  
@@ -66,6 +65,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   const [isValid, setIsValid] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [formErrors, setFormErrors] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   //селекторы
   const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
@@ -75,9 +75,12 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
   const technologiesListItems = technologiesListSelectors?.items;
   const technologiesListLoading = technologiesListSelectors?.loading;
   const technologiesItems = useSelector((state) => state.technologies.items);
-  const drawingExternalCode = useSelector(selectDrawingExternalCode);
   const drawing = useSelector((state) => state.drawings.drawing);
-  const technologiesError = useSelector((state) => state.technologies.getSavedDataError);
+  const technologiesSaveError = useSelector((state) => state.technologies.setDataError);
+
+  //рефы
+  const saveTimeoutRef = useRef(null); // Для хранения идентификатора таймаута
+  const isMountedRef = useRef(true); // Для отслеживания монтирования компонента
   
   //хуки
   const { enqueueSnackbar } = useSnackbar();
@@ -96,6 +99,146 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
     setAccordionOperationTabPanelExpanded(!accordionOperationTabPanelExpanded);
   };
 
+  const handleClose = useCallback((reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+      setOpen(false);
+  }, []);
+  
+  //сохранение
+  const handleSave = async () => {   
+    if (!hasUnsavedChanges) {
+      enqueueSnackbar(`Сохранение не требуется`, { variant: 'info' });
+      return;
+    }
+
+    // Сбрасываем предыдущий таймаут
+    clearSaveTimeout();
+
+    try {
+      // Сначала не активируем затемнение, а только через 300мс (для быстрых операций)
+      setIsSaving(false);
+
+      // Для очень быстрых операций не показываем индикатор
+      saveTimeoutRef.current = setTimeout(() => {
+        if (isMountedRef.current) {
+          setIsSaving(true);
+        }
+      }, 300);
+
+      const { isValid, technologyErrors, operationErrors } = validateForm(); // валидация
+      if (isValid) {      
+        //выполняем сохранение
+        const result = await dispatch(technologiesSetData({ 
+          user: user, 
+          technologies: technologiesItems 
+        })).unwrap();
+
+        // Очищаем таймаут, если операция завершилась быстро
+        clearSaveTimeout();
+        
+        if (result) {
+          //успешно
+          //dispatch(productsSetItems());
+          //dispatch(technologiesSetItems()); //очистить компонент технологий
+          //dispatch(productsFetchData({limit: 50, page: 1}));            
+          dispatch(technologiesFetchData({ drawing: drawing, user: user })); //обновить items в technologiesSlice
+          
+          //уведомление
+          enqueueSnackbar(`Сохранено успешно`, { variant: 'success' });
+        } else {
+          //ошибка
+          enqueueSnackbar(`Ошибка: ${technologiesSaveError}`, { variant: 'error' });
+        }   
+      } else {
+        // Очищаем таймаут, так как мы не будем сохранять
+        clearSaveTimeout();
+
+        //обработка ошибок валидации
+        if (currentTechnology) {
+          dispatch(updateTechnologyFormErrors({ 
+            id: currentTechnology.id, 
+            formErrors: technologyErrors 
+          }));
+        }
+        if (currentOperation) {
+          dispatch(updateOperationFormErrors({ 
+            id: currentOperation.id, 
+            formErrors: operationErrors 
+          }));
+        }
+        enqueueSnackbar(`Незаполнена форма!`, { variant: 'warning' }); 
+      }
+    } catch (error) {
+      // Очищаем таймаут при ошибке
+      clearSaveTimeout();
+      enqueueSnackbar(`Ошибка: ${technologiesSaveError}`, { variant: 'error' });
+    } finally {  
+      // Убедимся, что устанавливаем состояние только если компонент всё ещё смонтирован
+      if (isMountedRef.current) {
+        setIsSaving(false);
+      }
+      handleClose();
+    }
+  };
+
+  //эффекты
+  useEffect(() => {
+    if (drawing) {
+      dispatch(technologiesFetchData({ drawing: drawing, user: user }));
+    }
+  }, [drawing]);
+
+  useEffect(() => {
+    if (!currentItems) { return; }
+    /*if (!currentItems[0]) { return; }*/
+    try {
+      setCurrentTechnology(currentItems[0] ? currentItems[0] : null);
+      setCurrentOperation(currentItems[1] ? currentItems[1] : null);
+    } catch (e) {
+      console.error('Ошибка при получении данных из хранилища', e);
+    }
+  }, [currentItems]);
+
+  useEffect(() => {
+    if (currentTechnology) {
+      setTechnologyFormValues(currentTechnology.content.formValues);
+      setTechnologyFormErrors(currentTechnology.content.formErrors);
+    }
+    if (currentOperation) {
+      setOperationFormValues(currentOperation.content.formValues);
+      setOperationFormErrors(currentOperation.content.formErrors);
+    }
+  }, [currentTechnology, currentOperation]);
+
+  useEffect(() => {
+    if (!technologiesListLoading && technologiesListItems) {
+      setAutocompleteOptions(prevState => ({
+        ...prevState,
+        technologies: technologiesListSelectors
+      }));
+      setIsAutocompleteLoaded(true); //загрузка items завершена
+    }
+  }, [technologiesListItems, technologiesListLoading]);
+  
+  useEffect(() => {
+    if (showLoading) {
+      showLoading(isSaving);
+    }
+  }, [isSaving, showLoading]);
+
+  useEffect(() => {
+    // Отслеживаем, смонтирован ли компонент
+    return () => {
+      isMountedRef.current = false;
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  //валидация
   const validateForm = () => {
     if (!technologyFormValues || !operationFormValues) { return { isValid: false, technologyErrors: [], operationErrors: [] }; }
     const technologyErrors = {};
@@ -194,109 +337,18 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
     };
   };
 
-  const handleClose = useCallback((reason) => {
-      if (reason === 'clickaway') {
-        return;
-      }
-      setOpen(false);
-  }, []);
-  
-  const handleSave = async () => {   
-    if (!hasUnsavedChanges) {
-      //сохранение не требуется
-      enqueueSnackbar(`Сохранение не требуется`, { variant: 'info' });
-      //dispatch(setStatus({ statusValue: 'info', responseValue: dbResponse }));
-      //showSnackbar();
-      return;
+  const clearSaveTimeout = () => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
     }
-
-    //сохранение
-    setSmartBackdropActive(true);
-    setLoading((prev) => ({ ...prev, save: true }));
-    const { isValid, technologyErrors, operationErrors } = validateForm(); // валидация     
-    if (isValid) {
-      try {
-        //обновление
-        const result = await dispatch(technologiesSetData({ user: user, technologies: technologiesItems })).unwrap();
-        if (result) {
-          //успешно
-          //dispatch(productsSetItems());
-          //dispatch(technologiesSetItems()); //очистить компонент технологий
-          //dispatch(productsFetchData({limit: 50, page: 1}));            
-          dispatch(technologiesFetchData({ drawing: drawing, user: user })); //обновить items в technologiesSlice
-          //
-          enqueueSnackbar(`Сохранено успешно`, { variant: 'success' }); //dispatch(setStatus({ statusValue: 'success', responseValue: dbResponse }));
-        } else {
-          //ошибка
-          enqueueSnackbar(`Ошибка: ${technologiesError}`, { variant: 'error' }); //dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));
-        }
-      } catch (error) {
-        enqueueSnackbar(`Ошибка: ${error}`, { variant: 'error' }); //dispatch(setStatus({ statusValue: 'error', responseValue: dbResponse }));
-      } finally {
-        handleClose();
-        //showSnackbar();
-      }
-    } else {
-      //обновить ошибки в redux
-      if (currentTechnology) {
-        dispatch(updateTechnologyFormErrors({ id: currentTechnology.id, formErrors: technologyErrors }));
-      }
-      if (currentOperation) {
-        dispatch(updateOperationFormErrors({ id: currentOperation.id, formErrors: operationErrors }));
-      }
-      //
-      handleClose();
-      enqueueSnackbar(`Незаполнена форма!`, { variant: 'warning' }); //dispatch(setStatus({ statusValue: 'warning', responseValue: dbResponse }));
-      //showSnackbar();
-    }
-    setLoading((prev) => ({ ...prev, save: false }));
-    setSmartBackdropActive(false);
   };
 
-  //эффекты
-  useEffect(() => {
-    if (drawing) {
-      dispatch(technologiesFetchData({ drawing: drawing, user: user }));
-    }
-  }, [drawing]);
-
-  useEffect(() => {
-    if (!currentItems) { return; }
-    /*if (!currentItems[0]) { return; }*/
-    try {
-      setCurrentTechnology(currentItems[0] ? currentItems[0] : null);
-      setCurrentOperation(currentItems[1] ? currentItems[1] : null);
-    } catch (e) {
-      console.error('Ошибка при получении данных из хранилища', e);
-    }
-  }, [currentItems]);
-
-  useEffect(() => {
-    if (currentTechnology) {
-      setTechnologyFormValues(currentTechnology.content.formValues);
-      setTechnologyFormErrors(currentTechnology.content.formErrors);
-    }
-    if (currentOperation) {
-      setOperationFormValues(currentOperation.content.formValues);
-      setOperationFormErrors(currentOperation.content.formErrors);
-    }
-  }, [currentTechnology, currentOperation]);
-
-  useEffect(() => {
-    if (!technologiesListLoading && technologiesListItems) {
-      setAutocompleteOptions(prevState => ({
-        ...prevState,
-        technologies: technologiesListSelectors
-      }));
-      setIsAutocompleteLoaded(true); //загрузка items завершена
-    }
-  }, [technologiesListItems, technologiesListLoading]);
-  
   //вывод
   return (
     <>
     {/*console.log(hasUnsavedChanges)*/}
-      {/*drawingExternalCode &&*/ <Box sx={{
+      <Box sx={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
@@ -349,8 +401,8 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
             </Box>
           </AccordionDetails>          
         </Accordion>
-      </Box>}
-      {/*drawingExternalCode &&*/ <Box sx={{
+      </Box>
+      <Box sx={{
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
@@ -395,8 +447,7 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
               )}
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px' }}>
-              <TechnologyTabPanel handleClose={handleClose} showLoading={showLoading} autocompleteOptions={autocompleteOptions}
-              isAutocompleteLoaded={isAutocompleteLoaded} />
+              <TechnologyTabPanel showLoading={showLoading} isAutocompleteLoaded={isAutocompleteLoaded} />
             </AccordionDetails>        
           </Accordion>
           <Accordion defaultExpanded
@@ -418,14 +469,25 @@ function Technologies({ setSmartBackdropActive, showLoading }) {
               )}
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0, overflow: 'auto', /*maxHeight: '525px', minHeight: '100px'*/ }}>
-              <OperationTabPanel handleClose={handleClose} open={open} showLoading={showLoading} />
+              <OperationTabPanel showLoading={showLoading} />
             </AccordionDetails>
           </Accordion>
         </Box>
         {<Box sx={{ paddingTop: 2, }}>
           <ButtonGroupPanel handleSave={handleSave} loading={showLoading} isDisabled={!drawing} />
         </Box>}
-      </Box>}
+      </Box>
+      
+      <Backdrop
+        sx={{ 
+          color: '#fff', 
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          transition: 'opacity 300ms'
+        }}
+        open={isSaving}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </>
   );
 }

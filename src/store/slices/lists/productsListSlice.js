@@ -1,6 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-//import { selectSearch } from './headerSlice';
-import { selectDrawingExternalCode } from '../drawingsSlice';
 
 const LIMIT_DEFAULT = 50;
 const PAGE_DEFAULT = 1;
@@ -23,7 +21,7 @@ export const fetchData = createAsyncThunk(
   async ({ limit, page }, { getState, rejectWithValue }) => {
     try {
       const state = getState();
-      const externalCode = selectDrawingExternalCode(state);//const search = selectSearch(state);
+      const externalCode = ''; //selectDrawingExternalCode(state);
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
       //
       const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/CreateproductsListDataTree.v0.php?search=${externalCode}&&limit=${limit}&page=${page}`); /* http://localhost/Ivc/Ogt/ExecuteScripts/CreateproductsListDataTree.v0.php?search=${externalCode}&&limit=${limit}&page=${page} */

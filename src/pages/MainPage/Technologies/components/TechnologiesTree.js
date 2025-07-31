@@ -29,7 +29,6 @@ import {
 } from '@mui/x-tree-view/TreeItem2';
 import { useTreeItem2Utils, useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import { selectDrawingExternalCode } from '../../../../store/slices/drawingsSlice'; //'../../../../../store/slices/drawingsSlice';
 import { 
   setSelectedId,
   restoreItems, restoreItem,
@@ -75,7 +74,7 @@ const TechnologiesTree = () => {
   const items = useSelector((state) => state.technologies.items);
   const loading = useSelector((state) => state.technologies.getSavedDataLoading);
   const error = useSelector((state) => state.technologies.getSavedDataError);
-  const drawingExternalCode = useSelector(selectDrawingExternalCode);//значение строки поиска (чертежей)
+  const drawing = useSelector((state) => state.drawings.drawing);//значение строки поиска (чертежей)
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
   const user = useSelector((state) => state.users.user);
   const currentItems = useSelector(selectCurrentItems);
@@ -328,13 +327,13 @@ const TechnologiesTree = () => {
   //эффекты
   //анимация загрузки вкладки
   useEffect(() => {
-    if (drawingExternalCode != '') {
+    if (drawing) {
       setLoadingTimer(true);
       setTimeout(() => {
         setLoadingTimer(false);
       }, 500); 
     }
-  }, [drawingExternalCode]);
+  }, [drawing]);
 
   useEffect(() => {
     //для expandedItems
@@ -405,7 +404,7 @@ const TechnologiesTree = () => {
         break;
 
       case 'add-technology':
-        dispatch(addTechnology({ user: { UID: user?.UID }, drawing: { externalCode: drawingExternalCode } }));
+        dispatch(addTechnology({ user: { UID: user?.UID }, drawing: { externalCode: drawing.externalcode } }));
         enqueueSnackbar(`Технология добавлена`, { variant: 'info' });        
         break;
 
@@ -493,7 +492,7 @@ const TechnologiesTree = () => {
             expansionTrigger='iconContainer'
           />                        
           <Stack direction="row" spacing={1} sx={{ padding: 2, paddingBottom: 1.8, display: 'flex', flexDirection: 'row', justifyContent: 'right', alignItems: 'center' }}>
-            {drawingExternalCode && (
+            {drawing.externalcode && (
               <>
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
