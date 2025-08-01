@@ -85,7 +85,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
     });
 
     //formErrors
-    const errorMessage = numericFields.includes(name) && (value && !/^\d*$/.test(value))
+    const errorMessage = numericFields.includes(name) && (value && !/^-?\d+([.,]\d+)?$/.test(value))
       ? 'Это поле должно содержать только цифры'
       : undefined;
 
@@ -248,7 +248,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
                         formHelperText: {
                           sx: { whiteSpace: 'nowrap' },
                         },
-                        input: { readOnly: true /*!access*/ }
+                        input: { readOnly: !access }
                       }}
                     >
                     </TextField>

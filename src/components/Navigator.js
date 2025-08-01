@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useBlocker } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
@@ -33,15 +33,7 @@ const categories = [
         id: 'Технологии',
         icon: <EngineeringIcon />,
         route: '/technologies',
-        active: true,
       },      
-      { id: 'Hosting', icon: <PublicIcon />, route: '/', },
-      { id: 'Functions', icon: <SettingsEthernetIcon />, route: '/', },
-      {
-        id: 'Machine learning',
-        icon: <SettingsInputComponentIcon />,
-        route: '/',
-      },
     ],
   },
   {
@@ -50,18 +42,13 @@ const categories = [
       { 
         id: 'Администрирование', 
         icon: <AdminPanelSettingsIcon />, 
-        route: '/admin/accounts', 
-        active: false 
+        route: '/admin/accounts',
       },
       { 
         id: 'Журнал событий', 
         icon: <EventIcon />, 
-        route: '/admin/logs', 
-        active: false 
+        route: '/admin/logs',
       },
-      { id: 'Analytics', icon: <SettingsIcon />, route: '/', },
-      { id: 'Performance', icon: <TimerIcon />, route: '/', },
-      { id: 'Test Lab', icon: <PhonelinkSetupIcon />, route: '/', },
     ],
   },
 ];
@@ -84,22 +71,28 @@ const itemCategory = {
 export default function Navigator(props) {
   const { ...other } = props;
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
   //селекторы
-  const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
-
   //хуки
   const { safeResetAndExecute, ConfirmationDialog } = useSafeReset();
 
   //события
   const handleSafeNavigation = (route) => async () => {
-    await safeResetAndExecute({
+    const confirmed = await safeResetAndExecute({
       title: 'Есть несохранённые изменения!',
       message: 'Вы хотите покинуть страницу? Все несохранённые изменения будут потеряны.'
-    });    
-    navigate(route);    
+    });
+
+    //переход
+    if (confirmed) {
+      navigate(route);
+    }
   };
+
+  // Определяем, является ли текущая страница главной
+  const isMainPageActive = location.pathname === '/dashboard';
 
   return (
     <Drawer variant="persistent" {...other}>
@@ -107,10 +100,14 @@ export default function Navigator(props) {
         <ListItem sx={{ ...item, ...itemCategory, fontSize: 22, color: '#fff' }}>
           Навигация
         </ListItem>
+
+        {/* Главная страница */}
         <ListItem sx={{ ...item, ...itemCategory }}>
-          <ListItemButton onClick={() => {
-            handleSafeNavigation('/')();
-          }}>
+          <ListItemButton 
+            selected={isMainPageActive}
+            sx={item} 
+            onClick={handleSafeNavigation('/')}
+          >
             <ListItemIcon>
               <DashboardIcon />
             </ListItemIcon>
@@ -118,19 +115,28 @@ export default function Navigator(props) {
           </ListItemButton>          
         </ListItem>
 
+        {/* Другие страницы */}
         {categories.map(({ id, children }) => (
           <Box key={id} sx={{ bgcolor: '#101F33' }}>
             <ListItem sx={{ py: 2, px: 3 }}>
               <ListItemText sx={{ color: '#fff' }}>{id}</ListItemText>
             </ListItem>
-            {children.map(({ id: childId, icon, active, route }) => (
-              <ListItem disablePadding key={childId}>
-                <ListItemButton selected={active} sx={item} onClick={() => handleSafeNavigation(route)()}>
-                  <ListItemIcon>{icon}</ListItemIcon>
-                  <ListItemText>{childId}</ListItemText>
-                </ListItemButton>
-              </ListItem>
-            ))}
+            {children.map(({ id: childId, icon, route }) => {
+              // Определяем активный элемент на основе текущего URL
+              const isActive = location.pathname === route;              
+              return (
+                <ListItem disablePadding key={childId}>
+                  <ListItemButton 
+                    selected={isActive} 
+                    sx={item} 
+                    onClick={handleSafeNavigation(route)}
+                  >
+                    <ListItemIcon>{icon}</ListItemIcon>
+                    <ListItemText>{childId}</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              )
+            })}
             <Divider sx={{ mt: 2 }} />
           </Box>
         ))}

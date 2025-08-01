@@ -6,11 +6,6 @@ import {
   Chip,
   Checkbox,
   CircularProgress, 
-  Dialog, 
-  DialogActions, 
-  DialogContent, 
-  DialogContentText, 
-  DialogTitle, 
   IconButton, 
   Menu, 
   MenuItem, 
@@ -386,11 +381,6 @@ const TechnologiesTree = () => {
 
   const handleSpeedDialActionClick = useCallback((action) => {
     setCheckAccess(true);
-    /*if (user?.role === 'read_only') {
-      //действие недоступно  
-      setOpen(true);
-      return;
-    }*/
     //
     switch(action.name) {
       case 'delete':
@@ -410,8 +400,7 @@ const TechnologiesTree = () => {
 
       case 'add-operation':
         dispatch(addOperation(selectedId));
-        enqueueSnackbar(`Операция добавлена`, { variant: 'info' });
-        
+        enqueueSnackbar(`Операция добавлена`, { variant: 'info' });        
         break;
 
       case 'copy':
@@ -452,14 +441,6 @@ const TechnologiesTree = () => {
     dispatch(deleteItem(node));
     handleContextMenuClose();
   };
-
-  const handleDialogOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setOpen(false);
-  };
   
   //вывод
   if (loadingTimer) {
@@ -476,7 +457,7 @@ const TechnologiesTree = () => {
   //
   return (
     <>
-    {console.log(currentTechnology)}
+    {/*console.log(currentTechnology)*/}
       {items.length > 0 ? (
         <>
           <MemoizedRichTreeView
@@ -542,20 +523,6 @@ const TechnologiesTree = () => {
           </Box>
         </>
       )}
-
-      {/* Сообщение при отсутствии прав на действие */}
-      {<Dialog
-        open={open}
-        onClose={handleDialogClose}
-      >        
-        <DialogTitle>Нет доступа</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{error}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose}>OK</Button>
-        </DialogActions>
-      </Dialog>}
     </>
   );
 };

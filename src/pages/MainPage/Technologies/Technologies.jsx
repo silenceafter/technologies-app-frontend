@@ -36,8 +36,7 @@ import {
   getSavedData as technologiesFetchData,
   setData as technologiesSetData,
   selectCurrentItems,
-  updateOperation, updateTechnologyFormErrors, updateOperationFormErrors,
-  resetTechnologies
+  updateTechnologyFormErrors, updateOperationFormErrors,
 } from '../../../store/slices/technologiesSlice';
 import { fetchData, selectTechnologies } from '../../../store/slices/lists/technologiesListSlice';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -79,9 +78,6 @@ function Technologies({ showLoading }) {
   const technologiesSaveError = useSelector((state) => state.technologies.setDataError);
 
   //рефы
-  const saveTimeoutRef = useRef(null); // Для хранения идентификатора таймаута
-  const isMountedRef = useRef(true); // Для отслеживания монтирования компонента
-  
   //хуки
   const { enqueueSnackbar } = useSnackbar();
 
@@ -113,19 +109,9 @@ function Technologies({ showLoading }) {
       return;
     }
 
-    // Сбрасываем предыдущий таймаут
-    //clearSaveTimeout();
-
     try {
       // Сначала не активируем затемнение, а только через 300мс (для быстрых операций)
       setIsSaving(true);
-
-      // Для очень быстрых операций не показываем индикатор
-      /*saveTimeoutRef.current = setTimeout(() => {
-        if (isMountedRef.current) {
-          setIsSaving(true);
-        }
-      }, 300);*/
 
       const { isValid, technologyErrors, operationErrors } = validateForm(); // валидация
       if (isValid) {      
@@ -134,9 +120,6 @@ function Technologies({ showLoading }) {
           user: user, 
           technologies: technologiesItems 
         })).unwrap();
-
-        // Очищаем таймаут, если операция завершилась быстро
-        //clearSaveTimeout();
         
         if (result) {
           //успешно
@@ -152,9 +135,6 @@ function Technologies({ showLoading }) {
           enqueueSnackbar(`Ошибка: ${technologiesSaveError}`, { variant: 'error' });
         }   
       } else {
-        // Очищаем таймаут, так как мы не будем сохранять
-        //clearSaveTimeout();
-
         //обработка ошибок валидации
         if (currentTechnology) {
           dispatch(updateTechnologyFormErrors({ 
@@ -172,7 +152,6 @@ function Technologies({ showLoading }) {
       }
     } catch (error) {
       // Очищаем таймаут при ошибке
-      //clearSaveTimeout();
       enqueueSnackbar(`Ошибка: ${technologiesSaveError}`, { variant: 'error' });
     } finally {  
       // Убедимся, что устанавливаем состояние только если компонент всё ещё смонтирован
@@ -330,13 +309,6 @@ function Technologies({ showLoading }) {
       technologyErrors,
       operationErrors
     };
-  };
-
-  const clearSaveTimeout = () => {
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-      saveTimeoutRef.current = null;
-    }
   };
 
   //вывод

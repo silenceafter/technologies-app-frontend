@@ -103,7 +103,7 @@ function HeaderSearch({onReset}) {
   //
   return (
     <>
-    {console.log(drawing)}
+    {console.log(limit)}
       <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0, paddingBottom: '0.5rem' }}>
         <Toolbar>
           <Grid container spacing={0} sx={{ alignItems: 'center' }}>
