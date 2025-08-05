@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Accordion, Button, Grid, TextField, Typography } from '@mui/material';
+import { Accordion, Button, Grid, Grid2, TextField, Typography } from '@mui/material';
 import { OperationsSearch } from './search/OperationsSearch';
 import { JobsSearch } from './search/JobsSearch';
 import { EquipmentSearch } from './search/EquipmentSearch';
+import { MaterialsSearch } from './search/MaterialsSearch';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -26,7 +27,9 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
         laborEffort: '', 
         jobCode: { code: '', name: '' }, 
         equipmentCode: { code: '', name: '' }, 
-        toolingCode: { code: '', name: '' }
+        toolingCode: { code: '', name: '' },
+        materialCode: { code: '', name: '' },
+        materialMass: 0,
       },
       formErrors: {}, 
       changedValues: {},
@@ -49,7 +52,8 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
     'workingConditions',
     'numberOfWorkers',
     'numberOfProcessedParts',
-    'laborEffort'
+    'laborEffort',
+    'materialMass'
   ];
 
   const handleInputChange = useCallback((e) => {
@@ -634,16 +638,43 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
         <AccordionDetails sx={{ padding: 2, overflow: 'auto'}}>
           <form>
             <Grid container spacing={2} columns={{xs:5}}>
-            {/* Первая строка */}
+              {/* Первая строка */}
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={4.8}>
-                    {/*<MaterialsSearch 
+                    <MaterialsSearch 
                       id="materials" 
                       onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues.materials}
+                      selectedValue={localData.formValues.materialCode}
+                      options={autocompleteOptions.materials || null}
+                      onChange={handleOptionSelect}
                       errorValue={localData.formErrors.materials}
-                    />*/}
+                      access={access}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+              {/* Вторая строка */}
+              <Grid item xs={12}>
+                <Grid container spacing={2}>
+                  <Grid item xs={2.4}>
+                    <TextField
+                      fullWidth
+                      name='materialMass'
+                      id="material-mass-4"
+                      label="Масса материала"
+                      type="text"
+                      size="small"
+                      onChange={handleInputChange}
+                      value={localData.formValues.materialMass || ''}
+                      slotProps={{
+                        formHelperText: {
+                          sx: { whiteSpace: 'nowrap' },
+                        },
+                        input: { readOnly: !access }
+                      }}
+                    >
+                    </TextField>
                   </Grid>
                 </Grid>
               </Grid>

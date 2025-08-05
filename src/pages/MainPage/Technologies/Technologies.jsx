@@ -23,12 +23,6 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { ButtonGroupPanel } from './components/ButtonGroupPanel';
 import TechnologiesTree from './components/TechnologiesTree';
 import ProductsTree from './components/ProductsTree';
-import { OperationsSearch } from './components/search/OperationsSearch';
-import { ProfessionsSearch } from './components/search/JobsSearch';
-import { MeasuringToolsSearch } from './components/search/MeasuringToolsSearch';
-import { ToolingSearch } from './components/search/ToolingSearch';
-import { ComponentsSearch } from './components/search/ComponentsSearch';
-import { MaterialsSearch } from './components/search/MaterialsSearch';
 import { OperationTabPanel } from './components/OperationTabPanel';
 import { TechnologyTabPanel } from './components/TechnologyTabPanel';
 
@@ -288,20 +282,25 @@ function Technologies({ showLoading }) {
       if (operationFormValues.toolingCode.length == 0) {
         operationErrors.toolingCode = autocompleteTextFieldMessage;
       }
-    }*/
-
-    //components
-    /*if (!operationFormValues.components) {
-      operationErrors.components = autocompleteTextFieldMessage;
     }
 
-    //materials
-    if (!operationFormValues.materials) {
-      operationErrors.materials = autocompleteTextFieldMessage;
+    //components
+    if (!operationFormValues.components) {
+      operationErrors.components = autocompleteTextFieldMessage;
+    }*/
+
+    //materialCode
+    if (!operationFormValues.materialCode) {
+      operationErrors.materialCode = autocompleteTextFieldMessage;
+    }
+
+    //materialMass
+    if (!operationFormValues.materialMass) {
+      operationErrors.materialMass = textFieldMessage;
     }
 
     //measuringTools
-    if (!operationFormValues.measuringTools) {
+    /*if (!operationFormValues.measuringTools) {
       operationErrors.measuringTools = autocompleteTextFieldMessage;
     }*/
     return { 

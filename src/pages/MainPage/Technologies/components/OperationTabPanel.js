@@ -32,6 +32,7 @@ import { selectOperations, fetchData } from '../../../../store/slices/lists/oper
 import { selectJobs, fetchData as jobsFetchData } from '../../../../store/slices/lists/jobsListSlice';
 import { selectEquipment, fetchData as equipmentFetchData } from '../../../../store/slices/lists/equipmentListSlice';
 import { selectTooling, fetchData as toolingFetchData } from '../../../../store/slices/lists/toolingListSlice';
+import { selectMaterials, fetchData as materialsFetchData } from '../../../../store/slices/lists/materialsListSlice';
 
 function OperationTabPanel({ showLoading }) {
   const dispatch = useDispatch();
@@ -74,11 +75,16 @@ function OperationTabPanel({ showLoading }) {
   const toolingItems = toolingSelectors?.items;
   const toolingLoading = toolingSelectors?.loading;
 
+  //materials
+  const materialsSelectors = useSelector(selectMaterials);
+  const materialsItems = materialsSelectors?.items;
+  const materialsLoading = materialsSelectors?.loading;
+
   //события
   const handleOperationUpdate = useCallback(
     (newData) => {
       if (currentOperation) {
-        dispatch(updateOperation({ id: currentOperation.id, newContent: newData })); //handleUpdateTabContent(currentOperation.id, newData);
+        dispatch(updateOperation({ id: currentOperation.id, newContent: newData }));
       }
     },
     [currentOperation]
@@ -100,23 +106,27 @@ function OperationTabPanel({ showLoading }) {
     dispatch(jobsFetchData({ search: '', limit: 500, page: 1 }));
     dispatch(equipmentFetchData({ search: '', limit: 10, page: 1 }));
     dispatch(toolingFetchData({ search: '', limit: 10, page: 1 }));
+    dispatch(materialsFetchData({ search: '', limit: 10, page: 1 }));
   }, [dispatch]);
 
   useEffect(() => {
     if (!operationsLoading && operationsItems &&
         !jobsLoading && jobsItems &&
         !equipmentLoading && equipmentItems &&
-        !toolingLoading && toolingItems) {
+        !toolingLoading && toolingItems &&
+        !materialsLoading && materialsItems
+      ) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
         operations: operationsSelectors,
         jobs: jobsSelectors,
         equipment: equipmentSelectors,
         tooling: toolingSelectors,
+        materials: materialsSelectors,
       }));
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
-  }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading, toolingItems, toolingLoading]);
+  }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading, toolingItems, toolingLoading, materialsItems, materialsLoading]);
 
   const findNodeById = (items, targetId) => {
     for (let item of items) {

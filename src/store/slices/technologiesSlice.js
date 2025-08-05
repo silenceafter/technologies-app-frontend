@@ -380,6 +380,26 @@ const technologiesSlice = createSlice({
 
       //jobCode
       //jobName
+
+      //materialCode
+      /*let materialCode = { code: id, name: 'Новая операция' };
+
+      //если операция изменена
+      if (newContent.changedValues.hasOwnProperty('operationCode')) {
+        if (newContent.changedValues.operationCode) {
+          operationCode.code = newContent.changedValues.operationCode.code;
+          operationCode.name = newContent.changedValues.operationCode.name;
+        }
+      }
+
+      //areaNumber
+      let areaNumber = null;
+      if (newContent.changedValues.hasOwnProperty('areaNumber')) {
+        if (newContent.changedValues.areaNumber) {
+          areaNumber = newContent.changedValues.areaNumber;
+        }
+      }*/
+
       const isUpdatedOperation = newContent.isNewRecord || newContent.isDeleted ? false : true;
       //
       return {

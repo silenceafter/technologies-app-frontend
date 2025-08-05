@@ -76,6 +76,7 @@ const materialsListSlice = createSlice({
 export const selectSearch = (state) => state.materialsList.search;
 export const selectLimit = (state) => state.materialsList.limit;
 export const selectPage = (state) => state.materialsList.page;
+export const selectMaterials = (state) => state.materialsList;
 
 export const { setSearch, setLimit, setPage } = materialsListSlice.actions;
 export default materialsListSlice.reducer;
