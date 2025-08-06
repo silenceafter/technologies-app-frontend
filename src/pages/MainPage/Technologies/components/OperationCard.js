@@ -28,8 +28,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
         jobCode: { code: '', name: '' }, 
         equipmentCode: { code: '', name: '' }, 
         toolingCode: { code: '', name: '' },
-        materialCode: { code: '', name: '' },
-        materialMass: 0,
+        materialCode: [],
       },
       formErrors: {}, 
       changedValues: {},
@@ -37,7 +36,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
         parameters: false,
         equipment: false,
         components: false,
-        materials: false,
+        materials: true,
         tooling: false,
         measuringTools: false
       },             
@@ -363,96 +362,96 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
               </Grid>
               {/* Шестая строка */}
               <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={2.4}>
-                        <TextField
-                          required
-                          fullWidth
-                          name='grade'
-                          id="grade-7"
-                          label="Разряд"
-                          type="text"
-                          size="small"
-                          onChange={handleInputChange}
-                          error={!!localData.formErrors.grade}
-                          helperText={localData.formErrors.grade}
-                          value={localData.formValues.grade || ''}
-                          slotProps={{
-                            formHelperText: {
-                              sx: { whiteSpace: 'nowrap' },
-                            },
-                            input: { readOnly: !access }
-                          }}
-                        >
-                        </TextField>
-                      </Grid>
-                      <Grid item xs={2.4}>
-                        <TextField
-                          required
-                          fullWidth
-                          name='workingConditions'
-                          id="working-conditions-8"
-                          label="Условия труда"
-                          type="text"
-                          size="small"
-                          onChange={handleInputChange}
-                          error={!!localData.formErrors.workingConditions}
-                          helperText={localData.formErrors.workingConditions}
-                          value={localData.formValues.workingConditions || ''}
-                          slotProps={{
-                            formHelperText: {
-                              sx: { whiteSpace: 'nowrap' },
-                            },
-                            input: { readOnly: !access }
-                          }}
-                        >
-                        </TextField>
-                      </Grid>
-                      <Grid item xs={2.4}>
-                        <TextField
-                          required
-                          fullWidth
-                          name='numberOfWorkers'
-                          id="number-of-workers-9"
-                          label="Кол-во работающих"
-                          type="text"
-                          size="small"
-                          onChange={handleInputChange}
-                          error={!!localData.formErrors.numberOfWorkers}
-                          helperText={localData.formErrors.numberOfWorkers}
-                          value={localData.formValues.numberOfWorkers || ''}
-                          slotProps={{
-                            formHelperText: {
-                              sx: { whiteSpace: 'nowrap' },
-                            },
-                            input: { readOnly: !access }
-                          }}
-                        >
-                        </TextField>
-                      </Grid>
-                      <Grid item xs={4.8}>
-                        <TextField
-                          required
-                          fullWidth
-                          name='numberOfProcessedParts'
-                          id="number-of-processed-parts-10"
-                          label="Кол-во одновременно обрабатываемых деталей"
-                          type="text"
-                          size="small"
-                          onChange={handleInputChange}
-                          error={!!localData.formErrors.numberOfProcessedParts}
-                          helperText={localData.formErrors.numberOfProcessedParts}
-                          value={localData.formValues.numberOfProcessedParts || ''}
-                          slotProps={{
-                            formHelperText: {
-                              sx: { whiteSpace: 'nowrap' },
-                            },
-                            input: { readOnly: !access }
-                          }}
-                        >
-                        </TextField>
-                      </Grid>
-                    </Grid>
+                <Grid container spacing={2}>
+                  <Grid item xs={2.4}>
+                    <TextField
+                      required
+                      fullWidth
+                      name='grade'
+                      id="grade-7"
+                      label="Разряд"
+                      type="text"
+                      size="small"
+                      onChange={handleInputChange}
+                      error={!!localData.formErrors.grade}
+                      helperText={localData.formErrors.grade}
+                      value={localData.formValues.grade || ''}
+                      slotProps={{
+                        formHelperText: {
+                          sx: { whiteSpace: 'nowrap' },
+                        },
+                        input: { readOnly: !access }
+                      }}
+                    >
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={2.4}>
+                    <TextField
+                      required
+                      fullWidth
+                      name='workingConditions'
+                      id="working-conditions-8"
+                      label="Условия труда"
+                      type="text"
+                      size="small"
+                      onChange={handleInputChange}
+                      error={!!localData.formErrors.workingConditions}
+                      helperText={localData.formErrors.workingConditions}
+                      value={localData.formValues.workingConditions || ''}
+                      slotProps={{
+                        formHelperText: {
+                          sx: { whiteSpace: 'nowrap' },
+                        },
+                        input: { readOnly: !access }
+                      }}
+                    >
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={2.4}>
+                    <TextField
+                      required
+                      fullWidth
+                      name='numberOfWorkers'
+                      id="number-of-workers-9"
+                      label="Кол-во работающих"
+                      type="text"
+                      size="small"
+                      onChange={handleInputChange}
+                      error={!!localData.formErrors.numberOfWorkers}
+                      helperText={localData.formErrors.numberOfWorkers}
+                      value={localData.formValues.numberOfWorkers || ''}
+                      slotProps={{
+                        formHelperText: {
+                          sx: { whiteSpace: 'nowrap' },
+                        },
+                        input: { readOnly: !access }
+                      }}
+                    >
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={4.8}>
+                    <TextField
+                      required
+                      fullWidth
+                      name='numberOfProcessedParts'
+                      id="number-of-processed-parts-10"
+                      label="Кол-во одновременно обрабатываемых деталей"
+                      type="text"
+                      size="small"
+                      onChange={handleInputChange}
+                      error={!!localData.formErrors.numberOfProcessedParts}
+                      helperText={localData.formErrors.numberOfProcessedParts}
+                      value={localData.formValues.numberOfProcessedParts || ''}
+                      slotProps={{
+                        formHelperText: {
+                          sx: { whiteSpace: 'nowrap' },
+                        },
+                        input: { readOnly: !access }
+                      }}
+                    >
+                    </TextField>
+                  </Grid>
+                </Grid>
               </Grid>
               {/* Седьмая строка */}
               <Grid item xs={12}>
@@ -641,8 +640,8 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
               {/* Первая строка */}
               <Grid item xs={12}>
                 <Grid container spacing={2}>
-                  <Grid item xs={4.8}>
-                    <MaterialsSearch 
+                  <Grid item xs={12}>
+                    <MaterialsSearch props={{id: "materials-code-2", placeholder: "Код материала"}}
                       id="materials" 
                       onOptionSelect={handleOptionSelect} 
                       selectedValue={localData.formValues.materialCode}
@@ -658,7 +657,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={2.4}>
-                    <TextField
+                    {/*<TextField
                       fullWidth
                       name='materialMass'
                       id="material-mass-4"
@@ -674,7 +673,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
                         input: { readOnly: !access }
                       }}
                     >
-                    </TextField>
+                    </TextField>*/}
                   </Grid>
                 </Grid>
               </Grid>
