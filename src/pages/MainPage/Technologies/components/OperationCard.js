@@ -51,8 +51,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
     'workingConditions',
     'numberOfWorkers',
     'numberOfProcessedParts',
-    'laborEffort',
-    'materialMass'
+    'laborEffort'
   ];
 
   const handleInputChange = useCallback((e) => {
@@ -125,6 +124,10 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
       );
     }
   }, [localData, setLocalData, numericFields, onUpdate]);
+
+  const handleSpecialInputChange = useCallback((e) => {
+    console.log('yyy');
+  }, [[localData, setLocalData, numericFields, onUpdate]]);
 
   const handleOptionSelect = useCallback((id, option) => {
     // Обновляем значение поля
@@ -214,6 +217,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
   //
   return (
     <>
+    {console.log(content)}
       {/* Параметры */}
       <Accordion defaultExpanded
         expanded={localData.expandedPanels['parameters'] || false}
@@ -635,50 +639,97 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
           <Typography component="span">Материалы</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ padding: 2, overflow: 'auto'}}>
-          <form>
-            <Grid container spacing={2} columns={{xs:5}}>
-              {/* Первая строка */}
-              <Grid item xs={12}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <MaterialsSearch props={{id: "materials-code-2", placeholder: "Код материала"}}
-                      id="materials" 
-                      onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues.materialCode}
-                      options={autocompleteOptions.materials || null}
-                      onChange={handleOptionSelect}
-                      errorValue={localData.formErrors.materials}
-                      access={access}
-                    />
-                  </Grid>
-                </Grid>
-              </Grid>
-              {/* Вторая строка */}
-              <Grid item xs={12}>
-                <Grid container spacing={2}>
-                  <Grid item xs={2.4}>
-                    {/*<TextField
-                      fullWidth
-                      name='materialMass'
-                      id="material-mass-4"
-                      label="Масса материала"
-                      type="text"
-                      size="small"
-                      onChange={handleInputChange}
-                      value={localData.formValues.materialMass || ''}
-                      slotProps={{
-                        formHelperText: {
-                          sx: { whiteSpace: 'nowrap' },
-                        },
-                        input: { readOnly: !access }
-                      }}
-                    >
-                    </TextField>*/}
-                  </Grid>
+          <Grid container spacing={2} rowSpacing={4} columns={{xs:5}}>
+            {/* Первая строка */}
+            <Grid item xs={5}>
+              <Grid container spacing={2}>
+                <Grid item xs={4.8}>
+                  <MaterialsSearch props={{id: "materials-code-2", placeholder: "Код материала"}}
+                    id="materials" 
+                    onOptionSelect={handleOptionSelect} 
+                    selectedValue={localData.formValues.materialCode}
+                    options={autocompleteOptions.materials || null}
+                    onChange={handleOptionSelect}
+                    errorValue={localData.formErrors.materials}
+                    access={access}
+                  />
                 </Grid>
               </Grid>
             </Grid>
-          </form>              
+            
+            {/* Вторая строка */}
+            <Grid item xs={12} sx={{ '& > :not(:last-child)': { mb: 2 } }}>
+              {localData.formValues.materialCode.map((item) => (
+                <>
+                  <Grid container spacing={2} key={item.cnt}>
+                    {/* Первый столбец */}
+                    <Grid item xs={2.4}>
+                      <TextField
+                        fullWidth
+                        name='materialCode'
+                        id={item.cnt-1}
+                        label="Код материала"
+                        placeholder='Код материала'
+                        variant="outlined"
+                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                        size='small'
+                        value={item.code}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: true }
+                        }}
+                      />                      
+                    </Grid>
+
+                    {/* Второй столбец */}
+                    <Grid item xs={7.2}>
+                      <TextField
+                        fullWidth
+                        name='materialName'
+                        id={item.cnt-2}
+                        label="Наименование материала"
+                        placeholder='Наименование материала'
+                        variant="outlined"
+                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                        size='small'
+                        value={item.name}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: true }
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Третий столбец */}
+                    <Grid item xs={2.4}>
+                      <TextField
+                        fullWidth
+                        name='materialMass'
+                        id={item.cnt-3}
+                        label="Масса материала"
+                        placeholder='Масса материала'
+                        type="text"
+                        size="small"
+                        onChange={handleSpecialInputChange}
+                        value={item.mass || ''}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: !access }
+                        }}
+                      >
+                      </TextField>
+                </Grid>
+                  </Grid>
+                </>                       
+              ))}                                   
+            </Grid>
+          </Grid>
         </AccordionDetails>
       </Accordion>      
 

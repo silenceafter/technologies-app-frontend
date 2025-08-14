@@ -4,7 +4,6 @@ import {
     Box,
     Chip,
     CircularProgress, 
-    Grid, Grid2,
     ListItem, 
     ListItemText,
     TextField
@@ -117,142 +116,86 @@ const MaterialsSearch = React.memo(({ props, id, selectedValue, options, onChang
   return (
     <>
     {console.log(selectedValue)}
-      {access ? (
-        <>
-          <Autocomplete
-            multiple
-            options={items || []}
-            getOptionLabel={(option) => formatOption(option)}
-            getOptionSelected={(option, value) => option.code === value.code && option.name === value.name}
-            filterOptions={(options, state) => {
-              const { inputValue } = state;
-              return options.filter(option =>
-                option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
-                option.name.toLowerCase().includes(inputValue.toLowerCase())
-              );
-            }}
-            onInputChange={(event, newInputValue) => {
-              setInputValue(newInputValue);
-            }}
-            onChange={handleChange}
-            inputValue={inputValue}
-            loadingText="поиск данных"
-            noOptionsText="нет результатов"
-            loading={loading}
-            ListboxProps={{
-              onScroll: handleScroll,
-              ref: listRef,
-              sx: {
-                maxHeight: '42.5vh',
-                overflowY: 'auto'
-              }
-            }}
-            renderGroup={(params) => (
-              <div key={params.key}>
-                {params.children}
-                {loading && (
-                  <Box sx={{ 
-                    display: 'flex',
-                    justifyContent: 'center',
-                    padding: '10px'}}>
-                    <CircularProgress size={24} />
-                  </Box>
-                )}
-              </div>
-            )}
-            renderOption={(props, option) => (
-              <ListItem {...props} key={`${option?.code}-${option?.name}`} style={{ padding: '8px 16px' }}>
-                <ListItemText
-                  primary={option?.code}
-                  secondary={option?.name}
-                  primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
-                  secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
-                />
-              </ListItem>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                required
-                fullWidth
-                name='materialCode6'
-                id={props.id}
-                error={!!errorValue}
-                helperText={errorValue}
-                placeholder={props.placeholder}
-                variant="outlined"
-                sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-                size='small'
-                value={props.placeholder}
+      {access ? (        
+        <Autocomplete
+          fullWidth
+          multiple
+          options={items || []}
+          getOptionLabel={(option) => formatOption(option)}
+          getOptionSelected={(option, value) => option.code === value.code && option.name === value.name}
+          filterOptions={(options, state) => {
+            const { inputValue } = state;
+            return options.filter(option =>
+              option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+              option.name.toLowerCase().includes(inputValue.toLowerCase())
+            );
+          }}
+          onInputChange={(event, newInputValue) => {
+            setInputValue(newInputValue);
+          }}
+          onChange={handleChange}
+          inputValue={inputValue}
+          loadingText="поиск данных"
+          noOptionsText="нет результатов"
+          loading={loading}
+          ListboxProps={{
+            onScroll: handleScroll,
+            ref: listRef,
+            sx: {
+              maxHeight: '42.5vh',
+              overflowY: 'auto'
+            }
+          }}
+          renderGroup={(params) => (
+            <div key={params.key}>
+              {params.children}
+              {loading && (
+                <Box sx={{ 
+                  display: 'flex',
+                  justifyContent: 'center',
+                  padding: '10px'}}>
+                  <CircularProgress size={24} />
+                </Box>
+              )}
+            </div>
+          )}
+          renderOption={(props, option) => (
+            <ListItem {...props} key={`${option?.code}-${option?.name}`} style={{ padding: '8px 16px' }}>
+              <ListItemText
+                primary={option?.code}
+                secondary={option?.name}
+                primaryTypographyProps={{ style: { fontWeight: 'bold' } }}
+                secondaryTypographyProps={{ style: { fontSize: 'small', color: 'gray' } }}
               />
-            )}
-            sx={{
-              '& .MuiAutocomplete-listbox': {
-                backgroundColor: '#fff',
-                boxShadow: 2
-              },
-              '& .MuiAutocomplete-option': {
-                padding: '8px 16px'
-              },
-              mb: 4,
-            }}
-            value={selectedOption || null}
-          />
-
-          
-              <Grid container spacing={2} rowSpacing={2} columns={{xs:5}}>
-                {selectedOption.map((item, index) => (<>
-                {/* Первая строка */}
-                <Grid item xs={12}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        name='materialCode6'
-                        id={id}
-                        label="Код материала"
-                        placeholder={props.placeholder}
-                        variant="outlined"
-                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-                        size='small'
-                        value={                          
-                          formatOption(item)
-                        }
-                        slotProps={{
-                          formHelperText: {
-                            sx: { whiteSpace: 'nowrap' },
-                          },
-                          input: { readOnly: true }
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        name='materialCode6'
-                        id={id}
-                        label="Код материала"
-                        placeholder={props.placeholder}
-                        variant="outlined"
-                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-                        size='small'
-                        value={                          
-                          formatOption(item)
-                        }
-                        slotProps={{
-                          formHelperText: {
-                            sx: { whiteSpace: 'nowrap' },
-                          },
-                          input: { readOnly: true }
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                </Grid>
-                {/* Вторая строка */}
-              
-          </>))}</Grid>
-          </>
+            </ListItem>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              required
+              fullWidth
+              name='materialCode6'
+              id={props.id}
+              error={!!errorValue}
+              helperText={errorValue}
+              placeholder={props.placeholder}
+              variant="outlined"
+              sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+              size='small'
+              value={props.placeholder}
+            />
+          )}
+          sx={{
+            '& .MuiAutocomplete-listbox': {
+              backgroundColor: '#fff',
+              boxShadow: 2
+            },
+            '& .MuiAutocomplete-option': {
+              padding: '8px 16px'
+            },
+          }}
+          value={selectedOption || null}
+        />
       ) : (
         <TextField
           fullWidth
