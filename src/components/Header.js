@@ -65,7 +65,7 @@ function Header(props) {
 
   //хуки
   const logout = useLogout();
-  const { safeResetAndExecute, ConfirmationDialog } = useSafeReset();
+  //const { safeResetAndExecute, ConfirmationDialog } = useSafeReset();
 
   //события
   const handleClick = (event) => {
@@ -75,12 +75,12 @@ function Header(props) {
     setAnchorEl(null);
   };
 
-  const handleSearchReset = async () => {
+  /*const handleSearchReset = async () => {
     await safeResetAndExecute({
       title: 'Есть несохранённые изменения',
       message: 'Текущий поиск будет очищен.'
     });
-  };
+  };*/
 
   const handleUserExitClose = async () => {
     //Учетная запись -> Выйти
@@ -215,8 +215,8 @@ function Header(props) {
           </Grid>
         </Toolbar>
       </AppBar>
-      <HeaderSearch onReset={handleSearchReset} />
-      {ConfirmationDialog}      
+      <HeaderSearch /*onReset={handleSearchReset}*/ />
+      {/*ConfirmationDialog*/}      
     </>
   );
 }

@@ -290,14 +290,44 @@ function Technologies({ showLoading }) {
     }*/
 
     //materialCode
-    if (!operationFormValues.materialCode) {
-      operationErrors.materialCode = autocompleteTextFieldMessage;
+    if (operationFormValues.materialCode && Array.isArray(operationFormValues.materialCode) && operationFormValues.materialCode.length > 0) {
+      //operationErrors.materialCode = autocompleteTextFieldMessage;
+      // Создаем объект ошибок с ID материалов
+      const massErrors = {};
+      let hasMassErrors = false;
+      
+      operationFormValues.materialCode.forEach(material => {
+        // Используем ID материала как ключ
+        const materialId = material.id || material.cnt;
+        
+        if (!material.mass || material.mass === '') {
+          massErrors[materialId] = 'Укажите массу';
+          hasMassErrors = true;
+        } else {
+          // Сохраняем существующую ошибку валидации, если она есть
+          const existingError = formErrors?.materials?.masses?.[materialId];
+          if (existingError) {
+            massErrors[materialId] = existingError;
+            hasMassErrors = true;
+          } else {
+            massErrors[materialId] = null;
+          }
+        }
+      });
+      
+      if (hasMassErrors) {
+        if (!operationErrors.materials) {
+          operationErrors.materials = { masses: massErrors };
+        } else {
+          operationErrors.materials.masses = massErrors;
+        }
+      }
     }
 
     //materialMass
-    if (!operationFormValues.materialMass) {
+    /*if (!operationFormValues.materialMass) {
       operationErrors.materialMass = textFieldMessage;
-    }
+    }*/
 
     //measuringTools
     /*if (!operationFormValues.measuringTools) {
@@ -313,7 +343,7 @@ function Technologies({ showLoading }) {
   //вывод
   return (
     <>
-    {/*console.log(hasUnsavedChanges)*/}
+    {console.log(operationFormValues)}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

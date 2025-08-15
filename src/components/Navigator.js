@@ -76,10 +76,10 @@ export default function Navigator(props) {
 
   //селекторы
   //хуки
-  const { safeResetAndExecute, ConfirmationDialog } = useSafeReset();
+  //const { safeResetAndExecute, ConfirmationDialog } = useSafeReset();
 
   //события
-  const handleSafeNavigation = (route) => async () => {
+  /*const handleSafeNavigation = (route) => async () => {
     const confirmed = await safeResetAndExecute({
       title: 'Есть несохранённые изменения!',
       message: 'Вы хотите покинуть страницу? Все несохранённые изменения будут потеряны.'
@@ -89,7 +89,7 @@ export default function Navigator(props) {
     if (confirmed) {
       navigate(route);
     }
-  };
+  };*/
 
   // Определяем, является ли текущая страница главной
   const isMainPageActive = location.pathname === '/dashboard';
@@ -106,7 +106,7 @@ export default function Navigator(props) {
           <ListItemButton 
             selected={isMainPageActive}
             sx={item} 
-            onClick={handleSafeNavigation('/')}
+            /*onClick={handleSafeNavigation('/')}*/
           >
             <ListItemIcon>
               <DashboardIcon />
@@ -129,7 +129,7 @@ export default function Navigator(props) {
                   <ListItemButton 
                     selected={isActive} 
                     sx={item} 
-                    onClick={handleSafeNavigation(route)}
+                    /*onClick={handleSafeNavigation(route)}*/
                   >
                     <ListItemIcon>{icon}</ListItemIcon>
                     <ListItemText>{childId}</ListItemText>
@@ -140,7 +140,7 @@ export default function Navigator(props) {
             <Divider sx={{ mt: 2 }} />
           </Box>
         ))}
-        {ConfirmationDialog}
+        {/*ConfirmationDialog*/}
       </List>
     </Drawer>
   );

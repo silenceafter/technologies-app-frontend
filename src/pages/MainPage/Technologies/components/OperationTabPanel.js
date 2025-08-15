@@ -158,7 +158,7 @@ function OperationTabPanel({ showLoading }) {
   //
   return (
     <>
-    {console.log(currentTechnology)}
+    {/*console.log(currentTechnology)*/}
       <Box sx={{           
         height: '100%',
         overflowY: 'auto'

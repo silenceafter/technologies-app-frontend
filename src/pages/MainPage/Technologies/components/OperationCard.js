@@ -125,9 +125,79 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
     }
   }, [localData, setLocalData, numericFields, onUpdate]);
 
-  const handleSpecialInputChange = useCallback((e) => {
-    console.log('yyy');
-  }, [[localData, setLocalData, numericFields, onUpdate]]);
+  const handleMaterialMassInputChange = useCallback((materialId) => (e) => {
+    const { value } = e.target;
+  
+    // Проверка на числовые значения
+    const numericRegex = /^-?\d+([.,]\d+)?$/;
+    const isValid = !value || numericRegex.test(value);
+    const errorMessage = !isValid ? 'Это поле должно содержать только цифры' : null;
+  
+    setLocalData(prev => {
+      // Обновляем значения материалов
+      const updatedMaterials = prev.formValues.materialCode.map(material => 
+        material.cnt === materialId ? { ...material, mass: value } : material
+      );
+      
+      // Создаем новый объект ошибок (НЕ МУТИРУЕМ существующий)
+      const newMassErrors = { 
+        ...prev.formErrors.materials?.masses 
+      };
+      
+      // Устанавливаем ошибку для конкретного материала
+      newMassErrors[materialId] = errorMessage;
+      
+      // Проверяем, есть ли вообще ошибки
+      const hasMaterialErrors = Object.values(newMassErrors).some(error => error !== null);
+      
+      return {
+        ...prev,
+        formValues: {
+          ...prev.formValues,
+          materialCode: updatedMaterials
+        },
+        formErrors: {
+          ...prev.formErrors,
+          materials: hasMaterialErrors ? { masses: newMassErrors } : null,
+          /*materialCode: hasMaterialErrors ? 'Заполните все обязательные поля материалов' : null*/
+        },
+        changedValues: {
+          ...prev.changedValues,
+          materialCode: updatedMaterials
+        }
+      };
+    });
+    
+    // Передача данных родителю
+    if (onUpdate) {
+      const newMassErrors = { 
+        ...localData.formErrors.materials?.masses 
+      };
+      newMassErrors[materialId] = errorMessage;
+      
+      onUpdate({
+        ...localData,
+        formValues: {
+          ...localData.formValues,
+          materialCode: localData.formValues.materialCode.map(material => 
+            material.cnt === materialId ? { ...material, mass: value } : material
+          )
+        },
+        formErrors: {
+          ...localData.formErrors,
+          materials: localData.formErrors.materials ? {
+            masses: newMassErrors
+          } : null
+        },
+        changedValues: {
+          ...localData.changedValues,
+          materialCode: localData.formValues.materialCode.map(material => 
+            material.cnt === materialId ? { ...material, mass: value } : material
+          )
+        }
+      });
+    }
+  }, [localData, setLocalData, onUpdate]);
 
   const handleOptionSelect = useCallback((id, option) => {
     // Обновляем значение поля
@@ -650,7 +720,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
                     selectedValue={localData.formValues.materialCode}
                     options={autocompleteOptions.materials || null}
                     onChange={handleOptionSelect}
-                    errorValue={localData.formErrors.materials}
+                    /*errorValue={localData.formErrors.materials}*/
                     access={access}
                   />
                 </Grid>
@@ -659,7 +729,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
             
             {/* Вторая строка */}
             <Grid item xs={12} sx={{ '& > :not(:last-child)': { mb: 2 } }}>
-              {localData.formValues.materialCode.map((item) => (
+              {localData.formValues.materialCode.map((item, index) => (
                 <>
                   <Grid container spacing={2} key={item.cnt}>
                     {/* Первый столбец */}
@@ -708,13 +778,15 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
                     <Grid item xs={2.4}>
                       <TextField
                         fullWidth
-                        name='materialMass'
-                        id={item.cnt-3}
+                        name={`materialMass_${item.id || item.cnt}`}
+                        id={`material-mass-${item.id || item.cnt}`}
                         label="Масса материала"
                         placeholder='Масса материала'
                         type="text"
                         size="small"
-                        onChange={handleSpecialInputChange}
+                        onChange={handleMaterialMassInputChange(item.id || item.cnt)}
+                        error={!!localData.formErrors?.materials?.masses?.[item.id || item.cnt]}
+                        helperText={localData.formErrors?.materials?.masses?.[item.id || item.cnt] || ''}
                         value={item.mass || ''}
                         slotProps={{
                           formHelperText: {

@@ -29,7 +29,7 @@ const formatOptions = (options) => {
   return formatOption(options);
 };
 
-const MaterialsSearch = React.memo(({ props, id, selectedValue, options, onChange, errorValue, access }) => {
+const MaterialsSearch = React.memo(({ props, id, selectedValue, options, onChange, /*errorValue,*/ access }) => {
   const dispatch = useDispatch();
   const onOptionSelect = onChange;
   
@@ -176,8 +176,8 @@ const MaterialsSearch = React.memo(({ props, id, selectedValue, options, onChang
               fullWidth
               name='materialCode6'
               id={props.id}
-              error={!!errorValue}
-              helperText={errorValue}
+              /*error={!!errorValue}
+              helperText={errorValue}*/
               placeholder={props.placeholder}
               variant="outlined"
               sx={{ backgroundColor: '#fff', borderRadius: 1 }}
