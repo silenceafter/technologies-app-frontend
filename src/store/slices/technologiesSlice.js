@@ -382,10 +382,15 @@ const technologiesSlice = createSlice({
       //jobName
 
       //materialCode
-      /*let materialCode = { code: id, name: 'Новая операция' };
+      let materialCode = null;
+      if (newContent.changedValues.hasOwnProperty('materialCode')) {
+        if (newContent.changedValues.materialCode) {
+          materialCode = newContent.changedValues.materialCode;
+        }
+      }
 
       //если операция изменена
-      if (newContent.changedValues.hasOwnProperty('operationCode')) {
+      /*if (newContent.changedValues.hasOwnProperty('operationCode')) {
         if (newContent.changedValues.operationCode) {
           operationCode.code = newContent.changedValues.operationCode.code;
           operationCode.name = newContent.changedValues.operationCode.name;
