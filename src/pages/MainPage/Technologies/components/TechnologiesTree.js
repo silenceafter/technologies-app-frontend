@@ -67,7 +67,7 @@ const TechnologiesTree = () => {
 
   //селекторы
   const items = useSelector((state) => state.technologies.items);
-  const loading = useSelector((state) => state.technologies.getSavedDataLoading);
+  //const loading = useSelector((state) => state.technologies.getSavedDataLoading);
   const error = useSelector((state) => state.technologies.getSavedDataError);
   const drawing = useSelector((state) => state.drawings.drawing);//значение строки поиска (чертежей)
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);

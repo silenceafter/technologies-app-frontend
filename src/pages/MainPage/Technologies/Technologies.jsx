@@ -32,7 +32,7 @@ import {
   selectCurrentItems,
   updateTechnologyFormErrors, updateOperationFormErrors,
 } from '../../../store/slices/technologiesSlice';
-import { fetchData, selectTechnologies } from '../../../store/slices/lists/technologiesListSlice';
+//import { fetchData, selectTechnologies } from '../../../store/slices/lists/technologiesListSlice';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useSnackbar } from 'notistack';
 
@@ -64,9 +64,9 @@ function Technologies({ showLoading }) {
   const hasUnsavedChanges = useSelector((state) => state.technologies.hasUnsavedChanges);
   const user = useSelector((state) => state.users.user);
   const currentItems = useSelector(selectCurrentItems);
-  const technologiesListSelectors = useSelector(selectTechnologies);
+  /*const technologiesListSelectors = useSelector(selectTechnologies);
   const technologiesListItems = technologiesListSelectors?.items;
-  const technologiesListLoading = technologiesListSelectors?.loading;
+  const technologiesListLoading = technologiesListSelectors?.loading;*/
   const technologiesItems = useSelector((state) => state.technologies.items);
   const drawing = useSelector((state) => state.drawings.drawing);
   const technologiesSaveError = useSelector((state) => state.technologies.setDataError);
@@ -183,7 +183,7 @@ function Technologies({ showLoading }) {
     }
   }, [currentTechnology, currentOperation]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (!technologiesListLoading && technologiesListItems) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
@@ -191,7 +191,7 @@ function Technologies({ showLoading }) {
       }));
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
-  }, [technologiesListItems, technologiesListLoading]);
+  }, [technologiesListItems, technologiesListLoading]);*/
   
   useEffect(() => {
     if (showLoading) {

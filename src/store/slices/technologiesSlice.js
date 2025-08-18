@@ -129,7 +129,7 @@ export const setData = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/UpdateOperation.v0.php`, {
+      const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/CommitChanges.v0.php`, {
         method: 'POST',
         body: JSON.stringify(payload),
         credentials: 'include'
