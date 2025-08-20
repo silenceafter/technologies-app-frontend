@@ -169,7 +169,9 @@ function Header(props) {
                         )}                
                       </IconButton> 
                       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography>{user?.lastname} {user?.firstname} {user?.patronimic}</Typography>
+                        <Typography variant='subtitle1' fontWeight='bold'>{user?.lastname} {user?.firstname} {user?.patronimic}</Typography>
+                        <Typography color='text.secondary'>{user?.guild}</Typography>
+                        <Typography color='text.secondary'>{user?.post}</Typography>
                         <Typography sx={{ fontStyle: 'italic'}}>{user?.taskStatusName}</Typography>
                       </Box>                    
                   </Box>

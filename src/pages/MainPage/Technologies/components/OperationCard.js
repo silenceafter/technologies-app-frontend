@@ -729,7 +729,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
             
             {/* Вторая строка */}
             <Grid item xs={12} sx={{ '& > :not(:last-child)': { mb: 2 } }}>
-              {localData.formValues.materialCode.map((item, index) => (
+              {localData.formValues.materialCode?.map((item) => (
                 <>
                   <Grid container spacing={2} key={item.cnt}>
                     {/* Первый столбец */}
@@ -778,15 +778,15 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
                     <Grid item xs={2.4}>
                       <TextField
                         fullWidth
-                        name={`materialMass_${item.id || item.cnt}`}
-                        id={`material-mass-${item.id || item.cnt}`}
+                        name={`materialMass_${/*item.id ||*/ item.cnt}`}
+                        id={`material-mass-${/*item.id ||*/ item.cnt}`}
                         label="Масса материала"
                         placeholder='Масса материала'
                         type="text"
                         size="small"
-                        onChange={handleMaterialMassInputChange(item.id || item.cnt)}
-                        error={!!localData.formErrors?.materials?.masses?.[item.id || item.cnt]}
-                        helperText={localData.formErrors?.materials?.masses?.[item.id || item.cnt] || ''}
+                        onChange={handleMaterialMassInputChange(/*item.id ||*/ item.cnt)}
+                        error={!!localData.formErrors?.materials?.masses?.[/*item.id ||*/ item.cnt]}
+                        helperText={localData.formErrors?.materials?.masses?.[/*item.id ||*/ item.cnt] || ''}
                         value={item.mass || ''}
                         slotProps={{
                           formHelperText: {
