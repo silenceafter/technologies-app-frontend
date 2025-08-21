@@ -4,6 +4,7 @@ import { OperationsSearch } from './search/OperationsSearch';
 import { JobsSearch } from './search/JobsSearch';
 import { EquipmentSearch } from './search/EquipmentSearch';
 import { MaterialsSearch } from './search/MaterialsSearch';
+import { ComponentsSearch } from './search/ComponentsSearch';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -29,13 +30,14 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
         equipmentCode: { code: '', name: '' }, 
         toolingCode: { code: '', name: '' },
         materialCode: [],
+        componentCode: [],
       },
       formErrors: {}, 
       changedValues: {},
       expandedPanels: {
         parameters: false,
         equipment: false,
-        components: false,
+        components: true,
         materials: true,
         tooling: false,
         measuringTools: false
@@ -193,6 +195,79 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
           ...localData.changedValues,
           materialCode: localData.formValues.materialCode.map(material => 
             material.cnt === materialId ? { ...material, mass: value } : material
+          )
+        }
+      });
+    }
+  }, [localData, setLocalData, onUpdate]);
+
+  const handleComponentQuantityInputChange = useCallback((componentId) => (e) => {
+    const { value } = e.target;
+  
+    // Проверка на числовые значения
+    const numericRegex = /^[-]?\d+$/;
+    const isValid = !value || numericRegex.test(value);
+    const errorMessage = !isValid ? 'Это поле должно содержать только цифры' : null;
+  
+    setLocalData(prev => {
+      // Обновляем значения
+      const updatedComponents = prev.formValues.componentCode.map(component => 
+        component.cnt === componentId ? { ...component, quantity: value } : component
+      );
+      
+      // Создаем новый объект ошибок (НЕ МУТИРУЕМ существующий)
+      const newQuantityErrors = { 
+        ...prev.formErrors.components?.quantity
+      };
+      
+      // Устанавливаем ошибку для конкретного комплектующего
+      newQuantityErrors[componentId] = errorMessage;
+      
+      // Проверяем, есть ли вообще ошибки
+      const hasComponentErrors = Object.values(newQuantityErrors).some(error => error !== null);
+      
+      return {
+        ...prev,
+        formValues: {
+          ...prev.formValues,
+          componentCode: updatedComponents
+        },
+        formErrors: {
+          ...prev.formErrors,
+          components: hasComponentErrors ? { quantity: newQuantityErrors } : null,
+        },
+        changedValues: {
+          ...prev.changedValues,
+          componentCode: updatedComponents
+        }
+      };
+    });
+    
+    // Передача данных родителю
+    if (onUpdate) {
+      const newQuantityErrors = { 
+        ...localData.formErrors.components?.quantity
+      };
+      newQuantityErrors[componentId] = errorMessage;
+      
+      onUpdate({
+        ...localData,
+        formValues: {
+          ...localData.formValues,
+          componentCode: localData.formValues.componentCode.map(component => 
+            component.cnt === componentId ? { ...component, quantity: value } : component
+          )
+        },
+        formErrors: {
+          ...localData.formErrors,
+          components: localData.formErrors.components ? {
+            quantity: newQuantityErrors
+          } : null
+        },
+        changedValues: {
+          ...localData.changedValues,
+          componentCode: localData.formValues.componentCode.map(component => 
+            component.cnt === componentId ? { ...component, quantity: value } : component
           )
         }
       });
@@ -673,23 +748,99 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
           <Typography component="span">Комплектующие</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ padding: 2, overflow: 'auto'}}>
-          <form>
-            <Grid container spacing={2} columns={{xs:5}}>
+        <Grid container spacing={2} rowSpacing={4} columns={{xs:5}}>
             {/* Первая строка */}
-              <Grid item xs={12}>
-                <Grid container spacing={2}>
-                  <Grid item xs={4.8}>
-                    {/*<ComponentsSearch 
-                      id="components" 
-                      onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues.components}
-                      errorValue={localData.formErrors.components}
-                    />*/}
-                  </Grid>
+            <Grid item xs={5}>
+              <Grid container spacing={2}>
+                <Grid item xs={4.8}>
+                  <ComponentsSearch props={{id: "components-code-2", placeholder: "Код комплектующего"}}
+                    id="componentCode" 
+                    onOptionSelect={handleOptionSelect} 
+                    selectedValue={localData.formValues.componentCode}
+                    options={autocompleteOptions.components || null}
+                    onChange={handleOptionSelect}
+                    /*errorValue={localData.formErrors.materials}*/
+                    access={access}
+                  />
                 </Grid>
               </Grid>
             </Grid>
-          </form>              
+            
+            {/* Вторая строка */}
+            <Grid item xs={12} sx={{ '& > :not(:last-child)': { mb: 2 } }}>
+              {localData.formValues.componentCode?.map((item) => (
+                <>
+                  <Grid container spacing={2} key={`component-item-${item.cnt}`}>
+                    {/* Первый столбец */}
+                    <Grid item xs={2.4}>
+                      <TextField
+                        fullWidth
+                        name='componentCode'
+                        id={`component-code-${item.cnt}`}
+                        label="Код"
+                        placeholder='Код'
+                        variant="outlined"
+                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                        size='small'
+                        value={item.code}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: true }
+                        }}
+                      />                      
+                    </Grid>
+
+                    {/* Второй столбец */}
+                    <Grid item xs={7.2}>
+                      <TextField
+                        fullWidth
+                        name='componentName'
+                        id={`component-name-${item.cnt}`}
+                        label="Наименование"
+                        placeholder='Наименование'
+                        variant="outlined"
+                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                        size='small'
+                        value={item.name}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: true }
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Третий столбец */}
+                    <Grid item xs={2.4}>
+                      <TextField
+                        fullWidth
+                        name={`componentQuantity_${item.cnt}`}
+                        id={`component-quantity-${item.cnt}`}
+                        label="Количество"
+                        placeholder='Количество'
+                        type="text"
+                        size="small"
+                        onChange={handleComponentQuantityInputChange(item.cnt)}
+                        error={!!localData.formErrors?.components?.quantity?.[item.cnt]}
+                        helperText={localData.formErrors?.components?.quantity?.[item.cnt] || ''}
+                        value={item.quantity || ''}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: !access }
+                        }}
+                      >
+                      </TextField>
+                </Grid>
+                  </Grid>
+                </>                       
+              ))}                                   
+            </Grid>
+          </Grid>             
         </AccordionDetails>
       </Accordion>
 
@@ -715,7 +866,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
               <Grid container spacing={2}>
                 <Grid item xs={4.8}>
                   <MaterialsSearch props={{id: "materials-code-2", placeholder: "Код материала"}}
-                    id="materials" 
+                    id="materialCode"
                     onOptionSelect={handleOptionSelect} 
                     selectedValue={localData.formValues.materialCode}
                     options={autocompleteOptions.materials || null}
@@ -731,15 +882,15 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
             <Grid item xs={12} sx={{ '& > :not(:last-child)': { mb: 2 } }}>
               {localData.formValues.materialCode?.map((item) => (
                 <>
-                  <Grid container spacing={2} key={item.cnt}>
+                  <Grid container spacing={2} key={`material-item-${item.cnt}`}>
                     {/* Первый столбец */}
                     <Grid item xs={2.4}>
                       <TextField
                         fullWidth
                         name='materialCode'
-                        id={item.cnt-1}
-                        label="Код материала"
-                        placeholder='Код материала'
+                        id={`material-code-${item.cnt}`}
+                        label="Код"
+                        placeholder='Код'
                         variant="outlined"
                         sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                         size='small'
@@ -758,9 +909,9 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
                       <TextField
                         fullWidth
                         name='materialName'
-                        id={item.cnt-2}
-                        label="Наименование материала"
-                        placeholder='Наименование материала'
+                        id={`material-name-${item.cnt}`}
+                        label="Наименование"
+                        placeholder='Наименование'
                         variant="outlined"
                         sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                         size='small'
@@ -780,8 +931,8 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
                         fullWidth
                         name={`materialMass_${/*item.id ||*/ item.cnt}`}
                         id={`material-mass-${/*item.id ||*/ item.cnt}`}
-                        label="Масса материала"
-                        placeholder='Масса материала'
+                        label="Масса"
+                        placeholder='Масса'
                         type="text"
                         size="small"
                         onChange={handleMaterialMassInputChange(/*item.id ||*/ item.cnt)}

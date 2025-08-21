@@ -282,11 +282,6 @@ function Technologies({ showLoading }) {
       if (operationFormValues.toolingCode.length == 0) {
         operationErrors.toolingCode = autocompleteTextFieldMessage;
       }
-    }
-
-    //components
-    if (!operationFormValues.components) {
-      operationErrors.components = autocompleteTextFieldMessage;
     }*/
 
     //materialCode
@@ -324,10 +319,39 @@ function Technologies({ showLoading }) {
       }
     }
 
-    //materialMass
-    /*if (!operationFormValues.materialMass) {
-      operationErrors.materialMass = textFieldMessage;
-    }*/
+    //componentCode
+    if (operationFormValues.componentCode && Array.isArray(operationFormValues.componentCode) && operationFormValues.componentCode.length > 0) {
+      // Создаем объект ошибок с ID материалов
+      const quantityErrors = {};
+      let hasQuantityErrors = false;
+      
+      operationFormValues.componentCode.forEach(component => {
+        // Используем ID материала как ключ
+        const componentId = component.id || component.cnt;
+        
+        if (!component.quantity || component.quantity === '') {
+          quantityErrors[componentId] = 'Укажите количество';
+          hasQuantityErrors = true;
+        } else {
+          // Сохраняем существующую ошибку валидации, если она есть
+          const existingError = formErrors?.components?.quantity?.[componentId];
+          if (existingError) {
+            quantityErrors[componentId] = existingError;
+            hasQuantityErrors = true;
+          } else {
+            quantityErrors[componentId] = null;
+          }
+        }
+      });
+      
+      if (hasQuantityErrors) {
+        if (!operationErrors.components) {
+          operationErrors.components = { quantity: quantityErrors };
+        } else {
+          operationErrors.components.quantity = quantityErrors;
+        }
+      }
+    }
 
     //measuringTools
     /*if (!operationFormValues.measuringTools) {

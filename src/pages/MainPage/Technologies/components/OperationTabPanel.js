@@ -33,6 +33,7 @@ import { selectJobs, fetchData as jobsFetchData } from '../../../../store/slices
 import { selectEquipment, fetchData as equipmentFetchData } from '../../../../store/slices/lists/equipmentListSlice';
 import { selectTooling, fetchData as toolingFetchData } from '../../../../store/slices/lists/toolingListSlice';
 import { selectMaterials, fetchData as materialsFetchData } from '../../../../store/slices/lists/materialsListSlice';
+import { selectComponents, fetchData as componentsFetchData } from '../../../../store/slices/lists/componentsListSlice';
 
 function OperationTabPanel({ showLoading }) {
   const dispatch = useDispatch();
@@ -80,6 +81,11 @@ function OperationTabPanel({ showLoading }) {
   const materialsItems = materialsSelectors?.items;
   const materialsLoading = materialsSelectors?.loading;
 
+  //components
+  const componentsSelectors = useSelector(selectComponents);
+  const componentsItems = componentsSelectors?.items;
+  const componentsLoading = componentsSelectors?.loading;
+
   //события
   const handleOperationUpdate = useCallback(
     (newData) => {
@@ -107,6 +113,7 @@ function OperationTabPanel({ showLoading }) {
     dispatch(equipmentFetchData({ search: '', limit: 10, page: 1 }));
     dispatch(toolingFetchData({ search: '', limit: 10, page: 1 }));
     dispatch(materialsFetchData({ search: '', limit: 10, page: 1 }));
+    dispatch(componentsFetchData({ search: '', limit: 10, page: 1 }));
   }, [dispatch]);
 
   useEffect(() => {
@@ -114,7 +121,8 @@ function OperationTabPanel({ showLoading }) {
         !jobsLoading && jobsItems &&
         !equipmentLoading && equipmentItems &&
         !toolingLoading && toolingItems &&
-        !materialsLoading && materialsItems
+        !materialsLoading && materialsItems &&
+        !componentsLoading && componentsItems
       ) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
@@ -123,10 +131,11 @@ function OperationTabPanel({ showLoading }) {
         equipment: equipmentSelectors,
         tooling: toolingSelectors,
         materials: materialsSelectors,
+        components: componentsSelectors,
       }));
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
-  }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading, toolingItems, toolingLoading, materialsItems, materialsLoading]);
+  }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading, toolingItems, toolingLoading, materialsItems, materialsLoading, componentsItems, componentsLoading]);
 
   const findNodeById = (items, targetId) => {
     for (let item of items) {

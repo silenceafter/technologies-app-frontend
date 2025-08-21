@@ -115,7 +115,6 @@ const MaterialsSearch = React.memo(({ props, id, selectedValue, options, onChang
 
   return (
     <>
-    {console.log(selectedValue)}
       {access ? (        
         <Autocomplete
           fullWidth
@@ -175,7 +174,7 @@ const MaterialsSearch = React.memo(({ props, id, selectedValue, options, onChang
               required
               fullWidth
               name='materialCode6'
-              id={props.id}
+              id={`material-textfield-${props.id}`}
               /*error={!!errorValue}
               helperText={errorValue}*/
               placeholder={props.placeholder}
@@ -200,7 +199,7 @@ const MaterialsSearch = React.memo(({ props, id, selectedValue, options, onChang
         <TextField
           fullWidth
           name='materialCode6'
-          id={id}
+          id={`material-textfield-${id}`}
           label="Код материала"
           placeholder={props.placeholder}
           variant="outlined"

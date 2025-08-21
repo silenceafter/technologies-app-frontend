@@ -15,7 +15,7 @@ export const fetchData = createAsyncThunk(
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      const response = await fetch(`${baseUrl}/ivc/ogt/executescripts/getcomponents.v0.php?search=${search}&&limit=${limit}&page=${page}`); /* http://localhost/ivc/ogt/executescripts/getcomponents.v0.php?search=${search}&&limit=${limit}&page=${page} */
+      const response = await fetch(`${baseUrl}/ivc/ogt/executescripts/getcomponents.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -76,6 +76,7 @@ const componentsListSlice = createSlice({
 export const selectSearch = (state) => state.componentsList.search;
 export const selectLimit = (state) => state.componentsList.limit;
 export const selectPage = (state) => state.componentsList.page;
+export const selectComponents = (state) => state.componentsList;
 
 export const { setSearch, setLimit, setPage } = componentsListSlice.actions;
 export default componentsListSlice.reducer;
