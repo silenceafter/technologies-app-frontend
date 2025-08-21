@@ -385,12 +385,12 @@ const TechnologiesTree = () => {
     switch(action.name) {
       case 'delete':
         dispatch(deleteItems());
-        enqueueSnackbar(`Технология удалена`, { variant: 'info' });
+        enqueueSnackbar(`${checkedItems.length > 1 ? 'Пометки на удаление установлены' : 'Пометка на удаление установлена'}`, { variant: 'info' });
         break;
 
       case 'restore-all':
         dispatch(restoreItems());
-        enqueueSnackbar(`Технология восстановлена`, { variant: 'info' });
+        enqueueSnackbar(`${disabledItems.length > 1 ? 'Пометки на удаление сняты' : 'Пометка на удаление снята'}`, { variant: 'info' });
         break;
 
       case 'add-technology':
@@ -410,7 +410,7 @@ const TechnologiesTree = () => {
         }      
         break;
     }
-  }, [disabledItems, selectedId]);
+  }, [disabledItems, checkedItems, selectedId]);
 
   //контекстное меню
   const handleContextMenu = (event, nodeId) => {

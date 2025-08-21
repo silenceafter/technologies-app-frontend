@@ -15,7 +15,7 @@ export const fetchData = createAsyncThunk(
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      const response = await fetch(`${baseUrl}/ivc/ogt/executescripts/getmeasuringtools.v0.php?search=${search}&&limit=${limit}&page=${page}`); /* http://localhost/ivc/ogt/executescripts/getmeasuringtools.v0.php?search=${search}&&limit=${limit}&page=${page} */
+      const response = await fetch(`${baseUrl}/ivc/ogt/executescripts/getmeasuringtools.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -76,6 +76,7 @@ const measuringToolsListSlice = createSlice({
 export const selectSearch = (state) => state.measuringToolsList.search;
 export const selectLimit = (state) => state.measuringToolsList.limit;
 export const selectPage = (state) => state.measuringToolsList.page;
+export const selectMeasuringTools = (state) => state.measuringToolsList;
 
 export const { setSearch, setLimit, setPage } = measuringToolsListSlice.actions;
 export default measuringToolsListSlice.reducer;

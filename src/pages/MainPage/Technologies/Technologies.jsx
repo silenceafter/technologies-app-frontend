@@ -275,13 +275,6 @@ function Technologies({ showLoading }) {
       if (operationFormValues.equipmentCode.length == 0) {
         operationErrors.equipmentCode = autocompleteTextFieldMessage;
       }      
-    }
-
-    //toolingCode
-    if (operationFormValues.toolingCode) {
-      if (operationFormValues.toolingCode.length == 0) {
-        operationErrors.toolingCode = autocompleteTextFieldMessage;
-      }
     }*/
 
     //materialCode
@@ -352,11 +345,6 @@ function Technologies({ showLoading }) {
         }
       }
     }
-
-    //measuringTools
-    /*if (!operationFormValues.measuringTools) {
-      operationErrors.measuringTools = autocompleteTextFieldMessage;
-    }*/
     return { 
       isValid: Object.keys(technologyErrors).length === 0 && Object.keys(operationErrors).length === 0, 
       technologyErrors,

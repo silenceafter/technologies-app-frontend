@@ -34,6 +34,7 @@ import { selectEquipment, fetchData as equipmentFetchData } from '../../../../st
 import { selectTooling, fetchData as toolingFetchData } from '../../../../store/slices/lists/toolingListSlice';
 import { selectMaterials, fetchData as materialsFetchData } from '../../../../store/slices/lists/materialsListSlice';
 import { selectComponents, fetchData as componentsFetchData } from '../../../../store/slices/lists/componentsListSlice';
+import { selectMeasuringTools, fetchData as measuringToolsFetchData } from '../../../../store/slices/lists/measuringToolsListSlice';
 
 function OperationTabPanel({ showLoading }) {
   const dispatch = useDispatch();
@@ -86,6 +87,11 @@ function OperationTabPanel({ showLoading }) {
   const componentsItems = componentsSelectors?.items;
   const componentsLoading = componentsSelectors?.loading;
 
+  //measuringTools
+  const measuringToolsSelectors = useSelector(selectMeasuringTools);
+  const measuringToolsItems = measuringToolsSelectors?.items;
+  const measuringToolsLoading = measuringToolsSelectors?.loading;
+
   //события
   const handleOperationUpdate = useCallback(
     (newData) => {
@@ -114,6 +120,7 @@ function OperationTabPanel({ showLoading }) {
     dispatch(toolingFetchData({ search: '', limit: 10, page: 1 }));
     dispatch(materialsFetchData({ search: '', limit: 10, page: 1 }));
     dispatch(componentsFetchData({ search: '', limit: 10, page: 1 }));
+    dispatch(measuringToolsFetchData({ search: '', limit: 10, page: 1 }));
   }, [dispatch]);
 
   useEffect(() => {
@@ -122,7 +129,8 @@ function OperationTabPanel({ showLoading }) {
         !equipmentLoading && equipmentItems &&
         !toolingLoading && toolingItems &&
         !materialsLoading && materialsItems &&
-        !componentsLoading && componentsItems
+        !componentsLoading && componentsItems &&
+        !measuringToolsLoading && measuringToolsItems
       ) {
       setAutocompleteOptions(prevState => ({
         ...prevState,
@@ -132,10 +140,11 @@ function OperationTabPanel({ showLoading }) {
         tooling: toolingSelectors,
         materials: materialsSelectors,
         components: componentsSelectors,
+        measuringTools: measuringToolsSelectors,
       }));
       setIsAutocompleteLoaded(true); //загрузка items завершена
     }
-  }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading, toolingItems, toolingLoading, materialsItems, materialsLoading, componentsItems, componentsLoading]);
+  }, [operationsItems, operationsLoading, jobsItems, jobsLoading, equipmentItems, equipmentLoading, toolingItems, toolingLoading, materialsItems, materialsLoading, componentsItems, componentsLoading, measuringToolsItems, measuringToolsLoading]);
 
   const findNodeById = (items, targetId) => {
     for (let item of items) {

@@ -9,7 +9,7 @@ const initialState = {
   selectedId: null,
   hasUnsavedChanges: false,
   hasAccess: false,
-  expandedPanelsDefault: { parameters: true, equipment: false, components: true, materials: true, tooling: false, measuringTools: false },
+  expandedPanelsDefault: { parameters: true, equipment: false, components: true, materials: true, tooling: true, measuringTools: false },
   getSavedDataLoading: false,
   getSavedDataError: null,
   setDataLoading: false,
@@ -394,6 +394,22 @@ const technologiesSlice = createSlice({
       if (newContent.changedValues.hasOwnProperty('componentCode')) {
         if (newContent.changedValues.componentCode) {
           componentCode = newContent.changedValues.componentCode;
+        }
+      }
+
+      //toolingCode
+      let toolingCode = null;
+      if (newContent.changedValues.hasOwnProperty('toolingCode')) {
+        if (newContent.changedValues.toolingCode) {
+          toolingCode = newContent.changedValues.toolingCode;
+        }
+      }
+
+      //measuringToolsCode
+      let measuringToolsCode = null;
+      if (newContent.changedValues.hasOwnProperty('measuringToolsCode')) {
+        if (newContent.changedValues.measuringToolsCode) {
+          measuringToolsCode = newContent.changedValues.measuringToolsCode;
         }
       }
 

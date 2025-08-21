@@ -5,6 +5,8 @@ import { JobsSearch } from './search/JobsSearch';
 import { EquipmentSearch } from './search/EquipmentSearch';
 import { MaterialsSearch } from './search/MaterialsSearch';
 import { ComponentsSearch } from './search/ComponentsSearch';
+import { ToolingSearch } from './search/ToolingSearch';
+import { MeasuringToolsSearch } from './search/MeasuringToolsSearch';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -28,9 +30,10 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
         laborEffort: '', 
         jobCode: { code: '', name: '' }, 
         equipmentCode: { code: '', name: '' }, 
-        toolingCode: { code: '', name: '' },
+        toolingCode: [],
         materialCode: [],
         componentCode: [],
+        measuringToolsCode: [],
       },
       formErrors: {}, 
       changedValues: {},
@@ -39,8 +42,8 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
         equipment: false,
         components: true,
         materials: true,
-        tooling: false,
-        measuringTools: false
+        tooling: true,
+        measuringTools: true
       },             
     });
 
@@ -712,23 +715,75 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
           <Typography component="span">Оснастка</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ padding: 2, overflow: 'auto'}}>
-          <form>
-            <Grid container spacing={2} columns={{xs:5}}>
+        <Grid container spacing={2} rowSpacing={4} columns={{xs:5}}>
             {/* Первая строка */}
-              <Grid item xs={12}>
-                <Grid container spacing={2}>
-                  <Grid item xs={4.8}>
-                    {/*<ToolingSearch
-                      id="tooling" 
-                      onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues.tooling}
-                      errorValue={localData.formErrors.tooling}
-                    />*/}
-                  </Grid>
+            <Grid item xs={5}>
+              <Grid container spacing={2}>
+                <Grid item xs={4.8}>
+                  <ToolingSearch props={{id: "tooling-code-2", placeholder: "Код оснастки"}}
+                    id="toolingCode"
+                    onOptionSelect={handleOptionSelect} 
+                    selectedValue={localData.formValues.toolingCode}
+                    options={autocompleteOptions.tooling || null}
+                    onChange={handleOptionSelect}
+                    /*errorValue={localData.formErrors.materials}*/
+                    access={access}
+                  />
                 </Grid>
               </Grid>
-            </Grid>                      
-          </form>              
+            </Grid>
+            
+            {/* Вторая строка */}
+            <Grid item xs={12} sx={{ '& > :not(:last-child)': { mb: 2 } }}>
+              {localData.formValues.toolingCode?.map((item) => (
+                <>
+                  <Grid container spacing={2} key={`tooling-item-${item.cnt}`}>
+                    {/* Первый столбец */}
+                    <Grid item xs={2.4}>
+                      <TextField
+                        fullWidth
+                        name='toolingCode'
+                        id={`tooling-code-${item.cnt}`}
+                        label="Код"
+                        placeholder='Код'
+                        variant="outlined"
+                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                        size='small'
+                        value={item.code}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: true }
+                        }}
+                      />                      
+                    </Grid>
+
+                    {/* Второй столбец */}
+                    <Grid item xs={7.2}>
+                      <TextField
+                        fullWidth
+                        name='toolingName'
+                        id={`tooling-name-${item.cnt}`}
+                        label="Наименование"
+                        placeholder='Наименование'
+                        variant="outlined"
+                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                        size='small'
+                        value={item.name}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: true }
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </>                       
+              ))}                                   
+            </Grid>
+          </Grid>
         </AccordionDetails>
       </Accordion>
 
@@ -972,23 +1027,75 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
           <Typography component="span">Измерительный инструмент</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ padding: 2, overflow: 'auto'}}>           
-          <form>
-            <Grid container spacing={2} columns={{xs:5}}>
+        <Grid container spacing={2} rowSpacing={4} columns={{xs:5}}>
             {/* Первая строка */}
-              <Grid item xs={12}>
-                <Grid container spacing={2}>
-                  <Grid item xs={4.8}>
-                    {/*<MeasuringToolsSearch
-                      id="measuringTools"
-                      onOptionSelect={handleOptionSelect} 
-                      selectedValue={localData.formValues.measuringTools}
-                      errorValue={localData.formErrors.measuringTools}
-                    />*/}
-                  </Grid>
+            <Grid item xs={5}>
+              <Grid container spacing={2}>
+                <Grid item xs={4.8}>
+                  <MeasuringToolsSearch props={{id: "measuring-tools-code-2", placeholder: "Код инструмента"}}
+                    id="measuringToolsCode"
+                    onOptionSelect={handleOptionSelect} 
+                    selectedValue={localData.formValues.measuringToolsCode}
+                    options={autocompleteOptions.measuringTools || null}
+                    onChange={handleOptionSelect}
+                    /*errorValue={localData.formErrors.materials}*/
+                    access={access}
+                  />
                 </Grid>
               </Grid>
             </Grid>
-          </form>
+            
+            {/* Вторая строка */}
+            <Grid item xs={12} sx={{ '& > :not(:last-child)': { mb: 2 } }}>
+              {localData.formValues.measuringToolsCode?.map((item) => (
+                <>
+                  <Grid container spacing={2} key={`measuring-tools-item-${item.cnt}`}>
+                    {/* Первый столбец */}
+                    <Grid item xs={2.4}>
+                      <TextField
+                        fullWidth
+                        name='measuringToolsCode'
+                        id={`measuring-tools-code-${item.cnt}`}
+                        label="Код"
+                        placeholder='Код'
+                        variant="outlined"
+                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                        size='small'
+                        value={item.code}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: true }
+                        }}
+                      />                      
+                    </Grid>
+
+                    {/* Второй столбец */}
+                    <Grid item xs={7.2}>
+                      <TextField
+                        fullWidth
+                        name='measuringToolsName'
+                        id={`measuring-tools-name-${item.cnt}`}
+                        label="Наименование"
+                        placeholder='Наименование'
+                        variant="outlined"
+                        sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                        size='small'
+                        value={item.name}
+                        slotProps={{
+                          formHelperText: {
+                            sx: { whiteSpace: 'nowrap' },
+                          },
+                          input: { readOnly: true }
+                        }}
+                      />
+                    </Grid>                   
+                  </Grid>
+                </>                       
+              ))}                                   
+            </Grid>
+          </Grid>
         </AccordionDetails>
       </Accordion>
     </>
