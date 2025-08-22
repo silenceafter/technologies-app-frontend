@@ -23,6 +23,7 @@ function App() {
           <Route exact path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<MainPage page="dashboard" />} />
             <Route path="/technologies" element={<MainPage page="technologies" />} />
+            <Route path="/admin/accounts" element={<MainPage page="admin/accounts" />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/crud" element={<CrudPage />} />
             <Route path="/access-denied" element={<AccessDenied />} />

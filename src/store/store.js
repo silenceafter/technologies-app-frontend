@@ -10,7 +10,6 @@ import measuringToolsListReducer from './slices/lists/measuringToolsListSlice';
 import toolingListReducer from './slices/lists/toolingListSlice';
 import componentsListReducer from './slices/lists/componentsListSlice';
 import materialsListReducer from './slices/lists/materialsListSlice';
-import productsListReducer from './slices/lists/productsListSlice';
 import technologiesListReducer from './slices/lists/technologiesListSlice';
 import equipmentListReducer from './slices/lists/equipmentListSlice';
 import drawingsReducer from './slices/drawingsSlice';
@@ -19,6 +18,7 @@ import technologiesReducer from './slices/technologiesSlice';
 import unsavedChangesReducer from './slices/unsavedChangesSlice';
 import technologiesPrefixReducer from './slices/technologiesPrefixSlice';
 import dashboardReducer from './slices/dashboardSlice';
+import productsReducer from './slices/productsSlice';
 
 //корневой редьюсер
 const rootReducer = combineReducers({  
@@ -28,10 +28,10 @@ const rootReducer = combineReducers({
   toolingList: toolingListReducer /* оснастка */,
   componentsList: componentsListReducer,
   materialsList: materialsListReducer,
-  productsList: productsListReducer,
   equipmentList: equipmentListReducer,
   unsavedChanges: unsavedChangesReducer,
   drawings: drawingsReducer,
+  products: productsReducer,
   technologies: technologiesReducer,
   technologiesPrefix: technologiesPrefixReducer,
   users: usersReducer, /* храним обязательно */  
@@ -42,8 +42,8 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['users', 'dashboard', 'drawings'],
-  blacklist: ['technologies', 'technologiesPrefix'],
+  whitelist: ['users', 'dashboard' ],
+  blacklist: ['technologies', 'technologiesPrefix', 'products', 'drawings' ],
   /*stateReconciler: autoMergeLevel2,*/
 };
 

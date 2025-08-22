@@ -5,6 +5,7 @@ import { resetDrawings } from '../store/slices/drawingsSlice';
 import { resetTechnologiesPrefix } from '../store/slices/technologiesPrefixSlice';
 import { resetTechnologies } from '../store/slices/technologiesSlice';
 import { resetUnsavedChanges } from '../store/slices/unsavedChangesSlice';
+import { resetProducts } from '../store/slices/productsSlice';
 
 export const useResetStates = () => {
   const dispatch = useDispatch();
@@ -15,5 +16,6 @@ export const useResetStates = () => {
     dispatch(resetTechnologiesPrefix());
     dispatch(resetTechnologies());
     dispatch(resetUnsavedChanges());
+    dispatch(resetProducts());
   };
 };

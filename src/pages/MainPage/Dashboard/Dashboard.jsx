@@ -170,7 +170,7 @@ function Dashboard() {
                       </Typography>                       
                       <BarChart
                         width={600}
-                        height={370}
+                        height={350}
                         data={
                           technologiesCreatedByUserLastMonthActions 
                             ? technologiesCreatedByUserLastMonthActions 

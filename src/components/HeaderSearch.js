@@ -15,7 +15,6 @@ import {
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData as drawingsFetchData, setSearch, setPage, setDrawing } from '../store/slices/drawingsSlice';
-import { fetchData as productsFetchData, setItems as productsSetItems } from '../store/slices/lists/productsListSlice';
 import { debounce } from 'lodash';
 
 function HeaderSearch({onReset}) {

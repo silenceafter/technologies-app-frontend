@@ -22,6 +22,7 @@ import { getTechnologiesCreatedByUser } from '../../store/slices/dashboardSlice'
 import { tableCellClasses } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Rectangle } from 'recharts';
 import { Dashboard } from './Dashboard/Dashboard';
+import { Accounts } from './Admin/Accounts/Accounts';
 
 function Copyright() {
   return (
@@ -150,6 +151,9 @@ function MainPage({ page }) {
       break;
     case 'technologies':
       content = <Technologies showLoading={showLoading} />;
+      break;
+    case 'admin/accounts':
+      content = <Accounts />;
       break;
     default:
       content = <Dashboard />;

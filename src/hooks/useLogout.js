@@ -6,6 +6,7 @@ import { resetTechnologiesPrefix } from '../store/slices/technologiesPrefixSlice
 import { resetTechnologies } from '../store/slices/technologiesSlice';
 import { resetUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 import { resetUsers } from '../store/slices/usersSlice';
+import { resetProducts } from '../store/slices/productsSlice';
 
 export const useLogout = () => {
   const dispatch = useDispatch();
@@ -17,5 +18,6 @@ export const useLogout = () => {
     dispatch(resetTechnologies());
     dispatch(resetUnsavedChanges());
     dispatch(resetUsers());
+    dispatch(resetProducts());
   };
 };

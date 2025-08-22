@@ -21,6 +21,14 @@ export const useAccessActions = ({ user, currentTechnology }) => {
     // Если нет пользователя — не показываем ничего
     if (!user) return [];
 
+    // Если нет текущей технологии, разрешаем только добавление технологии
+    if (!currentTechnology) {
+      return ALL_ACTIONS.filter(action => 
+        action.name === 'add-technology' && 
+        action.roles.includes(user.role)
+      );
+    }
+
     // Проверка роли
     const isTaskUser = user.role === 'task_user';
     const hasAccessToTech = Boolean(currentTechnology?.hasAccess);

@@ -377,20 +377,15 @@ function Technologies({ showLoading }) {
           >
             <Typography component="span">Список технологий</Typography>
           </AccordionSummary>
-          <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '525px', color: 'black', marginLeft: 2, marginTop: 2, /*border: '1px solid rgba(0, 0, 0, 0.12)'*/ }}>
-            <Box sx={{ height: '100%', /*, display: 'flex', flexDirection: 'column', gap: 2*/ }}>
+          <AccordionDetails sx={{ padding: 0, overflow: 'auto', minHeight: '360px', maxHeight: '525px', color: 'black', marginLeft: 2, marginTop: 2, paddingBottom: 0, /*border: '1px solid rgba(0, 0, 0, 0.12)'*/ }}>
+            <Box sx={{ height: '100%', minHeight: '360px', display: 'flex', flexDirection: 'column' }}>
               <TechnologiesTree />
             </Box>              
-          </AccordionDetails>
-          <AccordionActions>
-            {/*<Button
-              sx={{ backgroundColor: 'primary.main', color: 'white' }}>
-                Добавить технологию
-            </Button>*/}
-          </AccordionActions>
+          </AccordionDetails>          
         </Accordion>
-        <Accordion /*defaultExpanded*/ 
-          expanded={false}
+
+        <Accordion defaultExpanded
+          expanded={accordionProductsTreeExpanded}
           onChange={handleAccordeonProductsTreeChange}
           elevation={3} 
           sx={{ bgcolor: 'white', color: 'white', width: '100%', overflow: 'hidden', flexShrink: 0 }}
@@ -403,13 +398,14 @@ function Technologies({ showLoading }) {
           >
             <Typography component="span">Изделия</Typography>
           </AccordionSummary>
-          <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px' }}>
+          <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px', color: 'black', marginLeft: 2, marginTop: 2, }}>
             <Box sx={{ height: 'auto' }}>
-              {/*<ProductsTree />*/}
+              {<ProductsTree />}
             </Box>
           </AccordionDetails>          
         </Accordion>
       </Box>
+
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -458,6 +454,7 @@ function Technologies({ showLoading }) {
               <TechnologyTabPanel showLoading={showLoading} isAutocompleteLoaded={isAutocompleteLoaded} />
             </AccordionDetails>        
           </Accordion>
+
           <Accordion defaultExpanded
             expanded={accordionOperationTabPanelExpanded}
             onChange={handleAccordeonOperationTabPanelChange}
@@ -481,6 +478,7 @@ function Technologies({ showLoading }) {
             </AccordionDetails>
           </Accordion>
         </Box>
+        
         {<Box sx={{ paddingTop: 2, }}>
           <ButtonGroupPanel handleSave={handleSave} loading={showLoading} isDisabled={!drawing} />
         </Box>}

@@ -9,7 +9,7 @@ const initialState = {
   selectedId: null,
   hasUnsavedChanges: false,
   hasAccess: false,
-  expandedPanelsDefault: { parameters: true, equipment: false, components: true, materials: true, tooling: true, measuringTools: false },
+  expandedPanelsDefault: { parameters: true, equipment: false, components: true, materials: true, tooling: true, measuringTools: true },
   getSavedDataLoading: false,
   getSavedDataError: null,
   setDataLoading: false,

@@ -1,19 +1,13 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
-  Box, 
-  Button, 
-  Chip,
+  Box,
   Checkbox,
-  CircularProgress, 
-  IconButton, 
-  Menu, 
-  MenuItem, 
+  CircularProgress,  
   SpeedDial, 
   SpeedDialIcon, 
   SpeedDialAction, 
-  Stack, 
-  TextField, 
+  Stack,
   Typography 
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
@@ -35,15 +29,6 @@ import {
   setAccess,
   copyItems, clearError,
 } from '../../../../store/slices/technologiesSlice';
-import AdjustIcon from '@mui/icons-material/Adjust';
-import CheckIcon from '@mui/icons-material/Check';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
-import RestoreIcon from '@mui/icons-material/Restore';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAccessActions } from '../../../../hooks/useAccessActions';
 import { useSnackbar } from 'notistack';
@@ -479,7 +464,7 @@ const TechnologiesTree = () => {
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right', width: '100%' }}>
                     <SpeedDial
                       ariaLabel="SpeedDial basic example"
-                      sx={{ height: 'auto', position: 'absolute', bottom: 15, right: 15, /*transform: 'scale(0.85)',*/ '& .MuiFab-primary': { width: 45, height: 45 } }}
+                      sx={{ height: 'auto', position: 'absolute', bottom: 16, right: 15, /*transform: 'scale(0.85)',*/ '& .MuiFab-primary': { width: 45, height: 45 } }}
                       icon={<SpeedDialIcon />}
                       hidden={items && items.length > 0 ? false : true}
                     >
@@ -515,12 +500,59 @@ const TechnologiesTree = () => {
         </>
         ) : (
         <>
-          <Box
-            sx={{ display: 'flex', flexDirection: 'row', gap: 2}}
-          >
+          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
             <WarningIcon color='warning' />
             <Typography>Нет записей</Typography>
           </Box>
+
+          <Box 
+            sx={{ 
+              position: 'relative',
+              height: '100%',
+              minHeight: '360px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end', 
+            }}
+          >
+            {drawing?.externalcode && (
+              <Stack 
+                direction="row" 
+                spacing={1} 
+                sx={{ 
+                  padding: 2, 
+                  paddingBottom: 1.8, 
+                  display: 'flex', 
+                  flexDirection: 'row', 
+                  justifyContent: 'flex-end',
+                  width: '100%',
+                  bgcolor: 'transparent'
+                }}
+              >
+                <SpeedDial
+                  ariaLabel="SpeedDial"
+                  sx={{
+                    position: 'relative',
+                    '& .MuiFab-primary': { width: 45, height: 45 },
+                    // Динамический нижний отступ для развернутого меню
+                    mb: `${Math.min(actions.filter(a => a).length * 56 + 20, 300)}px`
+                  }}
+                  icon={<SpeedDialIcon />}
+                >
+                  {actions
+                    .filter(action => action && action.icon && action.title)
+                    .map((action) => 
+                      <SpeedDialAction
+                        key={action.name}
+                        icon={action.icon}
+                        tooltipTitle={action.title}
+                        onClick={() => handleSpeedDialActionClick(action)}
+                      />
+                  )}
+                </SpeedDial>
+              </Stack>
+            )}
+          </Box>    
         </>
       )}
     </>
