@@ -52,7 +52,7 @@ const TechnologiesTree = () => {
 
   //селекторы
   const items = useSelector((state) => state.technologies.items);
-  //const loading = useSelector((state) => state.technologies.getSavedDataLoading);
+  const loading = useSelector((state) => state.technologies.getSavedDataLoading);
   const error = useSelector((state) => state.technologies.getSavedDataError);
   const drawing = useSelector((state) => state.drawings.drawing);//значение строки поиска (чертежей)
   const { /*selectedItems,*/ disabledItems, checkedItems, selectedId, hasUnsavedChanges } = useSelector((state) => state.technologies);
@@ -428,9 +428,20 @@ const TechnologiesTree = () => {
   };
   
   //вывод
-  if (loadingTimer) {
+  if (loading) { /* loadingTimer */
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          py: 5, 
+          position: 'absolute', 
+          zIndex: '1000', 
+          top: "50%", 
+          left: "50%", 
+          transform: "translate(-50%, -50%)", 
+        }}
+      >
         <CircularProgress size={40} />
       </Box>
     );

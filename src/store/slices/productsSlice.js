@@ -5,7 +5,7 @@ const initialState = {
   loading: false,
   error: null,
   hasMore: true,
-  limit: 50,
+  limit: 10,
   page: 1,
   search: '',
 };
