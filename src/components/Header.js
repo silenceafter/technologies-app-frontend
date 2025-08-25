@@ -101,11 +101,11 @@ function Header(props) {
               </IconButton>
             </Grid>
             <Grid item xs />
-            <Grid item>
+            {/*<Grid item>
               <Link href="/" variant="body2" sx={{ textDecoration: 'none', color: lightColor }}>
                 Go to docs
               </Link>
-            </Grid>
+            </Grid>*/}
             <Grid item>
               <Tooltip title="Уведомления • Нет уведомлений">
                 <IconButton color="inherit">
@@ -201,7 +201,7 @@ function Header(props) {
                 Технологии
               </Typography>
             </Grid>
-            <Grid item>
+            {/*<Grid item>
               <Button sx={{ borderColor: lightColor }} variant="outlined" color="inherit" size="small">
                 Web setup
               </Button>
@@ -212,7 +212,7 @@ function Header(props) {
                   <HelpIcon />
                 </IconButton>
               </Tooltip>
-            </Grid>
+            </Grid>*/}
           </Grid>
         </Toolbar>
       </AppBar>

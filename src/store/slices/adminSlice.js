@@ -9,15 +9,11 @@ const initialState = {
 
 export const getAddedUsers = createAsyncThunk(
   'addedUsers',
-  async ({}, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
         const baseUrl = process.env.REACT_APP_API_BASE_URL;
-        //
         const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/GetAddedUsers.v0.php`, {
           method: 'GET',
-          /*headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },*/
           credentials: 'include'
         });
         //
@@ -32,11 +28,11 @@ export const getAddedUsers = createAsyncThunk(
   }
 );
 
-const adminsSlice = createSlice({
-  name: 'adminsSlice',
+const adminSlice = createSlice({
+  name: 'adminSlice',
   initialState,
   reducers: {
-    resetAdmins: () => initialState,
+    resetAdmin: () => initialState,
   },
   extraReducers: (builder) => {
     //getAddedUsers
@@ -45,16 +41,16 @@ const adminsSlice = createSlice({
       state.addedUsersError = null;
     });
     builder.addCase(getAddedUsers.fulfilled, (state, action) => {      
-      state.addedUsersItems = action.payload.AddedUser;
+      state.addedUsersItems = action.payload.data;
       state.addedUsersError = null;
       state.addedUsersLoading = false;
     });
     builder.addCase(getAddedUsers.rejected, (state, action) => {
       state.addedUsersLoading = false;
-      state.addedUsersError = action.payload.errorMessage;
+      state.addedUsersError = action.payload.message;
     });
   },
 });
 
-export const { resetAdmins } = adminsSlice.actions;
-export default adminsSlice.reducer;
+export const { resetAdmin } = adminSlice.actions;
+export default adminSlice.reducer;

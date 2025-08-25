@@ -7,6 +7,7 @@ import { resetTechnologies } from '../store/slices/technologiesSlice';
 import { resetUnsavedChanges } from '../store/slices/unsavedChangesSlice';
 import { resetUsers } from '../store/slices/usersSlice';
 import { resetProducts } from '../store/slices/productsSlice';
+import { resetAdmin } from '../store/slices/adminSlice';
 
 export const useLogout = () => {
   const dispatch = useDispatch();
@@ -19,5 +20,6 @@ export const useLogout = () => {
     dispatch(resetUnsavedChanges());
     dispatch(resetUsers());
     dispatch(resetProducts());
+    dispatch(resetAdmin());
   };
 };

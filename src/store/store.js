@@ -19,6 +19,7 @@ import unsavedChangesReducer from './slices/unsavedChangesSlice';
 import technologiesPrefixReducer from './slices/technologiesPrefixSlice';
 import dashboardReducer from './slices/dashboardSlice';
 import productsReducer from './slices/productsSlice';
+import adminReducer from './slices/adminSlice';
 
 //корневой редьюсер
 const rootReducer = combineReducers({  
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   technologiesPrefix: technologiesPrefixReducer,
   users: usersReducer, /* храним обязательно */  
   dashboard: dashboardReducer,
+  admin: adminReducer,
 });
 
 //конфигурация persist

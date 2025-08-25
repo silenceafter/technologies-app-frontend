@@ -79,17 +79,17 @@ export default function Navigator(props) {
   //const { safeResetAndExecute, ConfirmationDialog } = useSafeReset();
 
   //события
-  /*const handleSafeNavigation = (route) => async () => {
-    const confirmed = await safeResetAndExecute({
+  const handleSafeNavigation = (route) => async () => {
+    /*const confirmed = await safeResetAndExecute({
       title: 'Есть несохранённые изменения!',
       message: 'Вы хотите покинуть страницу? Все несохранённые изменения будут потеряны.'
-    });
+    });*/
 
     //переход
-    if (confirmed) {
+    //if (confirmed) {
       navigate(route);
-    }
-  };*/
+    //}
+  };
 
   // Определяем, является ли текущая страница главной
   const isMainPageActive = location.pathname === '/dashboard';
@@ -106,7 +106,7 @@ export default function Navigator(props) {
           <ListItemButton 
             selected={isMainPageActive}
             sx={item} 
-            /*onClick={handleSafeNavigation('/')}*/
+            onClick={handleSafeNavigation('/dashboard')}
           >
             <ListItemIcon>
               <DashboardIcon />
@@ -129,7 +129,7 @@ export default function Navigator(props) {
                   <ListItemButton 
                     selected={isActive} 
                     sx={item} 
-                    /*onClick={handleSafeNavigation(route)}*/
+                    onClick={handleSafeNavigation(route)}
                   >
                     <ListItemIcon>{icon}</ListItemIcon>
                     <ListItemText>{childId}</ListItemText>
