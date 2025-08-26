@@ -718,6 +718,7 @@ const technologiesSlice = createSlice({
     builder.addCase(getSavedData.pending, (state) => {
       state.getSavedDataLoading = true;
       state.getSavedDataError = null;
+      state.items = []; //?
     });
     builder.addCase(getSavedData.fulfilled, (state, action) => {
       state.getSavedDataLoading = false;        

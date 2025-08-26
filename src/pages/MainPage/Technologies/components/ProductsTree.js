@@ -285,6 +285,26 @@ export default function ProductsTree() {
     ),
     [itemRef]  
   );
+
+  //вывод
+  if (loading) {
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          py: 5, 
+          position: 'absolute', 
+          zIndex: '1000', 
+          top: "50%", 
+          left: "50%", 
+          transform: "translate(-50%, -50%)", 
+        }}
+      >
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
   //
   return (
     <>
