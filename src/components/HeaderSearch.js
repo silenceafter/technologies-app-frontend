@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData as drawingsFetchData, setSearch, setPage, setDrawing } from '../store/slices/drawingsSlice';
-//import { debounce } from 'lodash';
+import { debounce } from 'lodash';
 
 function HeaderSearch({onReset}) {
   const navigate = useNavigate();
