@@ -19,7 +19,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
       formValues: { 
         orderNumber: 0,
         operationCode: { code: '', name: '' }, 
-        shopNumber: '', 
+        shopNumber: 0, /* '' */
         areaNumber: null, 
         document: null, 
         operationDescription: null,
@@ -27,7 +27,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
         workingConditions: 0, 
         numberOfWorkers: 0, 
         numberOfProcessedParts: 0, 
-        laborEffort: '', 
+        laborEffort: 0.0, /* '' */ 
         jobCode: { code: '', name: '' }, 
         equipmentCode: { code: '', name: '' }, 
         toolingCode: [],
@@ -365,7 +365,7 @@ const OperationCard = React.memo(({content, onUpdate, autocompleteOptions, acces
   //
   return (
     <>
-    {console.log(content)}
+    {/*console.log(content)*/}
       {/* Параметры */}
       <Accordion defaultExpanded
         expanded={localData.expandedPanels['parameters'] || false}

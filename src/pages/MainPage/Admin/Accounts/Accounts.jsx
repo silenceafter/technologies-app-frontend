@@ -97,7 +97,7 @@ function Accounts() {
   
   return (    
       <>
-      {console.log(addedUsersItems)}
+      {/*console.log(addedUsersItems)*/}
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
             <Typography variant='h6'>Пользователи</Typography>
             <TableContainer component={Paper}>

@@ -355,7 +355,7 @@ function Technologies({ showLoading }) {
   //вывод
   return (
     <>
-    {console.log(operationFormValues)}
+    {/*console.log(operationFormValues)*/}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',

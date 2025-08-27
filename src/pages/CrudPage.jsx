@@ -78,7 +78,7 @@ function CrudPage() {
   //main
   return (
       <>
-      {console.log(drawing)}      
+      {/*console.log(drawing)*/}      
       <ThemeProvider theme={theme}>
         <Box sx={{ display: 'flex', minHeight: '100vh' }}>
           {!user ? (

@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchData as drawingsFetchData, setSearch, setPage, setDrawing } from '../store/slices/drawingsSlice';
-import { debounce } from 'lodash';
+//import { debounce } from 'lodash';
 
 function HeaderSearch({onReset}) {
   const navigate = useNavigate();
@@ -42,9 +42,9 @@ function HeaderSearch({onReset}) {
   const memoizedItems = useMemo(() => items, [items]);
   const listRef = useRef(null);
 
-  const debouncedFetchData = debounce(() => {
+  /*const debouncedFetchData = debounce(() => {
     dispatch(drawingsFetchData({ search: inputValue, limit, page: 1 }));
-  }, 500); //задержка в 500 мс
+  }, 100);*/ //задержка в 500 мс
 
   //хуки
   //эффекты
@@ -59,9 +59,9 @@ function HeaderSearch({onReset}) {
     //поиск при изменении значения в поле ввода
     if (inputValue !== search) {
       dispatch(setSearch(inputValue));
-      debouncedFetchData();
+      dispatch(drawingsFetchData({ search: inputValue, limit, page: 1 })); //debouncedFetchData();
     }
-  }, [inputValue, search, debouncedFetchData, dispatch]);
+  }, [inputValue, search, /*debouncedFetchData,*/ inputValue, limit, page, dispatch]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -85,6 +85,7 @@ function HeaderSearch({onReset}) {
     //обновить выбранное значение в redux
     if (value) {
       //установить значение в redux
+      console.log(value);
       dispatch(setDrawing(value));
       navigate('/technologies');
     } else {
@@ -102,7 +103,7 @@ function HeaderSearch({onReset}) {
   //
   return (
     <>
-    {/*console.log(limit)*/}
+    {/*console.log(value)*/}
       <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0, paddingBottom: '0.5rem' }}>
         <Toolbar>
           <Grid container spacing={0} sx={{ alignItems: 'center' }}>
