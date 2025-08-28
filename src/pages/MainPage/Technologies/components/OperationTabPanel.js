@@ -114,7 +114,7 @@ function OperationTabPanel({ showLoading }) {
   }, [drawing]);
 
   useEffect(() => {
-    dispatch(operationsFetchData({ search: '', limit: 50, page: 1 })); /* 350 записей */
+    dispatch(operationsFetchData({ search: '', limit: 10, page: 1 })); /* 350 записей */
     dispatch(jobsFetchData({ search: '', limit: 500, page: 1 })); /* 100 записей = загружаем полностью */
     dispatch(equipmentFetchData({ search: '', limit: 10, page: 1 })); /* 1500 записей */
     dispatch(toolingFetchData({ search: '', limit: 10, page: 1 })); /* 16000 записей */

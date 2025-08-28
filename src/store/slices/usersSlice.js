@@ -56,7 +56,7 @@ export const authenticate = createAsyncThunk(
 //авторизация
 export const signIn = createAsyncThunk(
   'users/signIn',
-  async ({ login, password }, { getState, rejectWithValue }) => {
+  async ({ login, password, remember }, { getState, rejectWithValue }) => {
     try {
         const state = getState();
         const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -65,6 +65,7 @@ export const signIn = createAsyncThunk(
         const formData = new URLSearchParams();
         formData.append('login', login);
         formData.append('password', password);
+        formData.append('remember', remember);
 
         //запрос
         const response = await fetch(`${baseUrl}/Ivc/Ogt/index.php`, {

@@ -23,6 +23,7 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
+    const [remember, setRemember] = useState(false);
     //
     const [notification, setNotification] = useState({ severity: null, message: '' });
     const [errors, setErrors] = useState({});
@@ -34,19 +35,7 @@ const LoginPage = () => {
     //const error = null;//useSelector(selectError);
     const userError = useSelector((state) => state.users.error);
 
-    /*useEffect(() => {
-    if (userError) {
-      try {
-        // Предположим, вы хотите парсить ошибку как JSON
-        const parsedError = JSON.parse(userError);
-        console.log('Parsed error:', parsedError);
-      } catch (e) {
-        // Если это не JSON — обрабатываем как обычную строку
-        console.warn('Ошибка не является JSON:', userError);
-      }
-    }
-  }, [userError]);*/
-
+    //эффекты
     useEffect(() => {
         if (userErrorLoading) {
             if (userError == '') {
@@ -63,8 +52,13 @@ const LoginPage = () => {
         }        
     }, [userErrorLoading, userError]);
     
+    //события
     const handleLogin = async () => {
-        dispatch(signIn({ login: login , password: password }));
+        dispatch(signIn({ 
+            login: login , 
+            password: password,
+            remember: remember,
+        }));
         setUserErrorLoading(true);
     };
 
@@ -83,7 +77,7 @@ const LoginPage = () => {
             setNotification({ severity: 'error', message: 'Пожалуйста, заполните все обязательные поля' });
             return;
         }
-        
+        //
         setErrors({});
         setNotification({ severity: null, message: '' });
         handleLogin();
@@ -95,6 +89,10 @@ const LoginPage = () => {
 
     const handlePasswordChange = (event) => {
         setPassword(event.target.value);
+    };
+
+    const handleRememberChange = (event) => {
+        setRemember(event.target.checked);
     };
     //
     return (        
@@ -158,7 +156,13 @@ const LoginPage = () => {
                         helperText={errors.password}
                     />
                     <FormControlLabel
-                        control={<Checkbox value="remember" color="primary" />}
+                        control={
+                            <Checkbox 
+                                value="remember" 
+                                color="primary"
+                                checked={remember}
+                                onChange={handleRememberChange}
+                            />}
                         label="Запомнить"
                     />
                     {loading 

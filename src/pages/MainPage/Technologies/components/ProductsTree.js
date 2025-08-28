@@ -287,7 +287,7 @@ export default function ProductsTree() {
   );
 
   //вывод
-  if (loading) {
+  if (loading) { /* loadingTimer */
     return (
       <Box 
         sx={{ 

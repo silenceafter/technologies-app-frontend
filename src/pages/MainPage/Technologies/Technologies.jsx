@@ -399,8 +399,8 @@ function Technologies({ showLoading }) {
             <Typography component="span">Изделия</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px', color: 'black', marginLeft: 2, marginTop: 2, }}>
-            <Box sx={{ height: 'auto' }}>
-              {<ProductsTree />}
+            <Box sx={{ height: '100%', minHeight: '360px', display: 'flex', flexDirection: 'column', }}>
+              <ProductsTree />
             </Box>
           </AccordionDetails>          
         </Accordion>
