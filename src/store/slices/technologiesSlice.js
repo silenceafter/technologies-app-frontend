@@ -106,7 +106,6 @@ export const getSavedData = createAsyncThunk(
 
       //для пустого значения
       if (!externalCode.trim()) return rejectWithValue('Пустое значение поиска (реквизит drawing)');
-
       //приведем к нужному виду
       const processItem = (item) => ({
         ...item,

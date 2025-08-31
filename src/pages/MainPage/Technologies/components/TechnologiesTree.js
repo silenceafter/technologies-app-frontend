@@ -33,6 +33,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useAccessActions } from '../../../../hooks/useAccessActions';
 import { useSnackbar } from 'notistack';
 import WarningIcon from '@mui/icons-material/Warning';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const TechnologiesTree = () => {
   const dispatch = useDispatch();
@@ -445,6 +446,16 @@ const TechnologiesTree = () => {
         }}
       >
         <CircularProgress size={40} />
+      </Box>
+    );
+  }
+
+  //ошибка загрузки данных
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+        <ErrorIcon color='error' />
+        <Typography>{error}</Typography>
       </Box>
     );
   }

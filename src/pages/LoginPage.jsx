@@ -116,12 +116,12 @@ const LoginPage = () => {
                     Вход
                 </Typography>
                 {notification.severity && (
-                    <Alert severity={notification.severity} sx={{ width: '100%', mb: 2 }} onClose={() => setNotification({ severity: null, message: '' })}>
+                    <Alert severity={notification.severity} sx={{ width: '100%', mb: 2, mt: 2 }} onClose={() => setNotification({ severity: null, message: '' })}>
                         {notification.message}
                     </Alert>
                 )}
                 {userError && !notification.severity && (
-                    <Alert severity='error' sx={{ width: '100%', mb: 2 }}>
+                    <Alert severity='error' sx={{ width: '100%', mb: 2, mt: 2 }}>
                         {userError}
                     </Alert>
                 )}
