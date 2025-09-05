@@ -400,7 +400,7 @@ function Technologies({ showLoading }) {
           </AccordionSummary>
           <AccordionDetails sx={{ padding: 0, overflow: 'auto', maxHeight: '573px', minHeight: '100px', color: 'black', marginLeft: 2, marginTop: 2, }}>
             <Box sx={{ height: '100%', minHeight: '360px', display: 'flex', flexDirection: 'column', }}>
-              {/*<ProductsTree />*/}
+              {<ProductsTree />}
             </Box>
           </AccordionDetails>          
         </Accordion>

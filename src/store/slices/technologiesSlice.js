@@ -93,12 +93,13 @@ export const getSavedData = createAsyncThunk(
       const state = getState();
       const externalCode = payload.drawing.externalcode; //const externalCode = selectDrawingExternalCode(state);
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
+      const projectPath = process.env.REACT_APP_API_PROJECT_PATH;
       //
-      const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/GetSavedData.v2.php`, {
+      const response = await fetch(`${baseUrl}/${projectPath}/Ogt/ExecuteScripts/GetSavedData.v2.php`, {
         method: 'POST',
         body: JSON.stringify(payload),
         credentials: 'include'
-      }); /* `${baseUrl}/Ivc/Ogt/ExecuteScripts/GetSavedData.v2.php?code=${externalCode}` */
+      });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');
@@ -128,7 +129,8 @@ export const setData = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/CommitChanges.v0.php`, {
+      const projectPath = process.env.REACT_APP_API_PROJECT_PATH;
+      const response = await fetch(`${baseUrl}/${projectPath}/Ogt/ExecuteScripts/CommitChanges.v0.php`, {
         method: 'POST',
         body: JSON.stringify(payload),
         credentials: 'include'

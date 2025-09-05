@@ -19,15 +19,16 @@ export const getTechnologiesCreatedByUser = createAsyncThunk(
     try {
         const state = getState();
         const baseUrl = process.env.REACT_APP_API_BASE_URL;
+        const projectPath = process.env.REACT_APP_API_PROJECT_PATH;
         //
-        const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/GetDashboardData.v0.php`, {
+        const response = await fetch(`${baseUrl}/${projectPath}/Ogt/ExecuteScripts/GetDashboardData.v0.php`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: JSON.stringify(user),
           credentials: 'include'
-        }); /* http://192.168.15.72/Ivc/Ogt/ExecuteScripts/GetDashboardData.v0.php */
+        });
         //
         const data = await response.json();
         if (!response.ok) {

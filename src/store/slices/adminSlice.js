@@ -12,7 +12,8 @@ export const getAddedUsers = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
         const baseUrl = process.env.REACT_APP_API_BASE_URL;
-        const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/GetAddedUsers.v0.php`, {
+        const projectPath = process.env.REACT_APP_API_PROJECT_PATH;
+        const response = await fetch(`${baseUrl}/${projectPath}/Ogt/ExecuteScripts/GetAddedUsers.v0.php`, {
           method: 'GET',
           credentials: 'include'
         });

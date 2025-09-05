@@ -15,7 +15,8 @@ export const fetchData = createAsyncThunk(
   async ({ search, limit, page }, { rejectWithValue }) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      const response = await fetch(`${baseUrl}/ivc/ogt/executescripts/getjobs.v0.php?search=${search}&&limit=${limit}&page=${page}`); /* http://192.168.15.72/ivc/ogt/executescripts/getjobs.v0.php?search=${search}&&limit=${limit}&page=${page} */
+      const projectPath = process.env.REACT_APP_API_PROJECT_PATH;
+      const response = await fetch(`${baseUrl}/${projectPath}/ogt/executescripts/getjobs.v0.php?search=${search}&&limit=${limit}&page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Network response was not ok');

@@ -17,8 +17,9 @@ export const authenticate = createAsyncThunk(
     try {
         const state = getState();
         const baseUrl = process.env.REACT_APP_API_BASE_URL;
+        const projectPath = process.env.REACT_APP_API_PROJECT_PATH;
         //
-        const response = await fetch(`${baseUrl}/Ivc/Ogt/ExecuteScripts/GetUserData.v0.php`, {
+        const response = await fetch(`${baseUrl}/${projectPath}/Ogt/ExecuteScripts/GetUserData.v0.php`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -60,6 +61,7 @@ export const signIn = createAsyncThunk(
     try {
         const state = getState();
         const baseUrl = process.env.REACT_APP_API_BASE_URL;
+        const projectPath = process.env.REACT_APP_API_PROJECT_PATH;
 
         //параметры
         const formData = new URLSearchParams();
@@ -68,7 +70,7 @@ export const signIn = createAsyncThunk(
         formData.append('remember', remember);
 
         //запрос
-        const response = await fetch(`${baseUrl}/Ivc/Ogt/index.php`, {
+        const response = await fetch(`${baseUrl}/${projectPath}/Ogt/index.php`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -103,13 +105,14 @@ export const signOut = createAsyncThunk(
     try {
       //запрос
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      const response = await fetch(`${baseUrl}/Ivc/Ogt/index.php?action=signout`, {
+      const projectPath = process.env.REACT_APP_API_PROJECT_PATH;
+      const response = await fetch(`${baseUrl}/${projectPath}/Ogt/index.php?action=signout`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         credentials: 'include'
-      }); /* http://192.168.15.72/Ivc/Ogt/index.php?action=signout */
+      });
       //
       const data = await response.text();
       if (!response.ok) {
